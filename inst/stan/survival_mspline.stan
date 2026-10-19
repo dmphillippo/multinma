@@ -298,6 +298,8 @@ transformed data {
   cholesky_factor_corr[aux_reg_trt ? nt : 0] sigma_beta_L;
 
 #include /include/transformed_data_common.stan
+// Update totns (no intercepts for Cox)
+if(ns_agd_regression) totns -= ns_agd_regression;
 
   if (nX_aux) {
     if (ni_ipd) X_aux_ipd = X_aux[1:ni_ipd, ];
@@ -349,9 +351,6 @@ transformed data {
     }
   }
 
-  // Update totns (no intercepts for Cox)
-  if(no_agd_regression)
-    totns -= ns_agd_regression;
 
 }
 parameters {

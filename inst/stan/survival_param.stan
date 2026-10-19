@@ -563,6 +563,8 @@ transformed data {
   matrix[(aux_int ? nint_max : 1) * ni_agd_arm, nX_aux] X_aux_agd_arm;
 
 #include /include/transformed_data_common.stan
+// Update totns (no intercepts for Cox)
+if(ns_agd_regression && dist<=3) totns -= ns_agd_regression;
 
   if (nX_aux) {
     if (ni_ipd) X_aux_ipd = X_aux[1:ni_ipd];
@@ -577,7 +579,7 @@ transformed data {
   }
 
   // -- AgD model (regression coefficients) --
-  vector [(dist<=3 && no_agd_regression) ? ni_agd_regression:0] eta_red;
+  vector [no_agd_regression ? ni_agd_regression:0] eta_red;
   array[ no_agd_regression ? ns_agd_regression : 0] matrix[agd_regression_max_ncoef_inc, agd_regression_max_ncoef_omt] agd_regression_OVB_mat_omt; // (XI' XI)^{-1}XI' XO
   array[ no_agd_regression ? ns_agd_regression : 0] matrix[agd_regression_max_ncoef_inc, agd_regression_max_nrow] agd_regression_OVB_mat_hat; // (XI' XI)^{-1} XI'
 
@@ -618,9 +620,6 @@ transformed data {
      }
    }
 
-  // Update totns (no intercepts for Cox)
-  if(no_agd_regression && dist<=3)
-    totns -= ns_agd_regression;
 
 }
 parameters {
