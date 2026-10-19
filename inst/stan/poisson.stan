@@ -183,7 +183,8 @@ transformed parameters {
 
           if (link == 1){ // log link
 
-            mu_ful[(c_x+1):(c_x+agd_regression_nx[i])] =  exp(X_agd_regression_int[ (c_x+1):(c_x+agd_regression_nx[i]),] * allbeta) ;
+            mu_ful[(c_x+1):(c_x+agd_regression_nx[i])] =
+              exp(X_agd_regression_int[ (c_x+1):(c_x+agd_regression_nx[i]),] * allbeta) ;
 
             mu_err[(c_x+1):(c_x+agd_regression_nx[i])] =
               mu_red[ (c_x+1):(c_x+agd_regression_nx[i])] -

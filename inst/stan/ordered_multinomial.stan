@@ -362,7 +362,8 @@ transformed parameters {
 
           if (link == 1){ // logit link
 
-            mu_ful[(c_x+1):(c_x+agd_regression_nx[i])] =  1 - inv_logit(X_agd_regression_int[ (c_x+1):(c_x+agd_regression_nx[i]),] * allbeta) ;
+            mu_ful[(c_x+1):(c_x+agd_regression_nx[i])] =
+              1 - inv_logit(X_agd_regression_int[ (c_x+1):(c_x+agd_regression_nx[i]),] * allbeta) ;
 
             mu_err[(c_x+1):(c_x+agd_regression_nx[i])] =
               mu_red[ (c_x+1):(c_x+agd_regression_nx[i])] -
@@ -383,7 +384,8 @@ transformed parameters {
 
           }else if (link == 2){ // probit link
 
-            mu_ful[(c_x+1):(c_x+agd_regression_nx[i])] =  1 - Phi(X_agd_regression_int[ (c_x+1):(c_x+agd_regression_nx[i]),] * allbeta) ;
+            mu_ful[(c_x+1):(c_x+agd_regression_nx[i])] =
+              1 - Phi(X_agd_regression_int[ (c_x+1):(c_x+agd_regression_nx[i]),] * allbeta) ;
 
             mu_err[(c_x+1):(c_x+agd_regression_nx[i])] =
               mu_red[ (c_x+1):(c_x+agd_regression_nx[i])] -
@@ -404,7 +406,8 @@ transformed parameters {
 
           }else if (link == 3){ // cloglog link
 
-            mu_ful[(c_x+1):(c_x+agd_regression_nx[i])] =  1 - inv_cloglog(X_agd_regression_int[ (c_x+1):(c_x+agd_regression_nx[i]),] * allbeta) ;
+            mu_ful[(c_x+1):(c_x+agd_regression_nx[i])] =
+              1 - inv_cloglog(X_agd_regression_int[ (c_x+1):(c_x+agd_regression_nx[i]),] * allbeta) ;
 
             mu_err[(c_x+1):(c_x+agd_regression_nx[i])] =
               mu_red[ (c_x+1):(c_x+agd_regression_nx[i])] -
