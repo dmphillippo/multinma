@@ -67,8 +67,8 @@ fitted_agd_regression = eta_agd_regression;
     matrix[agd_regression_ncoef[i], agd_regression_ncoef[i]] sigma_chol = block(agd_regression_cov[i], 1, 1, agd_regression_ncoef[i], agd_regression_ncoef[i]);
     matrix[agd_regression_ncoef[i], agd_regression_ncoef[i]] sigma_inv = chol2inv(sigma_chol);
 
-    log_lik[ni_ipd + ni_agd_arm + ni_agd_contrast + i] = multi_normal_cholesky_lpdf(est | eta, sigma_chol);
-    resdev[ni_ipd + ni_agd_arm + ni_agd_contrast + i] = quad_form(sigma_inv, est - eta);
+    log_lik[ni_ipd + ni_agd_arm + ns_agd_contrast + i] = multi_normal_cholesky_lpdf(est | eta, sigma_chol);
+    resdev[ni_ipd + ni_agd_arm + ns_agd_contrast + i] = quad_form(sigma_inv, est - eta);
     c += agd_regression_ncoef[i];
   }
 }
