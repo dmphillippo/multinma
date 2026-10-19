@@ -1387,7 +1387,7 @@ set_agd_regression <- function(data,
   if (length(cmat_dim_err)) abort(glue::glue("Dimensions of {ctype} matrix `{substr(ctype, 1, 3)}` do not match the number of coefficients in `data` for stud{if (length(cmat_dim_err) > 1) 'ies' else 'y'} ", glue::glue_collapse(glue::double_quote(cmat_dim_err), sep = ", ", width = 30, last = " and ")))
   if (length(cmat_cor_err)) abort(glue::glue("`cor` is not a proper correlation matrix for stud{if (length(cmat_cor_err) > 1) 'ies' else 'y'} ", glue::glue_collapse(glue::double_quote(cmat_cor_err), sep = ", ", width = 30, last = " and ")))
   if (length(cmat_pd_err)) abort(glue::glue("Covariance matrix {if (ctype=='covariance') '`cov`' else 'constructed from `cor` and `se`'} is not symmetric positive definite for stud{if (length(cmat_pd_err) > 1) 'ies' else 'y'} ", glue::glue_collapse(glue::double_quote(cmat_pd_err), sep = ", ", width = 30, last = " and ")))
-  if (length(cmat_int_msg)) message(glue::glue("Neither correlation matrix `cor` or covariance matrix `cov` specified for stud{if (length(cmat_int_msg) > 1) 'ies' else 'y'} ", glue::glue_collapse(glue::double_quote(cmat_int_msg), sep = ", ", width = 30, last = " and "), '.\nUse `add_integration()` to reconstruct these (available for supported likelihood–link combinations).'))
+  if (length(cmat_int_msg)) message(glue::glue("Neither correlation matrix `cor` or covariance matrix `cov` specified for stud{if (length(cmat_int_msg) > 1) 'ies' else 'y'} ", glue::glue_collapse(glue::double_quote(cmat_int_msg), sep = ", ", width = 30, last = " and "), '.\nUse `add_integration()` to reconstruct these (available for supported likelihood-link combinations).'))
 
   # Store covariance matrix in compact lower triangular form
   d$.cov <- NA_real_

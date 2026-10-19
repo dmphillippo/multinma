@@ -564,9 +564,9 @@ test_that("set_agd_regression - standard errors and covariance/correlation matri
   err_B <- 'Specify regression coefficient standard errors `se` and correlation matrix `cor`, or covariance matrix `cov` for study "B"\\.\nIf only standard errors `se` are provided for certain models, the covariances may be reconstructed using integration points\\.'
   err_AB<- 'Specify regression coefficient standard errors `se` and correlation matrix `cor`, or covariance matrix `cov` for studies "A" and "B"\\.\nIf only standard errors `se` are provided for certain models, the covariances may be reconstructed using integration points\\.'
 
-  msg_A <- 'Neither correlation matrix `cor` or covariance matrix `cov` specified for study "A"\\.\nUse `add_integration\\(\\)` to reconstruct these \\(available for supported likelihood–link combinations\\)\\.'
-  msg_B <- 'Neither correlation matrix `cor` or covariance matrix `cov` specified for study "B"\\.\nUse `add_integration\\(\\)` to reconstruct these \\(available for supported likelihood–link combinations\\)\\.'
-  msg_AB<- 'Neither correlation matrix `cor` or covariance matrix `cov` specified for studies "A" and "B"\\.\nUse `add_integration\\(\\)` to reconstruct these \\(available for supported likelihood–link combinations\\)\\.'
+  msg_A <- 'Neither correlation matrix `cor` or covariance matrix `cov` specified for study "A"\\.\nUse `add_integration\\(\\)` to reconstruct these \\(available for supported likelihood-link combinations\\)\\.'
+  msg_B <- 'Neither correlation matrix `cor` or covariance matrix `cov` specified for study "B"\\.\nUse `add_integration\\(\\)` to reconstruct these \\(available for supported likelihood-link combinations\\)\\.'
+  msg_AB<- 'Neither correlation matrix `cor` or covariance matrix `cov` specified for studies "A" and "B"\\.\nUse `add_integration\\(\\)` to reconstruct these \\(available for supported likelihood-link combinations\\)\\.'
   # none
   expect_error(     set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x                                                ), err_AB)
   # se
@@ -1119,10 +1119,9 @@ test_that("set_agd_regression - reconstructing Variance-Covariance matrix and fi
   # Simulate data
   n <- 2*1000
   Sigma <- matrix(c(1,0.5,0.5,1),2,2)
-  X <- MASS::mvrnorm(n, mu = c(0,0), Sigma = Sigma)
   dat <- tibble::tibble(
-    X1 = X[,1],
-    X2 = X[,2],
+    X1 = rnorm(n),
+    X2 = 0.5 * X1 + sqrt(1 - 0.5^2) * rnorm(n),
     trt = sample(c('A','B'),n, replace = T),
     eta = drop(cbind(1, factor(trt, levels= c('A','B')), X1, X2) %*% c(-2,0.5,0.5,0.5))
   )
@@ -1554,10 +1553,9 @@ test_that("set_agd_regression - fitted nma() quntittes - AgD-reg Only", {
 
   n <- 2*1000
   Sigma <- matrix(c(1,0.5,0.5,1),2,2)
-  X <- MASS::mvrnorm(n, mu = c(0,0), Sigma = Sigma)
   dat <- tibble::tibble(
-    X1 = X[,1],
-    X2 = X[,2],
+    X1 = rnorm(n),
+    X2 = 0.5 * X1 + sqrt(1 - 0.5^2) * rnorm(n),
     trt = sample(c('A','B'),n, replace = T),
     eta = drop(cbind(1, factor(trt, levels= c('A','B')), X1, X2) %*% c(-2,0.5,0.5,0.5))
   )
@@ -1987,10 +1985,9 @@ test_that("set_agd_regression - fitted nma() quntittes - AgD-reg & IPD network",
 
   n <- 3*1000
   Sigma <- matrix(c(1,0.5,0.5,1),2,2)
-  X <- MASS::mvrnorm(n, mu = c(0,0), Sigma = Sigma)
   dat <- tibble::tibble(
-    X1 = X[,1],
-    X2 = X[,2],
+    X1 = rnorm(n),
+    X2 = 0.5 * X1 + sqrt(1 - 0.5^2) * rnorm(n),
     trt = sample(c('A','B'),n, replace = T),
     eta = drop(cbind(1, factor(trt, levels= c('A','B')), X1, X2) %*% c(-2,0.5,0.5,0.5))
   )
