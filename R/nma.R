@@ -569,6 +569,16 @@ nma <- function(network,
   likelihood <- check_likelihood(likelihood, network$outcome)
   link <- check_link(link, likelihood)
 
+  # When only AgD-Reg data are available, update the likelihood to use the appropriate Stan file.
+  # To skip unnecessary checks and auxiliary parameter/data requirements.
+  if ( !has_ipd(network) && !has_agd_arm(network) && !has_agd_contrast(network) && has_agd_regression(network) ){
+    if (likelihood %in% c('exponential', 'weibull', 'gompertz','mspline', 'pexp')){
+      likelihood <- 'exponential'
+    } else if (likelihood %in% c("exponential-aft","weibull-aft", "lognormal", "loglogistic", "gamma", "gengamma")){
+      likelihood <- 'exponential-aft'
+    }
+  }
+
   # When are priors on auxiliary parameters required?
   has_aux <- (likelihood == "normal" && has_ipd(network)) ||
               likelihood %in% c("ordered", "weibull", "gompertz",
