@@ -110,7 +110,7 @@ if (ni_agd_contrast) {
 
     // Add class effects contribution
     if (class_effects) {
-      for (i in 1:ni_agd_arm){
+      for (i in 1:ni_agd_contrast){
         if (agd_contrast_trt[i] > 1 && which_CE[agd_contrast_trt[i] - 1]) {
           eta_agd_contrast_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] += f_class[which_fclass[agd_contrast_trt[i] - 1]];
         }
