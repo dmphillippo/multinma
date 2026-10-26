@@ -64,6 +64,7 @@
 <li>Feature: Added <code>debug</code> option to <code><a href="../reference/nma.html">nma()</a></code>. When <code>TRUE</code>, the model will not be fitted and instead a list of input data to Stan is returned.</li>
 <li>Improvement: <code><a href="../reference/relative_effects.html">relative_effects()</a></code> now works when <code>newdata</code> contains integration points. Furthermore, <code><a href="../reference/relative_effects.html">relative_effects()</a></code> will now ask for integration points to be provided for models that involve non-linear covariate terms, so that these can be averaged over correctly.</li>
 <li>Fix: Error in <code><a href="../reference/dic.html">dic()</a></code> for models with IPD and a Normal likelihood, caused by dplyr deprecation.</li>
+<li>Fix: Indexing error in class effects models with contrast data and integration points, thanks to <a href="https://github.com/dmcalli2" class="external-link">@dmcalli2</a>.</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.9.1" id="multinma-091">multinma 0.9.1<a class="anchor" aria-label="anchor" href="#multinma-091"></a></h2><p class="text-muted">CRAN release: 2026-04-16</p>

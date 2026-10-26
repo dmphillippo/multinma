@@ -24,6 +24,9 @@
   [`dic()`](https://dmphillippo.github.io/multinma/dev/reference/dic.md)
   for models with IPD and a Normal likelihood, caused by dplyr
   deprecation.
+- Fix: Indexing error in class effects models with contrast data and
+  integration points, thanks to
+  [@dmcalli2](https://github.com/dmcalli2).
 
 ## multinma 0.9.1
 
