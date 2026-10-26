@@ -5,15 +5,18 @@ test_that("set_* produces empty nma_data objects", {
   empty_nma_data <- structure(
     list(agd_arm = NULL,
          agd_contrast = NULL,
+         agd_regression = NULL,
          ipd = NULL,
          treatments = NULL,
          classes = NULL,
-         studies = NULL), class = "nma_data")
+         studies = NULL,
+         outcome = NULL), class = "nma_data")
 
   expect_equal(set_ipd(smoking[0, ], "studyn", "trtc"), empty_nma_data)
   expect_equal(set_agd_arm(smoking[0, ], "studyn", "trtc"), empty_nma_data)
   expect_equal(set_agd_contrast(smoking[0, ], "studyn", "trtc"), empty_nma_data)
   expect_equal(set_agd_surv(smoking[0, ], "studyn", "trtc"), empty_nma_data)
+  expect_equal(set_agd_regression(smoking[0, ], "studyn", "trtc"), empty_nma_data)
 })
 
 test_that("set_* error if data does not inherit data.frame", {
@@ -24,6 +27,7 @@ test_that("set_* error if data does not inherit data.frame", {
   expect_error(set_agd_arm(vec), msg)
   expect_error(set_agd_contrast(vec), msg)
   expect_error(set_agd_surv(vec), msg)
+  expect_error(set_agd_regression(vec), msg)
 })
 
 test_that("set_* error if study not given, missing values, or not regular 1D column", {
@@ -31,6 +35,7 @@ test_that("set_* error if study not given, missing values, or not regular 1D col
   expect_error(set_agd_arm(smoking), "Specify `study`")
   expect_error(set_agd_contrast(smoking), "Specify `study`")
   expect_error(set_agd_surv(smoking), "Specify `study`")
+  expect_error(set_agd_regression(smoking), "Specify `study`")
 
   smk_miss <- smoking
   smk_miss[1, "studyn"] <- NA
@@ -38,6 +43,7 @@ test_that("set_* error if study not given, missing values, or not regular 1D col
   expect_error(set_agd_arm(smk_miss, "studyn", "trtc"), "cannot contain missing values")
   expect_error(set_agd_contrast(smk_miss, "studyn", "trtc"), "cannot contain missing values")
   expect_error(set_agd_surv(smk_miss, "studyn", "trtc"), "cannot contain missing values")
+  expect_error(set_agd_regression(smk_miss, "studyn", "trtc"), "cannot contain missing values")
 
   expect_error(set_ipd(smoking, cbind(studyn, studyn)), "must be a regular column")
   expect_error(set_ipd(smoking, list(studyn)), "must be a regular column")
@@ -47,6 +53,8 @@ test_that("set_* error if study not given, missing values, or not regular 1D col
   expect_error(set_agd_contrast(smoking, list(studyn)), "must be a regular column")
   expect_error(set_agd_surv(smoking, cbind(studyn, studyn)), "must be a regular column")
   expect_error(set_agd_surv(smoking, list(studyn)), "must be a regular column")
+  expect_error(set_agd_regression(smoking, cbind(studyn, studyn)), "must be a regular column")
+  expect_error(set_agd_regression(smoking, list(studyn)), "must be a regular column")
 })
 
 test_that("set_* error if single-arm studies included", {
@@ -57,9 +65,15 @@ test_that("set_* error if single-arm studies included", {
   expect_error(set_agd_arm(s, study, trt, r = r, n = n), paste0(m, '.+studies "a" and "c"'))
   expect_error(set_agd_contrast(s, study, trt, y = r, se = n), paste0(m, '.+studies "a" and "c"'))
 
-  # Allowed with message for survival outcomes
+  # Allowed with message for survival outcomes and regression coefficients
   expect_message(set_ipd(s, study, trt, Surv = Surv(time, status)), 'Single-arm studies present in the network: "a", "b" and "c"')
   expect_message(set_agd_surv(s, study, trt, Surv = Surv(time, status)), 'Single-arm studies present in the network: "a", "b" and "c"')
+
+  s2 <- tibble(study = c("a", "a", "b", "b", "b", "c", "c"), trt = c(rep("A", 5), rep("B", 2)), est = c(NA, 1, NA, 1, 1, NA, 1), x = 0)
+  expect_message(set_agd_regression(s2, study, trt, estimate = est,
+                                    regression = ~x*.trt,
+                                    cov = list(a = diag(1), b = diag(2), c = diag(1))),
+                 'Single-arm studies present in the network: "a", "b" and "c"')
 })
 
 test_that("set_* error if trt not given, missing values, or not regular 1D column", {
@@ -67,6 +81,7 @@ test_that("set_* error if trt not given, missing values, or not regular 1D colum
   expect_error(set_agd_arm(smoking, "studyn"), "Specify `trt`")
   expect_error(set_agd_contrast(smoking, "studyn"), "Specify `trt`")
   expect_error(set_agd_surv(smoking, "studyn"), "Specify `trt`")
+  expect_error(set_agd_regression(smoking, "studyn"), "Specify `trt`")
 
   smk_miss <- smoking
   smk_miss[1, "trtc"] <- NA
@@ -83,6 +98,22 @@ test_that("set_* error if trt not given, missing values, or not regular 1D colum
   expect_error(set_agd_contrast(smoking, studyn, list(trtc)), "must be a regular column")
   expect_error(set_agd_surv(smoking, studyn, cbind(trtc, trtc)), "must be a regular column")
   expect_error(set_agd_surv(smoking, studyn, list(trtc)), "must be a regular column")
+  expect_error(set_agd_regression(smoking, studyn, cbind(trtc, trtc)), "must be a regular column")
+  expect_error(set_agd_regression(smoking, studyn, list(trtc)), "must be a regular column")
+})
+
+test_that("set_agd_regression reference row checks", {
+  s <- tibble(study = c("a", "a", "b", "b", "b", "c", "c"), trt = c(rep("A", 5), rep("B", 2)), est = NA, x = 0)
+  expect_error(set_agd_regression(s, study, trt, estimate = est,
+                                  regression = ~x*.trt,
+                                  cov = list(a = diag(1), b = diag(2), c = diag(1))),
+               'Multiple reference rows \\(where estimate = NA\\) for studies "a", "b" and "c"')
+
+  s$est <- 1
+  expect_error(set_agd_regression(s, study, trt, estimate = est,
+                                  regression = ~x*.trt,
+                                  cov = list(a = diag(1), b = diag(2), c = diag(1))),
+               'No reference row \\(where estimate = NA\\) for studies "a", "b" and "c"')
 })
 
 # Dummy data
@@ -405,9 +436,9 @@ test_that("set_agd_surv - covariate checks work", {
 
   expect_equivalent(
     dplyr::select(set_agd_surv(ndmm_agd, studyf, trtf, Surv = Surv(eventtime, status),
-                                  covariates = ndmm_agd_covs)$agd_arm,
-                     study, trt, sample_size = .sample_size,
-                     age_min:male) %>%
+                               covariates = ndmm_agd_covs)$agd_arm,
+                  study, trt, sample_size = .sample_size,
+                  age_min:male) %>%
       dplyr::arrange(study, trt),
     dplyr::select(ndmm_agd_covs, -studyf, -trtf))
 
@@ -495,6 +526,1928 @@ test_that("set_agd_contrast - positive definite check", {
                'not positive definite for studies "b" and "c"')
 })
 
+test_that("set_agd_regression - standard errors and covariance/correlation matrices", {
+  s <- tibble(study = c("A", "A", "A", "B", "B", "B"),
+              trt = c("a", "a", "b", "b", "b", "c"),
+              est = c(NA, 1, 2, NA, 1, 2),
+              se = 1, se2 = -1, se3 = NA,
+              seA = c(NA,1,1,NA,NA,NA),
+              seB = c(NA,NA,NA,NA,1,1),
+              x = 1)
+
+  cor_list <- list(A = diag(2), B = diag(2))
+  cov_list <- list(A = diag(2), B = diag(2))
+
+  # --- input types ---
+  m <- 'Standard error `se` must be a regular column \\(not a list or matrix column\\)'
+  expect_error(   set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = list(s$se)       , cov = cov_list), m)
+  expect_error(   set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = matrix(s$se)     , cov = cov_list), m)
+  expect_no_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = data.frame(s$se) , cov = cov_list))
+  expect_no_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = NULL             , cov = cov_list))
+
+  m <- '`cor` must be a named list of correlation matrices.'
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se, cor = NA               ), m)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se, cor = NULL             ), m)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se, cor = 'zzz'            ), m)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se, cor = 1:3              ), m)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se, cor = data.frame(x=1:2)), m)
+
+  m <- '`cov` must be a named list of covariance matrices.'
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, cov = NA               ), m)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, cov = NULL             ), m)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, cov = 'zzz'            ), m)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, cov = 1:3              ), m)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, cov = data.frame(x=1:2)), m)
+
+  # --- se/cor/cov different input combinations ---
+  err_A <- 'Specify regression coefficient standard errors `se` and correlation matrix `cor`, or covariance matrix `cov` for study "A"\\.\nIf only standard errors `se` are provided for certain models, the covariances may be reconstructed using integration points\\.'
+  err_B <- 'Specify regression coefficient standard errors `se` and correlation matrix `cor`, or covariance matrix `cov` for study "B"\\.\nIf only standard errors `se` are provided for certain models, the covariances may be reconstructed using integration points\\.'
+  err_AB<- 'Specify regression coefficient standard errors `se` and correlation matrix `cor`, or covariance matrix `cov` for studies "A" and "B"\\.\nIf only standard errors `se` are provided for certain models, the covariances may be reconstructed using integration points\\.'
+
+  msg_A <- 'Neither correlation matrix `cor` or covariance matrix `cov` specified for study "A"\\.\nUse `add_integration\\(\\)` to reconstruct these \\(available for supported likelihood-link combinations\\)\\.'
+  msg_B <- 'Neither correlation matrix `cor` or covariance matrix `cov` specified for study "B"\\.\nUse `add_integration\\(\\)` to reconstruct these \\(available for supported likelihood-link combinations\\)\\.'
+  msg_AB<- 'Neither correlation matrix `cor` or covariance matrix `cov` specified for studies "A" and "B"\\.\nUse `add_integration\\(\\)` to reconstruct these \\(available for supported likelihood-link combinations\\)\\.'
+  # none
+  expect_error(     set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x                                                ), err_AB)
+  # se
+  expect_message(   set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se                                       ), msg_AB)
+  expect_error(     set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = seA                                      ), err_B)
+  expect_error(     set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = seB                                      ), err_A)
+  # cor
+  expect_error(     set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x          , cor = cor_list                      ), err_AB)
+  expect_error(     set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x          , cor = cor_list[1]                   ), err_AB)
+  expect_error(     set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x          , cor = cor_list[2]                   ), err_AB)
+  # cov
+  expect_no_error(  set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x                             , cov = cov_list   ))
+  expect_error(     set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x                             , cov = cov_list[1]), err_B)
+  expect_error(     set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x                             , cov = cov_list[2]), err_A)
+  # se & cor
+  expect_no_error(  set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se , cor = cor_list                      ))
+  expect_message(   set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se , cor = cor_list[2]                   ), msg_A)
+  expect_message(   set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se , cor = cor_list[1]                   ), msg_B)
+  expect_error(     set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = seA, cor = cor_list[1]                   ), err_B)
+  expect_error(     set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = seA, cor = cor_list[2]                   ), err_B)
+  # se & cov
+  expect_no_error(  set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se ,                  , cov = cov_list   ))
+  expect_message(   set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se ,                  , cov = cov_list[1]), msg_B )
+  expect_message(   set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se ,                  , cov = cov_list[2]), msg_A )
+  expect_error(     set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = seA,                  , cov = cov_list[1]), err_B )
+  expect_message(   set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = seA,                  , cov = cov_list[2]), msg_A )
+  # cor & cov
+  expect_no_error(  set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x          , cor = cor_list   , cov = cov_list   ))
+  expect_error(     set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x          , cor = cor_list   , cov = cov_list[1]), err_B)
+  expect_error(     set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x          , cor = cor_list   , cov = cov_list[2]), err_A)
+  expect_no_error(  set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x          , cor = cor_list[1], cov = cov_list   ))
+  expect_no_error(  set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x          , cor = cor_list[2], cov = cov_list   ))
+  expect_error(     set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x          , cor = cor_list[1], cov = cov_list[1]), err_B)
+  expect_error(     set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x          , cor = cor_list[1], cov = cov_list[2]), err_A)
+  expect_error(     set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x          , cor = cor_list[2], cov = cov_list[1]), err_B)
+  expect_error(     set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x          , cor = cor_list[2], cov = cov_list[2]), err_A)
+  # se & cor & cov
+  expect_no_error(  set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se , cor = cor_list   , cov = cov_list   ))
+  expect_no_error(  set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se , cor = cor_list   , cov = cov_list[1]))
+  expect_no_error(  set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se , cor = cor_list   , cov = cov_list[2]))
+  expect_no_error(  set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se , cor = cor_list[1], cov = cov_list   ))
+  expect_message(   set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se , cor = cor_list[1], cov = cov_list[1]), msg_B)
+  expect_no_error(  set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se , cor = cor_list[1], cov = cov_list[2]))
+  expect_no_error(  set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se , cor = cor_list[2], cov = cov_list   ))
+  expect_no_error(  set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se , cor = cor_list[2], cov = cov_list[1]))
+  expect_message(   set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se , cor = cor_list[2], cov = cov_list[2]), msg_A)
+  expect_no_error(  set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = seA, cor = cor_list   , cov = cov_list   ))
+  expect_error(     set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = seA, cor = cor_list   , cov = cov_list[1]), err_B)
+  expect_no_error(  set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = seA, cor = cor_list   , cov = cov_list[2]))
+  expect_no_error(  set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = seA, cor = cor_list[1], cov = cov_list   ))
+  expect_error(     set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = seA, cor = cor_list[1], cov = cov_list[1]), err_B)
+  expect_no_error(  set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = seA, cor = cor_list[1], cov = cov_list[2]))
+  expect_no_error(  set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = seA, cor = cor_list[2], cov = cov_list   ))
+  expect_error(     set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = seA, cor = cor_list[2], cov = cov_list[1]), err_B)
+  expect_message(   set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = seA, cor = cor_list[2], cov = cov_list[2]), msg_A)
+
+  # --- .cov_known different input combinations ---
+  m_TT <- c(FALSE, TRUE , TRUE , FALSE, TRUE , TRUE  )
+  m_TF <- c(FALSE, TRUE , TRUE , FALSE, FALSE, FALSE )
+  m_FT <- c(FALSE, FALSE, FALSE, FALSE, TRUE , TRUE  )
+  m_FF <- c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE )
+  # se
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se                                       )$agd_regression$.cov_known , m_FF)
+  # cov
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x                             , cov = cov_list   )$agd_regression$.cov_known , m_TT)
+  # se & cor
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se , cor = cor_list                      )$agd_regression$.cov_known , m_TT)
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se , cor = cor_list[1]                   )$agd_regression$.cov_known , m_TF)
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se , cor = cor_list[2]                   )$agd_regression$.cov_known , m_FT)
+  # se & cov
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se                    , cov = cov_list   )$agd_regression$.cov_known , m_TT)
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se                    , cov = cov_list[1])$agd_regression$.cov_known , m_TF)
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se                    , cov = cov_list[2])$agd_regression$.cov_known , m_FT)
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = seA                   , cov = cov_list[2])$agd_regression$.cov_known , m_FT)
+  # cor & cov
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x          , cor = cor_list   , cov = cov_list   )$agd_regression$.cov_known , m_TT)
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x          , cor = cor_list[1], cov = cov_list   )$agd_regression$.cov_known , m_TT)
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x          , cor = cor_list[2], cov = cov_list   )$agd_regression$.cov_known , m_TT)
+  # se & cor & cov
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se , cor = cor_list   , cov = cov_list   )$agd_regression$.cov_known , m_TT)
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se , cor = cor_list   , cov = cov_list[1])$agd_regression$.cov_known , m_TT)
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se , cor = cor_list   , cov = cov_list[2])$agd_regression$.cov_known , m_TT)
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se , cor = cor_list[1], cov = cov_list   )$agd_regression$.cov_known , m_TT)
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se , cor = cor_list[1], cov = cov_list[1])$agd_regression$.cov_known , m_TF)
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se , cor = cor_list[1], cov = cov_list[2])$agd_regression$.cov_known , m_TT)
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se , cor = cor_list[2], cov = cov_list   )$agd_regression$.cov_known , m_TT)
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se , cor = cor_list[2], cov = cov_list[1])$agd_regression$.cov_known , m_TT)
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = se , cor = cor_list[2], cov = cov_list[2])$agd_regression$.cov_known , m_FT)
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = seA, cor = cor_list   , cov = cov_list   )$agd_regression$.cov_known , m_TT)
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = seA, cor = cor_list   , cov = cov_list[2])$agd_regression$.cov_known , m_TT)
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = seA, cor = cor_list[1], cov = cov_list   )$agd_regression$.cov_known , m_TT)
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = seA, cor = cor_list[1], cov = cov_list[2])$agd_regression$.cov_known , m_TT)
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = seA, cor = cor_list[2], cov = cov_list   )$agd_regression$.cov_known , m_TT)
+  expect_equal(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, se = seA, cor = cor_list[2], cov = cov_list[2])$agd_regression$.cov_known , m_FT)
+
+  # --- provided se must be >0 ---
+  err_A <- "Standard error `se` must be numeric and greater than zero for study A\\."
+  err_B <- "Standard error `se` must be numeric and greater than zero for study B\\."
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = -1*se , cor = cor_list, regression = ~x*.trt), err_A)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = -1*seA, cor = cor_list, regression = ~x*.trt), err_A)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = -1*seB, cor = cor_list, regression = ~x*.trt), err_B)
+
+  # --- cor/cov named list  ---
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = list(diag(2), diag(2)), regression = ~x*.trt),
+               '`cor` must be a named list of correlation matrices.')
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cov = list(diag(2), diag(2)), regression = ~x*.trt),
+               '`cov` must be a named list of covariance matrices.')
+
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = list(A = diag(2), D = diag(2)), regression = ~x*.trt),
+               '`cor` list names must match study names in `data`\\.\nMismatched for study "D"\\.')
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = list(C = diag(2), D = diag(2)), regression = ~x*.trt),
+               '`cor` list names must match study names in `data`\\.\nMismatched for studies "C" and "D"')
+
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, cov = list(A = diag(2), D = diag(2)), regression = ~x*.trt),
+               '`cov` list names must match study names in `data`\\.\nMismatched for study "D"\\.')
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, cov = list(C = diag(2), D = diag(2)), regression = ~x*.trt),
+               '`cov` list names must match study names in `data`\\.\nMismatched for studies "C" and "D"\\.')
+
+  # --- cor values ---
+  expect_error(   set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = list(A = matrix(c('1','-0.5','-.5','1'), nrow=2), B = matrix(c(1,-0.5,-.5, 1), nrow=2)), regression = ~x*.trt),
+                  '`cor` must be a named list of correlation matrices\\.')
+  expect_error(   set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = list(A = matrix(c(1,-0.5,-.5,1), nrow=2), B = matrix(c(1,"-0.5",-.5, 1), nrow=2)), regression = ~x*.trt),
+                  '`cor` must be a named list of correlation matrices\\.')
+
+  err_A <- 'Correlation matrix `cor` must be numeric for study A\\.'
+  err_B <- 'Correlation matrix `cor` must be numeric for study B\\.'
+  expect_no_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = list(A = matrix(c(1,-0.5,-.5, 1), nrow=2), B = matrix(c(1,-0.5,-.5, 1), nrow=2)), regression = ~x*.trt))
+  expect_error(   set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = list(A = matrix(c(1, Inf,-.5, 1), nrow=2), B = matrix(c(1,  NA,-.5, 1), nrow=2)), regression = ~x*.trt), err_A )
+  expect_error(   set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = list(A = matrix(c(1, NA ,-.5, 1), nrow=2), B = matrix(c(1,-0.5,-.5, 1), nrow=2)), regression = ~x*.trt), err_A )
+  expect_error(   set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = list(A = matrix(c(1, NaN,-.5, 1), nrow=2), B = matrix(c(1,-0.5,-.5, 1), nrow=2)), regression = ~x*.trt), err_A )
+  expect_error(   set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = list(A = matrix(c(1, Inf,-.5, 1), nrow=2), B = matrix(c(1,-0.5,-.5, 1), nrow=2)), regression = ~x*.trt), err_A )
+  expect_error(   set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = list(A = matrix(c(1,-0.5,-.5, 1), nrow=2), B = matrix(c(1, 0.5, NA, 1), nrow=2)), regression = ~x*.trt), err_B )
+  expect_error(   set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = list(A = matrix(c(1,-0.5,-.5, 1), nrow=2), B = matrix(c(1, 0.5,NaN, 1), nrow=2)), regression = ~x*.trt), err_B )
+  expect_error(   set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = list(A = matrix(c(1,-0.5,-.5, 1), nrow=2), B = matrix(c(1, 0.5,Inf, 1), nrow=2)), regression = ~x*.trt), err_B )
+
+  # --- cov values ---
+  expect_error(   set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cov = list(A = matrix(c('1','-0.5','-.5','1'), nrow=2), B = matrix(c(1,-0.5,-.5, 1), nrow=2)), regression = ~x*.trt),
+                  '`cov` must be a named list of covariance matrices\\.')
+  expect_error(   set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cov = list(A = matrix(c(1,-0.5,-.5,1), nrow=2), B = matrix(c(1,"-0.5",-.5, 1), nrow=2)), regression = ~x*.trt),
+                  '`cov` must be a named list of covariance matrices\\.')
+
+  err_A <- 'Covariance matrix `cov` must be numeric for study A\\.'
+  err_B <- 'Covariance matrix `cov` must be numeric for study B\\.'
+  expect_no_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cov = list(A = matrix(c(1,-0.5,-.5, 1), nrow=2), B = matrix(c(1,-0.5,-.5, 1), nrow=2)), regression = ~x*.trt))
+  expect_error(   set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cov = list(A = matrix(c(1, Inf,-.5, 1), nrow=2), B = matrix(c(1,  NA,-.5, 1), nrow=2)), regression = ~x*.trt), err_A )
+  expect_error(   set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cov = list(A = matrix(c(1, NA ,-.5, 1), nrow=2), B = matrix(c(1,-0.5,-.5, 1), nrow=2)), regression = ~x*.trt), err_A )
+  expect_error(   set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cov = list(A = matrix(c(1, NaN,-.5, 1), nrow=2), B = matrix(c(1,-0.5,-.5, 1), nrow=2)), regression = ~x*.trt), err_A )
+  expect_error(   set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cov = list(A = matrix(c(1, Inf,-.5, 1), nrow=2), B = matrix(c(1,-0.5,-.5, 1), nrow=2)), regression = ~x*.trt), err_A )
+  expect_error(   set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cov = list(A = matrix(c(1,-0.5,-.5, 1), nrow=2), B = matrix(c(1, 0.5, NA, 1), nrow=2)), regression = ~x*.trt), err_B )
+  expect_error(   set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cov = list(A = matrix(c(1,-0.5,-.5, 1), nrow=2), B = matrix(c(1, 0.5,NaN, 1), nrow=2)), regression = ~x*.trt), err_B )
+  expect_error(   set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cov = list(A = matrix(c(1,-0.5,-.5, 1), nrow=2), B = matrix(c(1, 0.5,Inf, 1), nrow=2)), regression = ~x*.trt), err_B )
+
+  # --- provided cor/cov must be right dimensions ---
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = list(A = diag(2), B = diag(4)), regression = ~x*.trt),
+               'Dimensions of correlation matrix `cor` do not match the number of coefficients in `data` for study "B"')
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = list(A = diag(2), B = matrix(1, nrow = 3, ncol = 4)), regression = ~x*.trt),
+               'Dimensions of correlation matrix `cor` do not match the number of coefficients in `data` for study "B"')
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = list(A = diag(3), B = diag(4)), regression = ~x*.trt),
+               'Dimensions of correlation matrix `cor` do not match the number of coefficients in `data` for studies "A" and "B"')
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, cov = list(A = diag(2), B = diag(4)), regression = ~x*.trt),
+               'Dimensions of covariance matrix `cov` do not match the number of coefficients in `data` for study "B"')
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, cov = list(A = diag(2), B = matrix(1, nrow = 3, ncol = 4)), regression = ~x*.trt),
+               'Dimensions of covariance matrix `cov` do not match the number of coefficients in `data` for study "B"')
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, cov = list(A = diag(3), B = diag(4)), regression = ~x*.trt),
+               'Dimensions of covariance matrix `cov` do not match the number of coefficients in `data` for studies "A" and "B"')
+
+  # --- provided cor must be a correlation matrix ---
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = list(), regression = ~x*.trt),
+               '`cor` must be a named list of correlation matrices')
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = list(A = "A", b = matrix("B")), regression = ~x*.trt),
+               '`cor` must be a named list of correlation matrices')
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = list(A = 2*diag(2), B = 2*diag(2)), regression = ~x*.trt),
+               '`cor` is not a proper correlation matrix for studies "A" and "B"')
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = list(A = diag(2), B = matrix(c(1, -1.5, -1.5, 1), nrow=2)), regression = ~x*.trt),
+               '`cor` is not a proper correlation matrix for study "B"')
+
+  # --- cov or reconstructed cov from se and cor must be positive definite ---
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = list(A = diag(2), B = matrix(c(1, 0.5, 0.4, 1), nrow=2)), regression = ~x*.trt),
+               'Covariance matrix constructed from `cor` and `se` is not symmetric positive definite for study "B"')
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = list(A = diag(2), B = matrix(c(1, 1, 1, 1), nrow=2)), regression = ~x*.trt),
+               'Covariance matrix constructed from `cor` and `se` is not symmetric positive definite for study "B"')
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, cov = list(A = matrix(c(1, 0.5, 0.4, 1), nrow=2), B = matrix(c(0.1, 1, 1, 0.1), nrow = 2)), regression = ~x*.trt),
+               'Covariance matrix `cov` is not symmetric positive definite for studies "A" and "B"')
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = seB, cov = list(A = diag(2)), cor = list(B = matrix(c(1, 0.5, 0.4, 1), nrow=2)), regression = ~x*.trt),
+               'Covariance matrix constructed from `cor` and `se` is not symmetric positive definite for study "B"')
+
+})
+
+test_that("set_agd_regression - regression formula", {
+  s <- tibble(study = c("A", "A", "A", "B", "B", "B"),
+              trt = c("a", "a", "b", "b", "b", "c"),
+              est = c(NA, 1, 2, NA, 1, 2), se = 1, se2 = -1, se3 = NA, x = 1, y = 1)
+
+  cov_list <- list(A = diag(2), B = diag(2))
+
+  # --- input types ---
+  m <- '`regression` must be a regression formula or named list of regression formulas for each study'
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, cov = cov_list, regression = NULL             ), m)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, cov = cov_list, regression = NA               ), m)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, cov = cov_list, regression = 'zzz'            ), m)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, cov = cov_list, regression = data.frame(x=1:2)), m)
+
+  # --- one-sided regression formula ---
+  m <- '`regression` for each study must be a one-sided regression formula specifying the model for which estimates are given\\.'
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = cor_list, regression = list('zzz')                          ), m)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = cor_list, regression = list(A = 'zzz', B = 'zzz')           ), m)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = cor_list, regression =          y ~ x*.trt                  ), m)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = cor_list, regression = list(A =   ~ x2*.trt, B = y ~ x*.trt)), m)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = cor_list, regression = list(A = y ~ x2*.trt, B =   ~ x*.trt)), m)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, se = se, cor = cor_list, regression = list(A = y ~ x2*.trt, B = y ~ x*.trt)), m)
+
+  # --- regression variables present in data ---
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, cov = cov_list, regression = ~x2*.trt),
+               'Regression variables not present in `data`: x2')
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, cov = cov_list, regression = ~(x + x2 + x3)*.trt),
+               'Regression variables not present in `data`: x2 and x3')
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, cov = cov_list, regression = list(A = ~(x + x4)*.trt, B = ~(x + x2 + x3)*.trt)),
+               'Regression variables not present in `data`: x4, x2 and x3')
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, cov = cov_list, regression = list(A = ~ x*.trt, B = ~(x2 + x3)*.trt)),
+               'Regression variables not present in `data`: x2 and x3')
+
+  # --- named list ---
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, cov = cov_list, regression = list( ~ x*.trt, ~ x *.trt)),
+               '`regression` must be a named list of regression formulas for the included studies\\.')
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, cov = cov_list, regression = list(A = ~ x*.trt,  ~ x*.trt)),
+               '`regression` must be a named list of regression formulas for the included studies\\.')
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, cov = cov_list, regression = list(  ~ x*.trt, B = ~ x*.trt)),
+               '`regression` must be a named list of regression formulas for the included studies\\.')
+
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, cov = cov_list, regression = list(A = ~ x*.trt, C = ~ x*.trt)),
+               '`regression` list names must match study names in `data`\\.\nNo match for name for study "B"\\.')
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, cov = cov_list, regression = list(C = ~ x*.trt, B = ~ x*.trt)),
+               '`regression` list names must match study names in `data`\\.\nNo match for name for study "A"\\.')
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, cov = cov_list, regression = list(C = ~ x*.trt, D = ~ x*.trt)),
+               '`regression` list names must match study names in `data`\\.\nNo match for names for studies "A" and "B"\\.')
+
+})
+
+test_that("set_agd_regression - estimate", {
+  s <- tibble(study = c("A", "A", "A", "B", "B", "B"),
+              trt = c("a", "a", "b", "b", "b", "c"),
+              est = c(NA, 1, 2, NA, 1, 2),
+              se = 1,
+              x = 1)
+
+  cor_list <- list(A = diag(2), B = diag(2))
+  cov_list <- list(A = diag(2), B = diag(2))
+
+  # --- input types ---
+  expect_error(set_agd_regression(s, study = study, trt = trt,  estimate = NULL, cov = cov_list, regression = ~ x*.trt),
+               'Specify `estimates` column of regression coefficient estimates\\.')
+  expect_error(set_agd_regression(s, study = study, trt = trt,  estimate = list('zzz'), cov = cov_list, regression = ~ x*.trt),
+               'Estimates column `estimates` must be a regular column \\(not a list or matrix column\\)\\.')
+
+  # --- check values ---
+  m <-'`estimates` must be numeric.'
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = c(NA,1,1, NA, '1',1), regression = ~ x, cov = cov_list), m)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = c(NA,1,1, NA, NaN,1), regression = ~ x, cov = cov_list), m)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = c(NA,1,1, NA, Inf,1), regression = ~ x, cov = cov_list), m)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = c(NA,1,1, NA,-Inf,1), regression = ~ x, cov = cov_list), m)
+
+})
+
+
+test_that("set_agd_regression - covariate", {
+  s <- tibble(study = c("A","A", "A", "A", "B", "B", "B", "B"),
+              trt = c("a","a", "a","b", "a", "a","a", "c"),
+              est = c(NA, 1,1,1, NA, 1,1,1),
+              se = c(NA,1,1,1,NA,1,1,1),
+              x1 = c(NA,0,1,0,NA,0,1,0))
+
+  cov_list <- list(A = diag(3), B = diag(3))
+  cvt_AB      <- data.frame(study = c('A','B'    ),x1_mean = c(1,2)  , x1_sd = c(0.1,0.2)    , x2_mean = c(1,2)  , x2_sd = c(0.1,0.2)    )
+  cvt_ABB     <- data.frame(study = c('A','B','B'),x1_mean = c(1,2,3), x1_sd = c(0.1,0.2,0.3), x2_mean = c(1,2,3), x2_sd = c(0.1,0.2,0.3))
+  cvt_BC_x1x2 <- data.frame(study = c('C','B')    ,x1_mean = c(3,2)  , x1_sd = c(0.3,0.2)    , x2_mean = c(3,2)  , x2_sd = c(0.3,0.2)    )
+  cvt_BC_x1   <- data.frame(study = c('C','B')    ,x1_mean = c(3,2)  , x1_sd = c(0.3,0.2))
+
+
+  m <- "`covariates` must be a data frame\\."
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x1, cov = cov_list, covariates = list(z=1)), m)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x1, cov = cov_list, covariates = 1:3      ), m)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x1, cov = cov_list, covariates = NA       ), m)
+
+  expect_no_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x1, cov = cov_list, covariates = cvt_AB ))
+  expect_error(   set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x1, cov = cov_list, covariates = cvt_ABB),
+                  "Only one row is allowed per study in `covariates`.")
+
+  # Full provided
+  expect_equivalent(
+    set_agd_regression(s, study = study, trt = trt, estimate = est,
+                       regression = ~ .trt + x1, cov = cov_list,
+                       covariates = cvt_AB)$agd_regression %>%
+      dplyr::select(.study,x1_mean,x1_sd,x2_mean,x2_sd) %>%
+      dplyr::arrange(.study) %>%
+      dplyr::distinct(.study, .keep_all =TRUE) %>%
+      arrange(.study),
+    cvt_AB %>% arrange(study) %>%
+      rename(.study = study) %>%
+      mutate(.study = as.factor(.study) )
+  )
+
+  # Partially provided
+  expect_equivalent(
+    set_agd_regression(s, study = study, trt = trt, estimate = est,
+                       regression = ~ .trt + x1, cov = cov_list,
+                       covariates = cvt_BC_x1x2)$agd_regression %>%
+      dplyr::select(.study,x1_mean,x1_sd,x2_mean,x2_sd) %>%
+      dplyr::arrange(.study) %>%
+      dplyr::distinct(.study, .keep_all =TRUE) %>%
+      arrange(.study),
+    cvt_AB %>% arrange(study) %>%
+      rename(.study = study) %>%
+      mutate(.study = as.factor(.study) ) %>%
+      mutate(across(c(x1_mean,x1_sd,x2_mean,x2_sd), ~ if_else(.study == "A", NA_real_, .)))
+  )
+
+
+  m <- 'OVB_adj = "all", but no integration points are provided for study "A"\nUse add_integration\\(\\), or set OVB_adj = "auto" or "none"\\.'
+  AgD_reg <- set_agd_regression(s, study = study, trt = trt, estimate = est,
+                                regression = ~ .trt + x1, cov = list(A = diag(3), B = diag(3)),
+                                covariates = cvt_BC_x1x2)
+  AgD_reg <- add_integration(AgD_reg,
+                             x1 = distr(qnorm,mean=x1_mean,sd=x1_sd),
+                             x2 = distr(qnorm,mean=x2_mean,sd=x2_sd),
+                             cor=diag(2))
+  expect_error(nma(AgD_reg, regression = ~ .trt + x1 + x2, likelihood = "bernoulli" , OVB_adj = 'all', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10)), m)
+
+
+  m <- 'OVB_adj = "all", but no integration points are provided for studies "A" and "B"\nUse add_integration\\(\\), or set OVB_adj = "auto" or "none"\\.'
+  AgD_reg <- set_agd_regression(s, study = study, trt = trt, estimate = est,
+                                regression = ~ .trt + x1, cov = list(A = diag(3), B = diag(3)),
+                                covariates = cvt_BC_x1)
+  AgD_reg <- add_integration(AgD_reg,
+                             x1 = distr(qnorm,mean=x1_mean,sd=x1_sd),
+                             #x2 = distr(qnorm,mean=x2_mean,sd=x2_sd),
+                             cor=diag(2))
+  expect_error(nma(AgD_reg, regression = ~ .trt + x1 + x2, likelihood = "bernoulli" , OVB_adj = 'all', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10)), m)
+
+
+  # Multicollinearity
+  # s <- tibble(study = c("A","A", "A", "A","A", "B", "B", "B", "B"),
+  #             trt = c("a","a", "a","a","b", "a", "a","a", "c"),
+  #             est = c(NA, 1,1,1,1, NA, 1,1,1),
+  #             se = c(NA,1,1,1,1,NA,1,1,1),
+  #             x1 = c(0,0,1,0,0,0,0,1,0),
+  #             x2 = c(0,0,0,1,0,0,0,0,0))
+  # m <- 'The included matrix is singular and cannot be inverted for study A\\.'
+  # AgD_reg <- set_agd_regression(s, study = study, trt = trt, estimate = est,
+  #                               regression = ~ .trt + x1 + x2, cov = list(A = diag(4), B = diag(3)))
+  # AgD_reg <- add_integration(AgD_reg,
+  #                            x1 = distr(qbern, prob = .01),
+  #                            x2 = distr(qbern, prob = .99),
+  #                            x3 = distr(qnorm, mean=2, sd=1),
+  #                            cor = matrix(c(1 ,.5,.1,
+  #                                           .5, 1,.3,
+  #                                           .1,.3, 1),3,3))
+  # expect_error(nma(AgD_reg, regression = ~ .trt + x1 + x2 + x3, likelihood = "bernoulli" , OVB_adj = 'all'), m)
+
+})
+
+test_that("set_agd_regression - ordinal cutpoins", {
+  s <- tibble(study = c("A", "A", "A","A", "B", "B", "B", "B", "B"),
+              trt = c("a", "a","a", "b", "b", "b","b", "b", "c"),
+              est = c(NA, 1, 2,3, NA, 1, 2,3,4),
+              se = 1,
+              x = 1)
+  cov_list <- list(A = diag(3), B = diag(4))
+
+  s$ord_cut <- c(NA,'1|2',NA,NA,NA,NA,NA,'1|2',NA)
+  m <- "Specify both `ordinal_cut_lab` and `ordinal_cut`\\."
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, cov = cov_list,
+                                  ordinal_cut = 'ord_cut'),m)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, cov = cov_list,
+                                  ordinal_cut_lab = c('1|2','2|3','3|4')),m)
+
+
+  s$ord_cut <- c(NA,'1|2',NA,NA,NA,NA,NA,'1|2',NA)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, cov = cov_list,
+                                  ordinal_cut_lab = 1:3,
+                                  ordinal_cut = 'ord_cut'),
+               "`ordinal_cut_lab` must be a character vector.")
+  s$ord_cut <- 1
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, cov = cov_list,
+                                  ordinal_cut_lab = c('1|2','2|3','3|4'),
+                                  ordinal_cut = 'ord_cut'),
+               "`ordinal_cut` must be a character vector of cutpoint names.")
+
+  s$ord_cut <- c(NA,'1|2',NA,NA,NA,NA,NA,'1|2',NA)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, cov = cov_list,
+                                  ordinal_cut_lab = c('1|2','1|2','3|4'),
+                                  ordinal_cut = 'ord_cut'),
+               "`ordinal_cut_lab` must contain unique values.")
+
+  s$ord_cut <- c(NA,'1|2',NA,NA,NA,NA,NA,'10|2',NA)
+  expect_error(set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, cov = cov_list,
+                                  ordinal_cut_lab = c('1|2','2|3','3|4'),
+                                  ordinal_cut = 'ord_cut'),
+               " `ordinal_cut` must be a subset of `ordinal_cut_lab`.")
+
+  s$ord_cut <- c(NA,'2|3',NA,NA,NA,NA,'3|4','1|2',NA)
+  expect_equivalent(
+    set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x, cov = cov_list,
+                       ordinal_cut_lab = c('1|2','2|3','3|4'),
+                       ordinal_cut = 'ord_cut')$agd_regression %>%
+      dplyr::select(.rank_intercept) %>% dplyr::pull(),
+    c(0,2,0,0,0,0,3,1,0))
+
+})
+
+test_that("set_agd_regression - OVB_adj", {
+  m <- 'OVB_adj = "all", but no integration points are provided for studies "A" and "B"'
+  s <- tibble(study = c("A", "A", "A","A", "B", "B", "B", "B", "B"),
+              trt = c("a", "a","a", "b", "a", "a","a", "a", "c"),
+              est = c(NA, 1, 2,3, NA, 1, 2,3,4),
+              se = c(NA, 1, 1,1, NA, 1, 1,1,1),
+              x = c(NA,0,1,0, NA,0,0,1,0))
+  s2 <- s[-6,]
+  AgD_reg <- set_agd_regression(s2, study = study, trt = trt, estimate = est,
+                                regression = ~ x, cov = list(A = diag(3), B = diag(3)),
+                                covariates = data.frame(study = c("A", "B"), x1_mean = 1, x1_sd = 1, x2_mean = 1, x2_sd = 1))
+  expect_error(nma(AgD_reg, regression = ~ x + z, likelihood = "bernoulli" , OVB_adj = 'all', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10)), m)
+})
+
+test_that("set_agd_regression - intercept", {
+  s <- tibble(study = c("A", "A", "A","A", "B", "B", "B", "B", "B"),
+              trt = c("a", "a","a", "b", "a", "a","a", "a", "c"),
+              est = c(NA, 1, 2,3, NA, 1, 2,3,4),
+              se = c(NA, 1, 1,1, NA, 1, 1,1,1),
+              x1 = c(0,0,1,0, 0,0,0,1,0))
+  AgD_reg <- set_agd_regression(s, study = study, trt = trt, estimate = est,
+                                regression = ~ x1, cov = list(A = diag(3), B = diag(4)),
+                                covariates = data.frame(study = c("A", "B"),
+                                                        x1_mean = 1, x1_sd = 1,
+                                                        x2_mean = 1, x2_sd = 1))
+  AgD_reg <- add_integration(AgD_reg,
+                             x1 = distr(qnorm,mean=x1_mean,sd=x1_sd),
+                             x2 = distr(qnorm,mean=x2_mean,sd=x2_sd),
+                             cor=diag(2))
+  m <- "Intercept rows are not allowed in Cox PH models\\."
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "exponential" , OVB_adj = 'all', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10)), m)
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "weibull"     , OVB_adj = 'all', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10), prior_aux = flat()), m)
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "gompertz"    , OVB_adj = 'all', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10), prior_aux = flat()), m)
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "mspline"     , OVB_adj = 'all', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10), prior_aux = flat()), m)
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "pexp"        , OVB_adj = 'all', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10), prior_aux = flat()), m)
+
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "exponential" , OVB_adj = 'none', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10)), m)
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "weibull"     , OVB_adj = 'none', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10), prior_aux = flat()), m)
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "gompertz"    , OVB_adj = 'none', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10), prior_aux = flat()), m)
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "mspline"     , OVB_adj = 'none', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10), prior_aux = flat()), m)
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "pexp"        , OVB_adj = 'none', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10), prior_aux = flat()), m)
+
+  m <- "More than one intercept per study is not allowed\\."
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "bernoulli"   , OVB_adj = 'all', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10)), m)
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "bernoulli2"  , OVB_adj = 'all', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10)), m)
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "binomial"    , OVB_adj = 'all', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10)), m)
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "binomial2"   , OVB_adj = 'all', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10)), m)
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "poisson"     , OVB_adj = 'all', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10)), m)
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "normal"      , OVB_adj = 'all', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10)), m)
+
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "bernoulli"   , OVB_adj = 'none', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10)), m)
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "bernoulli2"  , OVB_adj = 'none', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10)), m)
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "binomial"    , OVB_adj = 'none', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10)), m)
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "binomial2"   , OVB_adj = 'none', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10)), m)
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "poisson"     , OVB_adj = 'none', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10)), m)
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "normal"      , OVB_adj = 'none', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10)), m)
+
+  s2 <- s[-c(2,6),]
+  AgD_reg <- set_agd_regression(s2, study = study, trt = trt, estimate = est,
+                                regression = ~ .trt + x1, cov = list(A = diag(2), B = diag(3)),
+                                covariates = data.frame(study = c("A", "B"), x1_mean = 1, x1_sd = 1, x2_mean = 1, x2_sd = 1))
+
+  AgD_reg <- add_integration(AgD_reg,
+                             x1 = distr(qnorm,mean=1,sd=1),
+                             x2 = distr(qnorm,mean=1,sd=1),
+                             cor=diag(2))
+
+  m <- "No intercept row specified for reducd models\\."
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "bernoulli"   , OVB_adj = 'all', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10)), m)
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "bernoulli2"  , OVB_adj = 'all', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10)), m)
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "binomial"    , OVB_adj = 'all', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10)), m)
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "binomial2"   , OVB_adj = 'all', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10)), m)
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "poisson"     , OVB_adj = 'all', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10)), m)
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "normal"      , OVB_adj = 'all', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10)), m)
+
+  # ordinal
+  m <- "No intercept specified in AgD regression for reduced models\\."
+  s$ord_cut <- c(NA,'1|2',NA,NA,NA,'2|3','1|2',NA,NA)
+  s2 <- s[-c(2),]
+  AgD_reg <- set_agd_regression(s2, study = study, trt = trt, estimate = est, regression = ~ x1,
+                                cov = list(A = diag(2), B = diag(4)),
+                                ordinal_cut = 'ord_cut',
+                                ordinal_cut_lab = c('1|2','2|3','3|4'),
+                                covariates = data.frame(study = c("A", "B"), x1_mean = 1, x1_sd = 1, x2_mean = 1, x2_sd = 1))
+  AgD_reg <- add_integration(AgD_reg,
+                             x1 = distr(qnorm,mean=1,sd=1),
+                             x2 = distr(qnorm,mean=1,sd=1),
+                             cor=diag(2))
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "ordered", OVB_adj = 'all', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10), prior_aux = flat()), m)
+
+
+  m <- 'Specify cuts using `ordinal_cut` and `ordinal_cut_lab` argumnets for reduced models\\.'
+  AgD_reg <- set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x1,
+                                cov = list(A = diag(3), B = diag(4)),
+                                covariates = data.frame(study = c("A", "B"), x1_mean = 1, x1_sd = 1, x2_mean = 1, x2_sd = 1)
+                                # ordinal_cut = 'ord_cut',
+                                #ordinal_cut_lab = c('1|2','2|3','3|4')
+  )
+  AgD_reg <- add_integration(AgD_reg,
+                             x1 = distr(qnorm,mean=1,sd=1),
+                             x2 = distr(qnorm,mean=1,sd=1),
+                             cor=diag(2))
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "ordered", OVB_adj = 'all', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10), prior_aux = flat()), m)
+
+
+  m <- '`ordinal_cut` must be used only for intercept rows\\.'
+  s$ord_cut <- c(NA,NA,'1|2',NA,NA,'2|3','1|2',NA,NA)
+  AgD_reg <- set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x1,
+                                cov = list(A = diag(3), B = diag(4)),
+                                covariates = data.frame(study = c("A", "B"), x1_mean = 1, x1_sd = 1, x2_mean = 1, x2_sd = 1),
+                                ordinal_cut = 'ord_cut',
+                                ordinal_cut_lab = c('1|2','2|3','3|4')
+  )
+  AgD_reg <- add_integration(AgD_reg,
+                             x1 = distr(qnorm,mean=1,sd=1),
+                             x2 = distr(qnorm,mean=1,sd=1),
+                             cor=diag(2))
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "ordered", OVB_adj = 'all' , prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10), prior_aux = flat()), m)
+  #expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "ordered", OVB_adj = 'none', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10), prior_aux = flat()), m)
+
+
+  m <- 'Intercept\\(s\\) at least must include the smallest one \\(study baseline\\) for reduced models\\.'
+  s$ord_cut <- c(NA,'2|3',NA,NA,NA,'2|3','1|2',NA,NA)
+  AgD_reg <- set_agd_regression(s, study = study, trt = trt, estimate = est, regression = ~ x1,
+                                cov = list(A = diag(3), B = diag(4)),
+                                covariates = data.frame(study = c("A", "B"), x1_mean = 1, x1_sd = 1, x2_mean = 1, x2_sd = 1),
+                                ordinal_cut = 'ord_cut',
+                                ordinal_cut_lab = c('1|2','2|3','3|4')
+  )
+  AgD_reg <- add_integration(AgD_reg,
+                             x1 = distr(qnorm,mean=1,sd=1),
+                             x2 = distr(qnorm,mean=1,sd=1),
+                             cor=diag(2))
+  expect_error(nma(AgD_reg, regression = ~ x1 + x2, likelihood = "ordered", OVB_adj = 'all', prior_intercept = normal(location = 0, scale = 100), prior_trt = normal(location = 0, scale = 10), prior_reg = normal(location = 0, scale = 10), prior_aux = flat()), m)
+
+
+})
+
+test_that("set_agd_regression - reconstructing Variance-Covariance matrix and fit nma()", {
+
+  # Simulate data
+  n <- 2*1000
+  Sigma <- matrix(c(1,0.1,0.1,1),2,2)
+  dat <- tibble::tibble(
+    X1 = rnorm(n),
+    X2 = 0.1 * X1 + sqrt(1 - 0.1^2) * rnorm(n),
+    trt = sample(c('A','B'),n, replace = T),
+    eta = drop(cbind(1, factor(trt, levels= c('A','B')), X1, X2) %*% c(-2,0.5,0.5,0.5))
+  )
+
+  # --- Normal (identity) ---
+  dat <- dat %>% dplyr::mutate(y = eta + rnorm( n, 2) )
+
+  fit_ful <- lm( y ~ trt + X1 + X2 , data = dat)
+  fit_1 <- lm( y ~ trt + X1 + X2, data = dat[1:1000,])
+  fit_2 <- lm( y ~ trt + X2 , data = dat[1001:2000,])
+
+  summary(fit_ful)
+  summary(fit_1)
+  summary(fit_2)
+
+  est_ful <- coef(fit_ful)
+  est_1 <- coef(fit_1)
+  est_2 <- coef(fit_2)
+
+  se_1 <- summary(fit_1)$coefficients[, "Std. Error"]
+  se_2 <- summary(fit_2)$coefficients[, "Std. Error"]
+
+  V_1 <- vcov(fit_1)
+  V_2 <- vcov(fit_2)
+
+  regression <- list(st_1 = ~ .trt + X1 + X2,
+                     st_2 = ~ .trt + X2)
+
+  reg_data <-
+    as.data.frame(tribble(
+      ~"trt", ~"X1", ~"X2",
+      "A", 0 , 0 ,
+      NA , NA, NA,
+      "B", NA, NA,
+      NA , 1 , NA,
+      NA , NA,  1,
+
+      "A", 0 , 0 ,
+      NA , NA, NA,
+      "B", NA, NA,
+      NA , NA,  1
+    )) %>%
+    dplyr::mutate(estimate = c(NA,est_1,NA,est_2),
+                  se       = c(NA,se_1,NA,se_2),
+                  study    = rep(paste0('st_',1:2),c(length(est_1)+1,length(est_2)+1))
+    )
+
+  reg_cov <- list(st_1 = V_1, st_2 = V_2)
+
+  reg_covariates <- data.frame(study=paste0('st_',1:2),
+                               X1_mean = rep(0,2),
+                               X2_mean = rep(0,2),
+                               X1_sd   = rep(1,2),
+                               X2_sd   = rep(1,2))
+
+  reg_obj <- set_agd_regression(
+    data       = reg_data,
+    study      = "study",
+    trt        = "trt",
+    estimate   = "estimate",
+    se         = "se",
+    # cov        = reg_cov,
+    covariates = reg_covariates,
+    regression = regression,
+    # trt_class  = "trt_class",
+    trt_ref    = "A")
+
+
+  reg_obj <- add_integration(reg_obj,
+                             X1 = distr(qnorm, mean = 0, sd = 1),
+                             X2 = distr(qnorm, mean = 0, sd = 1),
+                             cor = cov2cor(Sigma),
+                             n_int = 64)
+
+  fit <- suppressWarnings(nma(reg_obj,
+                                  regression = ~ .trt + X1 + X2,
+                                  likelihood = 'normal',
+                                  link = 'identity',
+                                  OVB_adj = 'all',
+                                  # iter = 4000,
+                                  debug = TRUE))
+
+  expect_lt(
+    max(c(abs(tcrossprod(fit$agd_regression_cov[1,1:4,1:4]) - V_1),
+          abs(tcrossprod(fit$agd_regression_cov[2,1:3,1:3]) - V_2)))
+    , 0.01)
+
+  # --- Binary (logit) ---
+  dat <- dat %>% dplyr::mutate(y = rbinom(n, 1, plogis(eta)) )
+  mean(dat$y)
+
+  fit_ful <- glm( y ~ trt + X1 + X2, family = binomial , data = dat)
+  fit_1 <- glm( y ~ trt + X1 + X2, family = binomial, data = dat[1:1000,])
+  fit_2 <- glm( y ~ trt + X2, family = binomial, data = dat[1001:2000,])
+
+  summary(fit_ful)
+  summary(fit_1)
+  summary(fit_2)
+
+  est_ful <- coef(fit_ful)
+  est_1 <- coef(fit_1)
+  est_2 <- coef(fit_2)
+
+  se_1 <- summary(fit_1)$coefficients[, "Std. Error"]
+  se_2 <- summary(fit_2)$coefficients[, "Std. Error"]
+
+  V_1 <- vcov(fit_1)
+  V_2 <- vcov(fit_2)
+
+  regression <- list(st_1 = ~ .trt + X1+X2,
+                     st_2 = ~ .trt + X2)
+
+  reg_data <-
+    as.data.frame(tribble(
+      ~"trt", ~"X1", ~"X2",
+      "A", 0 , 0 ,
+      NA , NA, NA,
+      "B", NA, NA,
+      NA , 1 , NA,
+      NA , NA,  1,
+
+      "A", 0 , 0 ,
+      NA , NA, NA,
+      "B", NA, NA,
+      NA , NA,  1
+    )) %>%
+    dplyr::mutate(estimate = c(NA,est_1,NA,est_2),
+                  se       = c(NA,se_1,NA,se_2),
+                  study    = rep(paste0('st_',1:2),c(length(est_1)+1,length(est_2)+1))
+    )
+
+  reg_cov <- list(st_1 = V_1, st_2 = V_2)
+
+  reg_covariates <- data.frame(study=paste0('st_',1:2),
+                               X1_mean = rep(0,2),
+                               X2_mean = rep(0,2),
+                               X1_sd   = rep(1,2),
+                               X2_sd   = rep(1,2))
+
+  reg_obj <- set_agd_regression(
+    data       = reg_data,
+    study      = "study",
+    trt        = "trt",
+    estimate   = "estimate",
+    se         = "se",
+    # cov        = reg_cov,
+    covariates = reg_covariates,
+    regression = regression,
+    # trt_class  = "trt_class",
+    trt_ref    = "A")
+
+
+  reg_obj <- add_integration(reg_obj,
+                             X1 = distr(qnorm, mean = 0, sd = 1),
+                             X2 = distr(qnorm, mean = 0, sd = 1),
+                             cor = cov2cor(Sigma),
+                             n_int = 64)
+
+  fit <- suppressWarnings(nma(reg_obj,
+                                  regression = ~ .trt + X1 + X2,
+                                  likelihood = 'bernoulli',
+                                  link = 'logit',
+                                  OVB_adj = 'all',
+                                  # iter = 4000,
+                                  debug = TRUE))
+  expect_lt(
+    max(c(abs(tcrossprod(fit$agd_regression_cov[1,1:4,1:4]) - V_1),
+          abs(tcrossprod(fit$agd_regression_cov[2,1:3,1:3]) - V_2)))
+    , 0.01)
+
+  # --- Count (log) ---
+  dat <- dat %>% dplyr::mutate(y = rpois(n, exp(eta)) )
+  mean(dat$y)
+
+  fit_ful <- glm( y ~ trt + X1 + X2, family = poisson(link = "log") , data = dat)
+  fit_1 <- glm( y ~ trt + X1+X2, family = poisson(link = "log"), data = dat[1:1000,])
+  fit_2 <- glm( y ~ trt + X2, family = poisson(link = "log"), data = dat[1001:2000,])
+
+  summary(fit_ful)
+  summary(fit_1)
+  summary(fit_2)
+
+  est_ful <- coef(fit_ful)
+  est_1 <- coef(fit_1)
+  est_2 <- coef(fit_2)
+
+  se_1 <- summary(fit_1)$coefficients[, "Std. Error"]
+  se_2 <- summary(fit_2)$coefficients[, "Std. Error"]
+
+  V_1 <- vcov(fit_1)
+  V_2 <- vcov(fit_2)
+
+  regression <- list(st_1 = ~ .trt + X1+X2,
+                     st_2 = ~ .trt + X2)
+
+  reg_data <-
+    as.data.frame(tribble(
+      ~"trt", ~"X1", ~"X2",
+      "A", 0 , 0 ,
+      NA , NA, NA,
+      "B", NA, NA,
+      NA , 1 , NA,
+      NA , NA,  1,
+
+      "A", 0 , 0 ,
+      NA , NA, NA,
+      "B", NA, NA,
+      NA , NA,  1
+    )) %>%
+    dplyr::mutate(estimate = c(NA,est_1,NA,est_2),
+                  se       = c(NA,se_1,NA,se_2),
+                  study    = rep(paste0('st_',1:2),c(length(est_1)+1,length(est_2)+1))
+    )
+
+  reg_cov <- list(st_1 = V_1, st_2 = V_2)
+
+  reg_covariates <- data.frame(study=paste0('st_',1:2),
+                               X1_mean = rep(0,2),
+                               X2_mean = rep(0,2),
+                               X1_sd   = rep(1,2),
+                               X2_sd   = rep(1,2))
+
+  reg_obj <- set_agd_regression(
+    data       = reg_data,
+    study      = "study",
+    trt        = "trt",
+    estimate   = "estimate",
+    se         = "se",
+    # cov        = reg_cov,
+    covariates = reg_covariates,
+    regression = regression,
+    # trt_class  = "trt_class",
+    trt_ref    = "A")
+
+  reg_obj <- add_integration(reg_obj,
+                             X1 = distr(qnorm, mean = 0, sd = 1),
+                             X2 = distr(qnorm, mean = 0, sd = 1),
+                             cor = cov2cor(Sigma),
+                             n_int = 64)
+
+  fit <- suppressWarnings(nma(reg_obj,
+                                  regression = ~ .trt + X1 + X2,
+                                  likelihood = 'poisson',
+                                  link = 'log',
+                                  OVB_adj = 'all',
+                                  # iter = 4000,
+                                  debug = TRUE))
+
+  expect_lt(
+    max(c(abs(tcrossprod(fit$agd_regression_cov[1,1:4,1:4]) - V_1),
+          abs(tcrossprod(fit$agd_regression_cov[2,1:3,1:3]) - V_2)))
+    , 0.01)
+
+  # --- Cox PH ---
+  # dat <- dat %>% dplyr::mutate(eventtime_raw = rexp(n, rate = exp(eta)),
+  #                              cen = rexp(n, rate = 0.02),
+  #                              status = as.integer(eventtime_raw < cen),
+  #                              eventtime = pmin(eventtime_raw,cen))
+  # mean(dat$status)
+  # fit_ful <- survival::coxph(survival::Surv(eventtime, status) ~ trt + X1 + X2, data = dat)
+  # fit_1 <- survival::coxph(survival::Surv(eventtime, status) ~ trt + X1 + X2, data = dat[1:1000,])
+  # fit_2 <- survival::coxph(survival::Surv(eventtime, status) ~ trt + X2, data = dat[1001:2000,])
+  #
+  # summary(fit_ful)
+  # summary(fit_1)
+  # summary(fit_2)
+  #
+  # est_ful <- coef(fit_ful)
+  # est_1 <- coef(fit_1)
+  # est_2 <- coef(fit_2)
+  #
+  # se_1 <- summary(fit_1)$coefficients[,"se(coef)"]
+  # se_2 <- summary(fit_2)$coefficients[,"se(coef)"]
+  #
+  # V_1 <- vcov(fit_1)[names(est_1), names(est_1)]
+  # V_2 <- vcov(fit_2)[names(est_2), names(est_2)]
+  #
+  # regression <- list(st_1 = ~ .trt + X1+X2,
+  #                    st_2 = ~ .trt + X2)
+  #
+  # reg_data <-
+  #   as.data.frame(tribble(
+  #     ~"trt", ~"X1", ~"X2",
+  #     "A", 0 , 0 ,
+  #     # NA , NA, NA,
+  #     "B", NA, NA,
+  #     NA , 1 , NA,
+  #     NA , NA,  1,
+  #
+  #     "A", 0 , 0 ,
+  #     # NA , NA, NA,
+  #     "B", NA, NA,
+  #     NA , NA,  1
+  #   )) %>%
+  #   dplyr::mutate(estimate = c(NA,est_1,NA,est_2),
+  #                 se       = c(NA,se_1,NA,se_2),
+  #                 study    = rep(paste0('st_',1:2),c(length(est_1)+1,length(est_2)+1))
+  #   )
+  #
+  # reg_cov <- list(st_1 = V_1, st_2 = V_2)
+  #
+  # reg_covariates <- data.frame(study=paste0('st_',1:2),
+  #                              X1_mean = rep(0,2),
+  #                              X2_mean = rep(0,2),
+  #                              X1_sd   = rep(1,2),
+  #                              X2_sd   = rep(1,2))
+  #
+  # reg_obj <- set_agd_regression(
+  #   data       = reg_data,
+  #   study      = "study",
+  #   trt        = "trt",
+  #   estimate   = "estimate",
+  #   se         = "se",
+  #   # cov        = reg_cov,
+  #   covariates = reg_covariates,
+  #   regression = regression,
+  #   # trt_class  = "trt_class",
+  #   trt_ref    = "A")
+  #
+  # reg_obj <- add_integration(reg_obj,
+  #                            X1 = distr(qnorm, mean = 0, sd = 1),
+  #                            X2 = distr(qnorm, mean = 0, sd = 1),
+  #                            cor = cov2cor(Sigma),
+  #                            n_int = 64)
+  #
+  # fit <- suppressWarnings(nma(reg_obj,
+  #                                 regression = ~ .trt + X1 + X2,
+  #                                 likelihood = 'weibull',
+  #                                 # link = 'log',
+  #                                 OVB_adj = 'all',
+  #                                 # iter = 4000,
+  #                                 debug = TRUE))
+  #
+  # expect_lt(
+  #   max(c(abs(tcrossprod(fit$agd_regression_cov[1,1:4,1:4]) - V_1),
+  #         abs(tcrossprod(fit$agd_regression_cov[2,1:3,1:3]) - V_2)))
+  #   , 0.01)
+
+  # --- AFT (Weibull) ---
+  dat <- dat %>% dplyr::mutate(eventtime_raw = rweibull(n, shape = 1, scale= exp(eta)),
+                               cen = eventtime_raw + 10, # no censoring
+                               status = as.integer(eventtime_raw < cen),
+                               eventtime = pmin(eventtime_raw,cen))
+  mean(dat$status)
+
+  fit_ful <- survival::survreg(survival::Surv(eventtime, status) ~ trt + X1 + X2, dist = "weibull", data = dat)
+  fit_1 <- survival::survreg(survival::Surv(eventtime, status) ~ trt + X1 + X2, dist = "weibull", data = dat[1:1000,])
+  fit_2 <- survival::survreg(survival::Surv(eventtime, status) ~ trt + X2, dist = "weibull", data = dat[1001:2000,])
+
+  summary(fit_ful)
+  summary(fit_1)
+  summary(fit_2)
+
+  est_ful <- coef(fit_ful)
+  est_1 <- coef(fit_1)
+  est_2 <- coef(fit_2)
+
+  se_1 <- summary(fit_1)$table[names(est_1), "Std. Error"]
+  se_2 <- summary(fit_2)$table[names(est_2), "Std. Error"]
+
+  V_1 <- vcov(fit_1)[names(est_1), names(est_1)]
+  V_2 <- vcov(fit_2)[names(est_2), names(est_2)]
+
+  regression <- list(st_1 = ~ .trt + X1+X2,
+                     st_2 = ~ .trt + X2)
+
+  reg_data <-
+    as.data.frame(tribble(
+      ~"trt", ~"X1", ~"X2",
+      "A", 0 , 0 ,
+      NA , NA, NA,
+      "B", NA, NA,
+      NA , 1 , NA,
+      NA , NA,  1,
+
+      "A", 0 , 0 ,
+      NA , NA, NA,
+      "B", NA, NA,
+      NA , NA,  1
+    )) %>%
+    dplyr::mutate(estimate = c(NA,est_1,NA,est_2),
+                  se       = c(NA,se_1,NA,se_2),
+                  study    = rep(paste0('st_',1:2),c(length(est_1)+1,length(est_2)+1))
+    )
+
+  reg_cov <- list(st_1 = V_1, st_2 = V_2)
+
+  reg_covariates <- data.frame(study=paste0('st_',1:2),
+                               X1_mean = rep(0,2),
+                               X2_mean = rep(0,2),
+                               X1_sd   = rep(1,2),
+                               X2_sd   = rep(1,2))
+
+  reg_obj <- set_agd_regression(
+    data       = reg_data,
+    study      = "study",
+    trt        = "trt",
+    estimate   = "estimate",
+    se         = "se",
+    # cov        = reg_cov,
+    covariates = reg_covariates,
+    regression = regression,
+    # trt_class  = "trt_class",
+    trt_ref    = "A")
+
+  reg_obj <- add_integration(reg_obj,
+                             X1 = distr(qnorm, mean = 0, sd = 1),
+                             X2 = distr(qnorm, mean = 0, sd = 1),
+                             cor = cov2cor(Sigma),
+                             n_int = 64)
+
+  fit <- suppressWarnings(nma(reg_obj,
+                                  regression = ~ .trt + X1 + X2,
+                                  likelihood = 'weibull-aft',
+                                  # link = 'log',
+                                  OVB_adj = 'all',
+                                  # iter = 4000,
+                                  debug = TRUE))
+
+  expect_lt(
+    max(c(abs(tcrossprod(fit$agd_regression_cov[1,1:4,1:4]) - V_1),
+          abs(tcrossprod(fit$agd_regression_cov[2,1:3,1:3]) - V_2)))
+    , 0.01)
+
+
+})
+test_that("set_agd_regression - fitted nma() quntittes - AgD-reg Only", {
+
+
+  n <- 2*1000
+  Sigma <- matrix(c(1,0.1,0.1,1),2,2)
+  dat <- tibble::tibble(
+    X1 = rnorm(n),
+    X2 = 0.1 * X1 + sqrt(1 - 0.1^2) * rnorm(n),
+    trt = sample(c('A','B'),n, replace = T),
+    eta = drop(cbind(1, factor(trt, levels= c('A','B')), X1, X2) %*% c(-2,0.5,0.5,0.5))
+  )
+
+  # --- Normal (identity) ---
+  dat <- dat %>% dplyr::mutate(y = eta + rnorm( n, 2) )
+
+  fit_ful <- lm( y ~ trt + X1 + X2 , data = dat)
+  fit_1 <- lm( y ~ trt + X1 + X2, data = dat[1:1000,])
+  fit_2 <- lm( y ~ trt + X2 , data = dat[1001:2000,])
+
+  summary(fit_ful)
+  summary(fit_1)
+  summary(fit_2)
+
+  est_ful <- coef(fit_ful)
+  est_1 <- coef(fit_1)
+  est_2 <- coef(fit_2)
+
+  se_1 <- summary(fit_1)$coefficients[, "Std. Error"]
+  se_2 <- summary(fit_2)$coefficients[, "Std. Error"]
+
+  V_1 <- vcov(fit_1)
+  V_2 <- vcov(fit_2)
+
+  regression <- list(st_1 = ~ .trt + X1 + X2,
+                     st_2 = ~ .trt + X2)
+
+  reg_data <-
+    as.data.frame(tribble(
+      ~"trt", ~"X1", ~"X2",
+      "A", 0 , 0 ,
+      NA , NA, NA,
+      "B", NA, NA,
+      NA , 1 , NA,
+      NA , NA,  1,
+
+      "A", 0 , 0 ,
+      NA , NA, NA,
+      "B", NA, NA,
+      NA , NA,  1
+    )) %>%
+    dplyr::mutate(estimate = c(NA,est_1,NA,est_2),
+                  se       = c(NA,se_1,NA,se_2),
+                  study    = rep(paste0('st_',1:2),c(length(est_1)+1,length(est_2)+1))
+    )
+
+  reg_cov <- list(st_1 = V_1, st_2 = V_2)
+
+  reg_covariates <- data.frame(study=paste0('st_',1:2),
+                               X1_mean = rep(0,2),
+                               X2_mean = rep(0,2),
+                               X1_sd   = rep(1,2),
+                               X2_sd   = rep(1,2))
+
+  reg_obj <- set_agd_regression(
+    data       = reg_data,
+    study      = "study",
+    trt        = "trt",
+    estimate   = "estimate",
+    se         = "se",
+    cov        = reg_cov,
+    covariates = reg_covariates,
+    regression = regression,
+    # trt_class  = "trt_class",
+    trt_ref    = "A")
+
+
+  reg_obj <- add_integration(reg_obj,
+                             X1 = distr(qnorm, mean = 0, sd = 1),
+                             X2 = distr(qnorm, mean = 0, sd = 1),
+                             cor = cov2cor(Sigma),
+                             n_int = 64)
+
+  fit <- suppressWarnings(nma(reg_obj,
+                                  regression = ~ .trt + X1 + X2,
+                                  likelihood = 'normal',
+                                  link = 'identity',
+                                  OVB_adj = 'all',
+                                  iter = 4000))
+  result <- as.data.frame(rstan::summary(fit$stanfit, pars = c("beta[X1]","beta[X2]","d[B]"))$summary[, c("mean",'Rhat')])
+
+  expect_equivalent(result$mean, est_ful[c("X1","X2","trtB")] , tol=0.3)
+  expect_equivalent(result$Rhat, rep(1,nrow(result)) , tol=0.3)
+
+
+  # --- Binary (logit) ---
+  dat <- dat %>% dplyr::mutate(y = rbinom(n, 1, plogis(eta)) )
+  mean(dat$y)
+
+  fit_ful <- glm( y ~ trt + X1 + X2, family = binomial , data = dat)
+  fit_1 <- glm( y ~ trt + X1 + X2, family = binomial, data = dat[1:1000,])
+  fit_2 <- glm( y ~ trt + X2, family = binomial, data = dat[1001:2000,])
+
+  summary(fit_ful)
+  summary(fit_1)
+  summary(fit_2)
+
+  est_ful <- coef(fit_ful)
+  est_1 <- coef(fit_1)
+  est_2 <- coef(fit_2)
+
+  se_1 <- summary(fit_1)$coefficients[, "Std. Error"]
+  se_2 <- summary(fit_2)$coefficients[, "Std. Error"]
+
+  V_1 <- vcov(fit_1)
+  V_2 <- vcov(fit_2)
+
+  regression <- list(st_1 = ~ .trt + X1+X2,
+                     st_2 = ~ .trt + X2)
+
+  reg_data <-
+    as.data.frame(tribble(
+      ~"trt", ~"X1", ~"X2",
+      "A", 0 , 0 ,
+      NA , NA, NA,
+      "B", NA, NA,
+      NA , 1 , NA,
+      NA , NA,  1,
+
+      "A", 0 , 0 ,
+      NA , NA, NA,
+      "B", NA, NA,
+      NA , NA,  1
+    )) %>%
+    dplyr::mutate(estimate = c(NA,est_1,NA,est_2),
+                  se       = c(NA,se_1,NA,se_2),
+                  study    = rep(paste0('st_',1:2),c(length(est_1)+1,length(est_2)+1))
+    )
+
+  reg_cov <- list(st_1 = V_1, st_2 = V_2)
+
+  reg_covariates <- data.frame(study=paste0('st_',1:2),
+                               X1_mean = rep(0,2),
+                               X2_mean = rep(0,2),
+                               X1_sd   = rep(1,2),
+                               X2_sd   = rep(1,2))
+
+  reg_obj <- set_agd_regression(
+    data       = reg_data,
+    study      = "study",
+    trt        = "trt",
+    estimate   = "estimate",
+    se         = "se",
+    cov        = reg_cov,
+    covariates = reg_covariates,
+    regression = regression,
+    # trt_class  = "trt_class",
+    trt_ref    = "A")
+
+  reg_obj <- add_integration(reg_obj,
+                             X1 = distr(qnorm, mean = 0, sd = 1),
+                             X2 = distr(qnorm, mean = 0, sd = 1),
+                             cor = cov2cor(Sigma),
+                             n_int = 64)
+
+  fit <- suppressWarnings(nma(reg_obj,
+                                  regression = ~ .trt + X1 + X2,
+                                  likelihood = 'bernoulli',
+                                  link = 'logit',
+                                  OVB_adj = 'all',
+                                  iter = 4000))
+  result <- as.data.frame(rstan::summary(fit$stanfit, pars = c("beta[X1]","beta[X2]","d[B]"))$summary[, c("mean",'Rhat')])
+
+  expect_equivalent(result$mean, est_ful[c("X1","X2","trtB")] , tol=0.3)
+  expect_equivalent(result$Rhat, rep(1,nrow(result)) , tol=0.3)
+
+
+  # --- Count (log) ---
+  dat <- dat %>% dplyr::mutate(y = rpois(n, exp(eta)) )
+  mean(dat$y)
+
+  fit_ful <- glm( y ~ trt + X1 + X2, family = poisson(link = "log") , data = dat)
+  fit_1 <- glm( y ~ trt + X1+X2, family = poisson(link = "log"), data = dat[1:1000,])
+  fit_2 <- glm( y ~ trt + X2, family = poisson(link = "log"), data = dat[1001:2000,])
+
+  summary(fit_ful)
+  summary(fit_1)
+  summary(fit_2)
+
+  est_ful <- coef(fit_ful)
+  est_1 <- coef(fit_1)
+  est_2 <- coef(fit_2)
+
+  se_1 <- summary(fit_1)$coefficients[, "Std. Error"]
+  se_2 <- summary(fit_2)$coefficients[, "Std. Error"]
+
+  V_1 <- vcov(fit_1)
+  V_2 <- vcov(fit_2)
+
+  regression <- list(st_1 = ~ .trt + X1+X2,
+                     st_2 = ~ .trt + X2)
+
+  reg_data <-
+    as.data.frame(tribble(
+      ~"trt", ~"X1", ~"X2",
+      "A", 0 , 0 ,
+      NA , NA, NA,
+      "B", NA, NA,
+      NA , 1 , NA,
+      NA , NA,  1,
+
+      "A", 0 , 0 ,
+      NA , NA, NA,
+      "B", NA, NA,
+      NA , NA,  1
+    )) %>%
+    dplyr::mutate(estimate = c(NA,est_1,NA,est_2),
+                  se       = c(NA,se_1,NA,se_2),
+                  study    = rep(paste0('st_',1:2),c(length(est_1)+1,length(est_2)+1))
+    )
+
+  reg_cov <- list(st_1 = V_1, st_2 = V_2)
+
+  reg_covariates <- data.frame(study=paste0('st_',1:2),
+                               X1_mean = rep(0,2),
+                               X2_mean = rep(0,2),
+                               X1_sd   = rep(1,2),
+                               X2_sd   = rep(1,2))
+
+  reg_obj <- set_agd_regression(
+    data       = reg_data,
+    study      = "study",
+    trt        = "trt",
+    estimate   = "estimate",
+    se         = "se",
+    cov        = reg_cov,
+    covariates = reg_covariates,
+    regression = regression,
+    # trt_class  = "trt_class",
+    trt_ref    = "A")
+
+
+  reg_obj <- add_integration(reg_obj,
+                             X1 = distr(qnorm, mean = 0, sd = 1),
+                             X2 = distr(qnorm, mean = 0, sd = 1),
+                             cor = cov2cor(Sigma),
+                             n_int = 64)
+
+  fit <- suppressWarnings(nma(reg_obj,
+                                  regression = ~ .trt + X1 + X2,
+                                  likelihood = 'poisson',
+                                  link = 'log',
+                                  OVB_adj = 'all',
+                                  iter = 4000))
+  result <- as.data.frame(rstan::summary(fit$stanfit, pars = c("beta[X1]","beta[X2]","d[B]"))$summary[, c("mean",'Rhat')])
+
+  expect_equivalent(result$mean, est_ful[c("X1","X2","trtB")] , tol=0.3)
+  expect_equivalent(result$Rhat, rep(1,nrow(result)) , tol=0.3)
+
+
+  # --- Cox PH ---
+  dat <- dat %>% dplyr::mutate(eventtime_raw = rexp(n, rate = exp(eta)),
+                               cen = rexp(n, rate = 0.05),
+                               status = as.integer(eventtime_raw < cen),
+                               eventtime = pmin(eventtime_raw,cen))
+  mean(dat$status)
+  fit_ful <- survival::coxph(survival::Surv(eventtime, status) ~ trt + X1 + X2, data = dat)
+  fit_1 <- survival::coxph(survival::Surv(eventtime, status) ~ trt + X1 + X2, data = dat[1:1000,])
+  fit_2 <- survival::coxph(survival::Surv(eventtime, status) ~ trt + X2, data = dat[1001:2000,])
+
+  summary(fit_ful)
+  summary(fit_1)
+  summary(fit_2)
+
+  est_ful <- coef(fit_ful)
+  est_1 <- coef(fit_1)
+  est_2 <- coef(fit_2)
+
+  se_1 <- summary(fit_1)$coefficients[,"se(coef)"]
+  se_2 <- summary(fit_2)$coefficients[,"se(coef)"]
+
+  V_1 <- vcov(fit_1)[names(est_1), names(est_1)]
+  V_2 <- vcov(fit_2)[names(est_2), names(est_2)]
+
+  regression <- list(st_1 = ~ .trt + X1+X2,
+                     st_2 = ~ .trt + X2)
+
+  reg_data <-
+    as.data.frame(tribble(
+      ~"trt", ~"X1", ~"X2",
+      "A", 0 , 0 ,
+      # NA , NA, NA,
+      "B", NA, NA,
+      NA , 1 , NA,
+      NA , NA,  1,
+
+      "A", 0 , 0 ,
+      # NA , NA, NA,
+      "B", NA, NA,
+      NA , NA,  1
+    )) %>%
+    dplyr::mutate(estimate = c(NA,est_1,NA,est_2),
+                  se       = c(NA,se_1,NA,se_2),
+                  study    = rep(paste0('st_',1:2),c(length(est_1)+1,length(est_2)+1))
+    )
+
+  reg_cov <- list(st_1 = V_1, st_2 = V_2)
+
+  reg_covariates <- data.frame(study=paste0('st_',1:2),
+                               X1_mean = rep(0,2),
+                               X2_mean = rep(0,2),
+                               X1_sd   = rep(1,2),
+                               X2_sd   = rep(1,2))
+
+  reg_obj <- set_agd_regression(
+    data       = reg_data,
+    study      = "study",
+    trt        = "trt",
+    estimate   = "estimate",
+    se         = "se",
+    cov        = reg_cov,
+    covariates = reg_covariates,
+    regression = regression,
+    # trt_class  = "trt_class",
+    trt_ref    = "A")
+
+  reg_obj <- add_integration(reg_obj,
+                             X1 = distr(qnorm, mean = 0, sd = 1),
+                             X2 = distr(qnorm, mean = 0, sd = 1),
+                             cor = cov2cor(Sigma),
+                             n_int = 64)
+
+  fit <- suppressWarnings(nma(reg_obj,
+                                  regression = ~ .trt + X1 + X2,
+                                  likelihood = 'mspline',
+                                  # link = 'log',
+                                  OVB_adj = 'all',
+                                  iter = 4000))
+  result <- as.data.frame(rstan::summary(fit$stanfit, pars = c("beta[X1]","beta[X2]","d[B]"))$summary[, c("mean",'Rhat')])
+
+  expect_equivalent(result$mean, est_ful[c("X1","X2","trtB")] , tol=0.3)
+  expect_equivalent(result$Rhat, rep(1,nrow(result)) , tol=0.3)
+
+
+  # --- AFT (Weibull) ---
+  dat <- dat %>% dplyr::mutate(eventtime_raw = rweibull(n, shape = 1, scale= exp(eta)),
+                               cen = rexp(n, rate = 0.1),
+                               status = as.integer(eventtime_raw < cen),
+                               eventtime = pmin(eventtime_raw,cen))
+  mean(dat$status)
+
+  fit_ful <- survival::survreg(survival::Surv(eventtime, status) ~ trt + X1 + X2, dist = "weibull", data = dat)
+  fit_1 <- survival::survreg(survival::Surv(eventtime, status) ~ trt + X1 + X2, dist = "weibull", data = dat[1:1000,])
+  fit_2 <- survival::survreg(survival::Surv(eventtime, status) ~ trt + X2, dist = "weibull", data = dat[1001:2000,])
+
+  summary(fit_ful)
+  summary(fit_1)
+  summary(fit_2)
+
+  est_ful <- coef(fit_ful)
+  est_1 <- coef(fit_1)
+  est_2 <- coef(fit_2)
+
+  se_1 <- summary(fit_1)$table[names(est_1), "Std. Error"]
+  se_2 <- summary(fit_2)$table[names(est_2), "Std. Error"]
+
+  V_1 <- vcov(fit_1)[names(est_1), names(est_1)]
+  V_2 <- vcov(fit_2)[names(est_2), names(est_2)]
+
+  regression <- list(st_1 = ~ .trt + X1+X2,
+                     st_2 = ~ .trt + X2)
+
+  reg_data <-
+    as.data.frame(tribble(
+      ~"trt", ~"X1", ~"X2",
+      "A", 0 , 0 ,
+      NA , NA, NA,
+      "B", NA, NA,
+      NA , 1 , NA,
+      NA , NA,  1,
+
+      "A", 0 , 0 ,
+      NA , NA, NA,
+      "B", NA, NA,
+      NA , NA,  1
+    )) %>%
+    dplyr::mutate(estimate = c(NA,est_1,NA,est_2),
+                  se       = c(NA,se_1,NA,se_2),
+                  study    = rep(paste0('st_',1:2),c(length(est_1)+1,length(est_2)+1))
+    )
+
+  reg_cov <- list(st_1 = as.matrix(Matrix::nearPD(V_1, keepDiag = TRUE)$mat),
+                  st_2 = as.matrix(Matrix::nearPD(V_2, keepDiag = TRUE)$mat))
+
+  reg_covariates <- data.frame(study=paste0('st_',1:2),
+                               X1_mean = rep(0,2),
+                               X2_mean = rep(0,2),
+                               X1_sd   = rep(1,2),
+                               X2_sd   = rep(1,2))
+
+  reg_obj <- set_agd_regression(
+    data       = reg_data,
+    study      = "study",
+    trt        = "trt",
+    estimate   = "estimate",
+    se         = "se",
+    cov        = reg_cov,
+    covariates = reg_covariates,
+    regression = regression,
+    # trt_class  = "trt_class",
+    trt_ref    = "A")
+
+
+  reg_obj <- add_integration(reg_obj,
+                             X1 = distr(qnorm, mean = 0, sd = 1),
+                             X2 = distr(qnorm, mean = 0, sd = 1),
+                             cor = cov2cor(Sigma),
+                             n_int = 64)
+
+  fit <- suppressWarnings(nma(reg_obj,
+                                  regression = ~ .trt + X1 + X2,
+                                  likelihood = 'weibull-aft',
+                                  # link = 'log',
+                                  OVB_adj = 'all',
+                                  iter = 4000))
+  result <- as.data.frame(rstan::summary(fit$stanfit, pars = c("beta[X1]","beta[X2]","d[B]"))$summary[, c("mean",'Rhat')])
+
+  expect_equivalent(result$mean, est_ful[c("X1","X2","trtB")] , tol=0.3)
+  expect_equivalent(result$Rhat, rep(1,nrow(result)) , tol=0.3)
+
+
+
+})
+
+test_that("set_agd_regression - fitted nma() quntittes - AgD-reg & IPD network", {
+
+  n <- 3*1000
+  Sigma <- matrix(c(1,0.1,0.1,1),2,2)
+  dat <- tibble::tibble(
+    X1 = rnorm(n),
+    X2 = 0.1 * X1 + sqrt(1 - 0.1^2) * rnorm(n),
+    trt = sample(c('A','B'),n, replace = T),
+    eta = drop(cbind(1, factor(trt, levels= c('A','B')), X1, X2) %*% c(-2,0.5,0.5,0.5))
+  )
+
+  # --- Normal (identity) ---
+  dat <- dat %>% dplyr::mutate(y = eta + rnorm( n, 2) )
+
+  fit_ful <- lm( y ~ trt + X1 + X2 , data = dat)
+  fit_1 <- lm( y ~ trt + X1 + X2, data = dat[1:1000,])
+  fit_2 <- lm( y ~ trt + X2 , data = dat[1001:2000,])
+
+  summary(fit_ful)
+  summary(fit_1)
+  summary(fit_2)
+
+  est_ful <- coef(fit_ful)
+  est_1 <- coef(fit_1)
+  est_2 <- coef(fit_2)
+
+  se_1 <- summary(fit_1)$coefficients[, "Std. Error"]
+  se_2 <- summary(fit_2)$coefficients[, "Std. Error"]
+
+  V_1 <- vcov(fit_1)
+  V_2 <- vcov(fit_2)
+
+  regression <- list(st_1 = ~ .trt + X1 + X2,
+                     st_2 = ~ .trt + X2)
+
+  reg_data <-
+    as.data.frame(tribble(
+      ~"trt", ~"X1", ~"X2",
+      "A", 0 , 0 ,
+      NA , NA, NA,
+      "B", NA, NA,
+      NA , 1 , NA,
+      NA , NA,  1,
+
+      "A", 0 , 0 ,
+      NA , NA, NA,
+      "B", NA, NA,
+      NA , NA,  1
+    )) %>%
+    dplyr::mutate(estimate = c(NA,est_1,NA,est_2),
+                  se       = c(NA,se_1,NA,se_2),
+                  study    = rep(paste0('st_',1:2),c(length(est_1)+1,length(est_2)+1))
+    )
+
+  reg_cov <- list(st_1 = V_1, st_2 = V_2)
+
+  reg_covariates <- data.frame(study=paste0('st_',1:2),
+                               X1_mean = rep(0,2),
+                               X2_mean = rep(0,2),
+                               X1_sd   = rep(1,2),
+                               X2_sd   = rep(1,2))
+
+  reg_obj <- set_agd_regression(
+    data       = reg_data,
+    study      = "study",
+    trt        = "trt",
+    estimate   = "estimate",
+    se         = "se",
+    cov        = reg_cov,
+    covariates = reg_covariates,
+    regression = regression,
+    # trt_class  = "trt_class",
+    trt_ref    = "A")
+
+
+  reg_obj <- add_integration(reg_obj,
+                             X1 = distr(qnorm, mean = 0, sd = 1),
+                             X2 = distr(qnorm, mean = 0, sd = 1),
+                             cor = cov2cor(Sigma),
+                             n_int = 64)
+
+  # IPD
+  ipd_obj <- set_ipd( dat[2001:3000,] %>% mutate(study='st_ipd') ,
+                           study = study,
+                           trt = trt,
+                           y = y)
+  net_IPD_Reg <- combine_network(reg_obj , ipd_obj, trt_ref = "A")
+
+
+  fit <- suppressWarnings(nma(net_IPD_Reg,
+                                  regression = ~ .trt + X1 + X2,
+                                  likelihood = 'normal',
+                                  link = 'identity',
+                                  OVB_adj = 'all',
+                                  iter = 4000))
+  result <- as.data.frame(rstan::summary(fit$stanfit, pars = c("beta[X1]","beta[X2]","d[B]"))$summary[, c("mean",'Rhat')])
+
+  expect_equivalent(result$mean, est_ful[c("X1","X2","trtB")] , tol=0.3)
+  expect_equivalent(result$Rhat, rep(1,nrow(result)) , tol=0.3)
+
+
+  # --- Binary (logit) ---
+  dat <- dat %>% dplyr::mutate(y = rbinom(n, 1, plogis(eta)) )
+  mean(dat$y)
+
+  fit_ful <- glm( y ~ trt + X1 + X2, family = binomial , data = dat)
+  fit_1 <- glm( y ~ trt + X1 + X2, family = binomial, data = dat[1:1000,])
+  fit_2 <- glm( y ~ trt + X2, family = binomial, data = dat[1001:2000,])
+
+  summary(fit_ful)
+  summary(fit_1)
+  summary(fit_2)
+
+  est_ful <- coef(fit_ful)
+  est_1 <- coef(fit_1)
+  est_2 <- coef(fit_2)
+
+  se_1 <- summary(fit_1)$coefficients[, "Std. Error"]
+  se_2 <- summary(fit_2)$coefficients[, "Std. Error"]
+
+  V_1 <- vcov(fit_1)
+  V_2 <- vcov(fit_2)
+
+  regression <- list(st_1 = ~ .trt + X1+X2,
+                     st_2 = ~ .trt + X2)
+
+  reg_data <-
+    as.data.frame(tribble(
+      ~"trt", ~"X1", ~"X2",
+      "A", 0 , 0 ,
+      NA , NA, NA,
+      "B", NA, NA,
+      NA , 1 , NA,
+      NA , NA,  1,
+
+      "A", 0 , 0 ,
+      NA , NA, NA,
+      "B", NA, NA,
+      NA , NA,  1
+    )) %>%
+    dplyr::mutate(estimate = c(NA,est_1,NA,est_2),
+                  se       = c(NA,se_1,NA,se_2),
+                  study    = rep(paste0('st_',1:2),c(length(est_1)+1,length(est_2)+1))
+    )
+
+  reg_cov <- list(st_1 = V_1, st_2 = V_2)
+
+  reg_covariates <- data.frame(study=paste0('st_',1:2),
+                               X1_mean = rep(0,2),
+                               X2_mean = rep(0,2),
+                               X1_sd   = rep(1,2),
+                               X2_sd   = rep(1,2))
+
+  reg_obj <- set_agd_regression(
+    data       = reg_data,
+    study      = "study",
+    trt        = "trt",
+    estimate   = "estimate",
+    se         = "se",
+    cov        = reg_cov,
+    covariates = reg_covariates,
+    regression = regression,
+    # trt_class  = "trt_class",
+    trt_ref    = "A")
+
+  reg_obj <- add_integration(reg_obj,
+                             X1 = distr(qnorm, mean = 0, sd = 1),
+                             X2 = distr(qnorm, mean = 0, sd = 1),
+                             cor = cov2cor(Sigma),
+                             n_int = 64)
+
+  # IPD
+  ipd_obj <- set_ipd( dat[2001:3000,] %>% mutate(study='st_ipd') ,
+                      study = study,
+                      trt = trt,
+                      r = y)
+  net_IPD_Reg <- combine_network(reg_obj , ipd_obj, trt_ref = "A")
+
+  fit <- suppressWarnings(nma(net_IPD_Reg,
+                                  regression = ~ .trt + X1 + X2,
+                                  likelihood = 'bernoulli',
+                                  link = 'logit',
+                                  OVB_adj = 'all',
+                                  iter = 4000))
+  result <- as.data.frame(rstan::summary(fit$stanfit, pars = c("beta[X1]","beta[X2]","d[B]"))$summary[, c("mean",'Rhat')])
+
+  expect_equivalent(result$mean, est_ful[c("X1","X2","trtB")] , tol=0.3)
+  expect_equivalent(result$Rhat, rep(1,nrow(result)) , tol=0.3)
+
+
+  # --- Count (log) ---
+  dat <- dat %>% dplyr::mutate(y = rpois(n, exp(eta)) )
+  mean(dat$y)
+
+  fit_ful <- glm( y ~ trt + X1 + X2, family = poisson(link = "log") , data = dat)
+  fit_1 <- glm( y ~ trt + X1+X2, family = poisson(link = "log"), data = dat[1:1000,])
+  fit_2 <- glm( y ~ trt + X2, family = poisson(link = "log"), data = dat[1001:2000,])
+
+  summary(fit_ful)
+  summary(fit_1)
+  summary(fit_2)
+
+  est_ful <- coef(fit_ful)
+  est_1 <- coef(fit_1)
+  est_2 <- coef(fit_2)
+
+  se_1 <- summary(fit_1)$coefficients[, "Std. Error"]
+  se_2 <- summary(fit_2)$coefficients[, "Std. Error"]
+
+  V_1 <- vcov(fit_1)
+  V_2 <- vcov(fit_2)
+
+  regression <- list(st_1 = ~ .trt + X1+X2,
+                     st_2 = ~ .trt + X2)
+
+  reg_data <-
+    as.data.frame(tribble(
+      ~"trt", ~"X1", ~"X2",
+      "A", 0 , 0 ,
+      NA , NA, NA,
+      "B", NA, NA,
+      NA , 1 , NA,
+      NA , NA,  1,
+
+      "A", 0 , 0 ,
+      NA , NA, NA,
+      "B", NA, NA,
+      NA , NA,  1
+    )) %>%
+    dplyr::mutate(estimate = c(NA,est_1,NA,est_2),
+                  se       = c(NA,se_1,NA,se_2),
+                  study    = rep(paste0('st_',1:2),c(length(est_1)+1,length(est_2)+1))
+    )
+
+  reg_cov <- list(st_1 = V_1, st_2 = V_2)
+
+  reg_covariates <- data.frame(study=paste0('st_',1:2),
+                               X1_mean = rep(0,2),
+                               X2_mean = rep(0,2),
+                               X1_sd   = rep(1,2),
+                               X2_sd   = rep(1,2))
+
+  reg_obj <- set_agd_regression(
+    data       = reg_data,
+    study      = "study",
+    trt        = "trt",
+    estimate   = "estimate",
+    se         = "se",
+    cov        = reg_cov,
+    covariates = reg_covariates,
+    regression = regression,
+    # trt_class  = "trt_class",
+    trt_ref    = "A")
+
+
+  reg_obj <- add_integration(reg_obj,
+                             X1 = distr(qnorm, mean = 0, sd = 1),
+                             X2 = distr(qnorm, mean = 0, sd = 1),
+                             cor = cov2cor(Sigma),
+                             n_int = 64)
+  # IPD
+  ipd_obj <- set_ipd( dat[2001:3000,] %>% mutate(study='st_ipd', E=1) ,
+                      study = study,
+                      trt = trt,
+                      E=E,
+                      r = y)
+  net_IPD_Reg <- combine_network(reg_obj , ipd_obj, trt_ref = "A")
+
+  fit <- suppressWarnings(nma(net_IPD_Reg,
+                                  regression = ~ .trt + X1 + X2,
+                                  likelihood = 'poisson',
+                                  link = 'log',
+                                  OVB_adj = 'all',
+                                  iter = 4000))
+  result <- as.data.frame(rstan::summary(fit$stanfit, pars = c("beta[X1]","beta[X2]","d[B]"))$summary[, c("mean",'Rhat')])
+
+  expect_equivalent(result$mean, est_ful[c("X1","X2","trtB")] , tol=0.3)
+  expect_equivalent(result$Rhat, rep(1,nrow(result)) , tol=0.3)
+
+  # --- Cox PH ---
+  dat <- dat %>% dplyr::mutate(eventtime_raw = rexp(n, rate = exp(eta)),
+                               cen = rexp(n, rate = 0.05),
+                               status = as.integer(eventtime_raw < cen),
+                               eventtime = pmin(eventtime_raw,cen))
+  mean(dat$status)
+  fit_ful <- survival::coxph(survival::Surv(eventtime, status) ~ trt + X1 + X2, data = dat)
+  fit_1 <- survival::coxph(survival::Surv(eventtime, status) ~ trt + X1 + X2, data = dat[1:1000,])
+  fit_2 <- survival::coxph(survival::Surv(eventtime, status) ~ trt + X2, data = dat[1001:2000,])
+
+  summary(fit_ful)
+  summary(fit_1)
+  summary(fit_2)
+
+  est_ful <- coef(fit_ful)
+  est_1 <- coef(fit_1)
+  est_2 <- coef(fit_2)
+
+  se_1 <- summary(fit_1)$coefficients[,"se(coef)"]
+  se_2 <- summary(fit_2)$coefficients[,"se(coef)"]
+
+  V_1 <- vcov(fit_1)[names(est_1), names(est_1)]
+  V_2 <- vcov(fit_2)[names(est_2), names(est_2)]
+
+  regression <- list(st_1 = ~ .trt + X1+X2,
+                     st_2 = ~ .trt + X2)
+
+  reg_data <-
+    as.data.frame(tribble(
+      ~"trt", ~"X1", ~"X2",
+      "A", 0 , 0 ,
+      # NA , NA, NA,
+      "B", NA, NA,
+      NA , 1 , NA,
+      NA , NA,  1,
+
+      "A", 0 , 0 ,
+      # NA , NA, NA,
+      "B", NA, NA,
+      NA , NA,  1
+    )) %>%
+    dplyr::mutate(estimate = c(NA,est_1,NA,est_2),
+                  se       = c(NA,se_1,NA,se_2),
+                  study    = rep(paste0('st_',1:2),c(length(est_1)+1,length(est_2)+1))
+    )
+
+  reg_cov <- list(st_1 = V_1, st_2 = V_2)
+
+  reg_covariates <- data.frame(study=paste0('st_',1:2),
+                               X1_mean = rep(0,2),
+                               X2_mean = rep(0,2),
+                               X1_sd   = rep(1,2),
+                               X2_sd   = rep(1,2))
+
+  reg_obj <- set_agd_regression(
+    data       = reg_data,
+    study      = "study",
+    trt        = "trt",
+    estimate   = "estimate",
+    se         = "se",
+    cov        = reg_cov,
+    covariates = reg_covariates,
+    regression = regression,
+    # trt_class  = "trt_class",
+    trt_ref    = "A")
+
+
+  reg_obj <- add_integration(reg_obj,
+                             X1 = distr(qnorm, mean = 0, sd = 1),
+                             X2 = distr(qnorm, mean = 0, sd = 1),
+                             cor = cov2cor(Sigma),
+                             n_int = 64)
+  # IPD
+  ipd_obj <- set_ipd( dat[2001:3000,] %>% mutate(study='st_ipd') ,
+                      study = study,
+                      trt = trt,
+                      Surv = Surv(eventtime, status))
+  net_IPD_Reg <- combine_network(reg_obj , ipd_obj, trt_ref = "A")
+
+  fit <- suppressWarnings(nma(net_IPD_Reg,
+                                  regression = ~ .trt + X1 + X2,
+                                  likelihood = 'exponential',
+                                  # link = 'log',
+                                  OVB_adj = 'all',
+                                  iter = 4000))
+  result <- as.data.frame(rstan::summary(fit$stanfit, pars = c("beta[X1]","beta[X2]","d[B]"))$summary[, c("mean",'Rhat')])
+
+  expect_equivalent(result$mean, est_ful[c("X1","X2","trtB")] , tol=0.3)
+  expect_equivalent(result$Rhat, rep(1,nrow(result)) , tol=0.3)
+
+  # --- AFT (Weibull) ---
+  dat <- dat %>% dplyr::mutate(eventtime_raw = rweibull(n, shape = 1, scale= exp(eta)),
+                               cen = rexp(n, rate = 0.1),
+                               status = as.integer(eventtime_raw < cen),
+                               eventtime = pmin(eventtime_raw,cen))
+  mean(dat$status)
+
+  fit_ful <- survival::survreg(survival::Surv(eventtime, status) ~ trt + X1 + X2, dist = "weibull", data = dat)
+  fit_1 <- survival::survreg(survival::Surv(eventtime, status) ~ trt + X1 + X2, dist = "weibull", data = dat[1:1000,])
+  fit_2 <- survival::survreg(survival::Surv(eventtime, status) ~ trt + X2, dist = "weibull", data = dat[1001:2000,])
+
+  summary(fit_ful)
+  summary(fit_1)
+  summary(fit_2)
+
+  est_ful <- coef(fit_ful)
+  est_1 <- coef(fit_1)
+  est_2 <- coef(fit_2)
+
+  se_1 <- summary(fit_1)$table[names(est_1), "Std. Error"]
+  se_2 <- summary(fit_2)$table[names(est_2), "Std. Error"]
+
+  V_1 <- vcov(fit_1)[names(est_1), names(est_1)]
+  V_2 <- vcov(fit_2)[names(est_2), names(est_2)]
+
+  regression <- list(st_1 = ~ .trt + X1+X2,
+                     st_2 = ~ .trt + X2)
+
+  reg_data <-
+    as.data.frame(tribble(
+      ~"trt", ~"X1", ~"X2",
+      "A", 0 , 0 ,
+      NA , NA, NA,
+      "B", NA, NA,
+      NA , 1 , NA,
+      NA , NA,  1,
+
+      "A", 0 , 0 ,
+      NA , NA, NA,
+      "B", NA, NA,
+      NA , NA,  1
+    )) %>%
+    dplyr::mutate(estimate = c(NA,est_1,NA,est_2),
+                  se       = c(NA,se_1,NA,se_2),
+                  study    = rep(paste0('st_',1:2),c(length(est_1)+1,length(est_2)+1))
+    )
+
+  # reg_cov <- list(st_1 = V_1, st_2 = V_2)
+  reg_cov <- list(st_1 = as.matrix(Matrix::nearPD(V_1, keepDiag = TRUE)$mat),
+                  st_2 = as.matrix(Matrix::nearPD(V_2, keepDiag = TRUE)$mat))
+
+  reg_covariates <- data.frame(study=paste0('st_',1:2),
+                               X1_mean = rep(0,2),
+                               X2_mean = rep(0,2),
+                               X1_sd   = rep(1,2),
+                               X2_sd   = rep(1,2))
+
+  reg_obj <- set_agd_regression(
+    data       = reg_data,
+    study      = "study",
+    trt        = "trt",
+    estimate   = "estimate",
+    se         = "se",
+    cov        = reg_cov,
+    covariates = reg_covariates,
+    regression = regression,
+    # trt_class  = "trt_class",
+    trt_ref    = "A")
+
+
+  reg_obj <- add_integration(reg_obj,
+                             X1 = distr(qnorm, mean = 0, sd = 1),
+                             X2 = distr(qnorm, mean = 0, sd = 1),
+                             cor = cov2cor(Sigma),
+                             n_int = 64)
+
+  # IPD
+  ipd_obj <- set_ipd( dat[2001:3000,] %>% mutate(study='st_ipd') ,
+                      study = study,
+                      trt = trt,
+                      Surv = Surv(eventtime, status))
+  net_IPD_Reg <- combine_network(reg_obj , ipd_obj, trt_ref = "A")
+
+  fit <- suppressWarnings(nma(net_IPD_Reg,
+                                  regression = ~ .trt + X1 + X2,
+                                  likelihood = 'weibull-aft',
+                                  # link = 'log',
+                                  OVB_adj = 'all',
+                                  iter = 4000))
+  result <- as.data.frame(rstan::summary(fit$stanfit, pars = c("beta[X1]","beta[X2]","d[B]"))$summary[, c("mean",'Rhat')])
+
+  expect_equivalent(result$mean, est_ful[c("X1","X2","trtB")] , tol=0.3)
+  expect_equivalent(result$Rhat, rep(1,nrow(result)) , tol=0.3)
+
+
+
+})
+
 test_that("set_* - take one and only one outcome", {
   m <- "specify one and only one outcome"
   expect_error(set_ipd(agd_arm, "studyn", "trtc", r = bin, y = cont), m)
@@ -504,6 +2457,21 @@ test_that("set_* - take one and only one outcome", {
 
 # Reference treatment for survival outcomes tie-breaks by longest follow-up
 bmax <- max(subset(agd_arm$cont_pos, agd_arm$trtf == "B")) > max(subset(agd_arm$cont_pos, agd_arm$trtf == "A"))
+
+agd_reg <- tibble(studyc = c("A", "A", "A", "A", "B", "B", "B"),
+                  studyf = factor(studyc),
+                  studyn = as.numeric(studyf),
+                  studyf2 = forcats::fct_rev(studyf),
+                  trtc = c("a", NA, "a", "b", "b", NA, "c"),
+                  trtf = factor(trtc),
+                  trtn = as.numeric(trtf),
+                  trtf2 = forcats::fct_relevel(trtf, "c"),
+                  tclassc = c("1", NA, "1", "2", "2", NA, "2"),
+                  tclassf = factor(tclassc),
+                  tclassn = as.numeric(tclassf),
+                  tclassf2 = forcats::fct_relevel(tclassf, "2"),
+                  est = c(NA, 0, 1, 2, NA, 1, 2), se = 1, x = 1)
+reg_cor <- list(A = diag(3), B = diag(2))
 
 test_that("set_* `.trt` column is correct", {
   expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont)$ipd$.trt,
@@ -515,6 +2483,11 @@ test_that("set_* `.trt` column is correct", {
   expect_equal(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin))$agd_arm$.trt,
                if (bmax) forcats::fct_relevel(agd_arm$trtf, "B", "A", "C") else agd_arm$trtf)
 
+  reg_trtf <- factor(c("a", "a", "a", "b", "b", "b", "c"), levels = c("b", "a", "c"))  # should set NA to reference trt within each study
+  expect_equal(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt)$agd_regression$.trt,
+               reg_trtf)
+
+  # by column position
   expect_equal(set_ipd(agd_arm, studyc, 6, y = cont)$ipd$.trt,
                agd_arm$trtf)
   expect_equal(set_agd_arm(agd_arm, studyc, 6, y = cont, se = cont_pos)$agd_arm$.trt,
@@ -523,6 +2496,8 @@ test_that("set_* `.trt` column is correct", {
                agd_contrast$trtf)
   expect_equal(set_agd_surv(agd_arm, studyc, 6, Surv = Surv(cont_pos, bin))$agd_arm$.trt,
                if (bmax) forcats::fct_relevel(agd_arm$trtf, "B", "A", "C") else agd_arm$trtf)
+  expect_equal(set_agd_regression(agd_reg, studyc, 5, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt)$agd_regression$.trt,
+               reg_trtf)
 
   expect_equal(set_ipd(agd_arm, studyc, "trtc", y = cont)$ipd$.trt,
                agd_arm$trtf)
@@ -532,6 +2507,8 @@ test_that("set_* `.trt` column is correct", {
                agd_contrast$trtf)
   expect_equal(set_agd_surv(agd_arm, studyc, "trtc", Surv = Surv(cont_pos, bin))$agd_arm$.trt,
                if (bmax) forcats::fct_relevel(agd_arm$trtf, "B", "A", "C") else agd_arm$trtf)
+  expect_equal(set_agd_regression(agd_reg, studyc, "trtc", estimate = est, se = se, cor = reg_cor, regression = ~x:.trt)$agd_regression$.trt,
+               reg_trtf)
 
   expect_equal(set_ipd(agd_arm, studyc, factor(trtc), y = cont)$ipd$.trt,
                agd_arm$trtf)
@@ -541,6 +2518,8 @@ test_that("set_* `.trt` column is correct", {
                agd_contrast$trtf)
   expect_equal(set_agd_surv(agd_arm, studyc, factor(trtc), Surv = Surv(cont_pos, bin))$agd_arm$.trt,
                if (bmax) forcats::fct_relevel(agd_arm$trtf, "B", "A", "C") else agd_arm$trtf)
+  expect_equal(set_agd_regression(agd_reg, studyc, factor(trtc), estimate = est, se = se, cor = reg_cor, regression = ~x:.trt)$agd_regression$.trt,
+               reg_trtf)
 
 
   expect_equal(set_ipd(agd_arm, studyc, trtf, y = cont)$ipd$.trt,
@@ -551,6 +2530,8 @@ test_that("set_* `.trt` column is correct", {
                agd_contrast$trtf)
   expect_equal(set_agd_surv(agd_arm, studyc, trtf, Surv = Surv(cont_pos, bin))$agd_arm$.trt,
                if (bmax) forcats::fct_relevel(agd_arm$trtf, "B", "A", "C") else agd_arm$trtf)
+  expect_equal(set_agd_regression(agd_reg, studyc, trtf, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt)$agd_regression$.trt,
+               reg_trtf)
 
   expect_equal(set_ipd(agd_arm, studyc, trtf2, y = cont, trt_ref = "C")$ipd$.trt,
                agd_arm$trtf2)
@@ -561,6 +2542,10 @@ test_that("set_* `.trt` column is correct", {
   expect_equal(set_agd_surv(agd_arm, studyc, trtf2, Surv = Surv(cont_pos, bin), trt_ref = "C")$agd_arm$.trt,
                agd_arm$trtf2)
 
+  reg_trtf2 <- forcats::fct_relevel(reg_trtf, "c", "a", "b")
+  expect_equal(set_agd_regression(agd_reg, studyc, trtf2, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_ref = "c")$agd_regression$.trt,
+               reg_trtf2)
+
   # Check that unused factor levels are dropped
   expect_equal(set_ipd(agd_arm, studyc, forcats::fct_expand(trtf, "zzz"), y = cont)$ipd$.trt,
                agd_arm$trtf)
@@ -570,6 +2555,8 @@ test_that("set_* `.trt` column is correct", {
                agd_contrast$trtf)
   expect_equal(set_agd_surv(agd_arm, studyc, forcats::fct_expand(trtf, "zzz"), Surv = Surv(cont_pos, bin))$agd_arm$.trt,
                if (bmax) forcats::fct_relevel(agd_arm$trtf, "B", "A", "C") else agd_arm$trtf)
+  expect_equal(set_agd_regression(agd_reg, studyc, forcats::fct_expand(trtf, "zzz"), estimate = est, se = se, cor = reg_cor, regression = ~x:.trt)$agd_regression$.trt,
+               reg_trtf)
 
   expect_equal(set_ipd(agd_arm, studyc, forcats::fct_expand(trtf2, "zzz"), y = cont, trt_ref = "C")$ipd$.trt,
                agd_arm$trtf2)
@@ -579,6 +2566,8 @@ test_that("set_* `.trt` column is correct", {
                agd_contrast$trtf2)
   expect_equal(set_agd_surv(agd_arm, studyc, forcats::fct_expand(trtf2, "zzz"), Surv = Surv(cont_pos, bin), trt_ref = "C")$agd_arm$.trt,
                agd_arm$trtf2)
+  expect_equal(set_agd_regression(agd_reg, studyc, forcats::fct_expand(trtf2, "zzz"), estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_ref = "c")$agd_regression$.trt,
+               reg_trtf2)
 })
 
 test_that("set_* `.study` column is correct", {
@@ -590,7 +2579,10 @@ test_that("set_* `.study` column is correct", {
                agd_contrast$studyf)
   expect_equal(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin))$agd_arm$.study,
                agd_arm$studyf)
+  expect_equal(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt)$agd_regression$.study,
+               agd_reg$studyf)
 
+  # by column position
   expect_equal(set_ipd(agd_arm, 2, trtc, y = cont)$ipd$.study,
                agd_arm$studyf)
   expect_equal(set_agd_arm(agd_arm, 2, trtc, y = cont, se = cont_pos)$agd_arm$.study,
@@ -599,6 +2591,8 @@ test_that("set_* `.study` column is correct", {
                agd_contrast$studyf)
   expect_equal(set_agd_surv(agd_arm, 2, trtc, Surv = Surv(cont_pos, bin))$agd_arm$.study,
                agd_arm$studyf)
+  expect_equal(set_agd_regression(agd_reg, 1, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt)$agd_regression$.study,
+               agd_reg$studyf)
 
   expect_equal(set_ipd(agd_arm, "studyc", trtc, y = cont)$ipd$.study,
                agd_arm$studyf)
@@ -608,6 +2602,8 @@ test_that("set_* `.study` column is correct", {
                agd_contrast$studyf)
   expect_equal(set_agd_surv(agd_arm, "studyc", trtc, Surv = Surv(cont_pos, bin))$agd_arm$.study,
                agd_arm$studyf)
+  expect_equal(set_agd_regression(agd_reg, "studyc", trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt)$agd_regression$.study,
+               agd_reg$studyf)
 
   expect_equal(set_ipd(agd_arm, factor(studyc), trtc, y = cont)$ipd$.study,
                agd_arm$studyf)
@@ -617,6 +2613,8 @@ test_that("set_* `.study` column is correct", {
                agd_contrast$studyf)
   expect_equal(set_agd_surv(agd_arm, factor(studyc), trtc, Surv = Surv(cont_pos, bin))$agd_arm$.study,
                agd_arm$studyf)
+  expect_equal(set_agd_regression(agd_reg, factor(studyc), trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt)$agd_regression$.study,
+               agd_reg$studyf)
 
   expect_equal(set_ipd(agd_arm, studyf, trtc, y = cont)$ipd$.study,
                agd_arm$studyf)
@@ -626,6 +2624,8 @@ test_that("set_* `.study` column is correct", {
                agd_contrast$studyf)
   expect_equal(set_agd_surv(agd_arm, studyf, trtc, Surv = Surv(cont_pos, bin))$agd_arm$.study,
                agd_arm$studyf)
+  expect_equal(set_agd_regression(agd_reg, studyf, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt)$agd_regression$.study,
+               agd_reg$studyf)
 
   expect_equal(set_ipd(agd_arm, studyf2, trtc, y = cont)$ipd$.study,
                agd_arm$studyf2)
@@ -635,6 +2635,9 @@ test_that("set_* `.study` column is correct", {
                agd_contrast$studyf2)
   expect_equal(set_agd_surv(agd_arm, studyf2, trtc, Surv = Surv(cont_pos, bin))$agd_arm$.study,
                agd_arm$studyf2)
+  # set_agd_regression reorders data in order of study
+  expect_equal(set_agd_regression(agd_reg, studyf2, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt)$agd_regression$.study,
+               sort(agd_reg$studyf2))
 
   # Check that unused levels are dropped
   expect_equal(set_ipd(agd_arm, forcats::fct_expand(studyf, "zzz"), trtc, y = cont)$ipd$.study,
@@ -645,6 +2648,8 @@ test_that("set_* `.study` column is correct", {
                agd_contrast$studyf)
   expect_equal(set_agd_surv(agd_arm, forcats::fct_expand(studyf, "zzz"), trtc, Surv = Surv(cont_pos, bin))$agd_arm$.study,
                agd_arm$studyf)
+  expect_equal(set_agd_regression(agd_reg, forcats::fct_expand(studyf, "zzz"), trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt)$agd_regression$.study,
+               agd_reg$studyf)
 
   expect_equal(set_ipd(agd_arm, forcats::fct_expand(studyf2, "zzz"), trtc, y = cont)$ipd$.study,
                agd_arm$studyf2)
@@ -654,10 +2659,13 @@ test_that("set_* `.study` column is correct", {
                agd_contrast$studyf2)
   expect_equal(set_agd_surv(agd_arm, forcats::fct_expand(studyf2, "zzz"), trtc, Surv = Surv(cont_pos, bin))$agd_arm$.study,
                agd_arm$studyf2)
+  expect_equal(set_agd_regression(agd_reg, forcats::fct_expand(studyf2, "zzz"), trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt)$agd_regression$.study,
+               sort(agd_reg$studyf2))
 
   # Check reserved column names handled correctly
   aa <- mutate(agd_arm, .study = studyc)
   ac <- mutate(agd_contrast, .study = studyc)
+  ar <- mutate(agd_reg, .study = studyc)
   expect_equal(set_ipd(aa, .study, trtc, y = cont)$ipd$.study,
                agd_arm$studyf)
   expect_equal(set_agd_arm(aa, .study, trtc, y = cont, se = cont_pos)$agd_arm$.study,
@@ -668,6 +2676,8 @@ test_that("set_* `.study` column is correct", {
                agd_arm$studyf)
   expect_equal(set_agd_surv(aa, .study, trtc, Surv = Surv(cont_pos, bin), covariates = aa)$agd_arm$.study,
                agd_arm$studyf)
+  expect_equal(set_agd_regression(ar, .study, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt)$agd_regression$.study,
+               agd_reg$studyf)
 
   expect_equal(set_ipd(aa, 26, trtc, y = cont)$ipd$.study,
                agd_arm$studyf)
@@ -679,6 +2689,8 @@ test_that("set_* `.study` column is correct", {
                agd_arm$studyf)
   expect_equal(set_agd_surv(aa, 26, trtc, Surv = Surv(cont_pos, bin), covariates = aa)$agd_arm$.study,
                agd_arm$studyf)
+  expect_equal(set_agd_regression(ar, 16, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt)$agd_regression$.study,
+               agd_reg$studyf)
 })
 
 test_that("set_* return default `treatments` factor", {
@@ -690,10 +2702,13 @@ test_that("set_* return default `treatments` factor", {
                .default(factor(LETTERS[1:3])))
   expect_equal(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin))$treatments,
                if (bmax) .default(factor(c("B", "A", "C"), levels = c("B", "A", "C"))) else .default(factor(LETTERS[1:3])))
+  expect_equal(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt)$treatments,
+               .default(factor(c("b", "a", "c"), levels = c("b", "a", "c"))))
 })
 
 test_that("set_* can set `trt_ref`", {
   f_BAC <- factor(LETTERS[c(2,1,3)], levels = LETTERS[c(2,1,3)])
+  f_bac <- factor(letters[c(2,1,3)], levels = letters[c(2,1,3)])
   expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont, trt_ref = "B")$treatments,
                f_BAC)
   expect_equal(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos, trt_ref = "B")$treatments,
@@ -702,6 +2717,8 @@ test_that("set_* can set `trt_ref`", {
                f_BAC)
   expect_equal(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin), trt_ref = "B")$treatments,
                f_BAC)
+  expect_equal(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_ref = "b")$treatments,
+               f_bac)
   expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont, trt_ref = factor("B"))$treatments,
                f_BAC)
   expect_equal(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos, trt_ref = factor("B"))$treatments,
@@ -710,9 +2727,12 @@ test_that("set_* can set `trt_ref`", {
                f_BAC)
   expect_equal(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin), trt_ref = factor("B"))$treatments,
                f_BAC)
+  expect_equal(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_ref = factor("b"))$treatments,
+               f_bac)
 
   # Using trtf sets original_levels attribute
   attr(f_BAC, "original_levels") <- LETTERS[1:3]
+  attr(f_bac, "original_levels") <- letters[1:3]
   expect_equal(set_ipd(agd_arm, studyc, trtf, y = cont, trt_ref = "B")$treatments,
                f_BAC)
   expect_equal(set_agd_arm(agd_arm, studyc, trtf, y = cont, se = cont_pos, trt_ref = "B")$treatments,
@@ -721,6 +2741,8 @@ test_that("set_* can set `trt_ref`", {
                f_BAC)
   expect_equal(set_agd_surv(agd_arm, studyc, trtf, Surv = Surv(cont_pos, bin), trt_ref = "B")$treatments,
                f_BAC)
+  expect_equal(set_agd_regression(agd_reg, studyc, trtf, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_ref = "b")$treatments,
+               f_bac)
   expect_equal(set_ipd(agd_arm, studyc, trtf, y = cont, trt_ref = factor("B"))$treatments,
                f_BAC)
   expect_equal(set_agd_arm(agd_arm, studyc, trtf, y = cont, se = cont_pos, trt_ref = factor("B"))$treatments,
@@ -729,6 +2751,8 @@ test_that("set_* can set `trt_ref`", {
                f_BAC)
   expect_equal(set_agd_surv(agd_arm, studyc, trtf, Surv = Surv(cont_pos, bin), trt_ref = factor("B"))$treatments,
                f_BAC)
+  expect_equal(set_agd_regression(agd_reg, studyc, trtf, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_ref = factor("b"))$treatments,
+               f_bac)
 
   f_213 <- factor(c(2, 1, 3), levels = c(2, 1, 3))
   expect_equal(set_ipd(agd_arm, studyc, trtn, y = cont, trt_ref = 2)$treatments,
@@ -738,6 +2762,8 @@ test_that("set_* can set `trt_ref`", {
   expect_equal(set_agd_contrast(agd_contrast, studyc, trtn, y = ydiff, se = sediff, trt_ref = 2)$treatments,
                f_213)
   expect_equal(set_agd_surv(agd_arm, studyc, trtn, Surv = Surv(cont_pos, bin), trt_ref = 2)$treatments,
+               f_213)
+  expect_equal(set_agd_regression(agd_reg, studyc, trtn, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_ref = "2")$treatments,
                f_213)
 
   f_BCA <- factor(LETTERS[c(2,3,1)], levels = LETTERS[c(2,3,1)])
@@ -761,6 +2787,7 @@ test_that("set_* can set `trt_ref`", {
 
   # Check that unused levels are dropped
   attr(f_BAC, "original_levels") <- c("A", "B", "C", "zzz")
+  attr(f_bac, "original_levels") <- c("a", "b", "c", "zzz")
   expect_equal(set_ipd(agd_arm, studyc, forcats::fct_expand(trtf, "zzz"), y = cont, trt_ref = "B")$treatments,
                f_BAC)
   expect_equal(set_agd_arm(agd_arm, studyc, forcats::fct_expand(trtf, "zzz"), y = cont, se = cont_pos, trt_ref = "B")$treatments,
@@ -769,12 +2796,15 @@ test_that("set_* can set `trt_ref`", {
                f_BAC)
   expect_equal(set_agd_surv(agd_arm, studyc, forcats::fct_expand(trtf, "zzz"), Surv = Surv(cont_pos, bin), trt_ref = "B")$treatments,
                f_BAC)
+  expect_equal(set_agd_regression(agd_reg, studyc, forcats::fct_expand(trtf, "zzz"), estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_ref = "b")$treatments,
+               f_bac)
 
   m <- "`trt_ref` does not match a treatment in the data.+Suitable values are:"
   expect_error(set_ipd(agd_arm, studyc, trtc, y = cont, trt_ref = 2), m)
   expect_error(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos, trt_ref = 2), m)
   expect_error(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff, trt_ref = 2), m)
   expect_error(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin), trt_ref = 2), m)
+  expect_error(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_ref = "Z")$treatments, m)
 })
 
 # Check classes when default reference treatment is not first in sort order
@@ -796,20 +2826,27 @@ test_that("set_* returns correct .trtclass column", {
                                 trt_class = tclassc)$agd_contrast$.trtclass,
                agd_contrast$tclassf)
   expect_equal(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin),
-                           trt_class = tclassc)$agd_arm$.trtclass,
+                            trt_class = tclassc)$agd_arm$.trtclass,
                if (bmax) forcats::fct_relevel(agd_arm$tclassf, "b") else agd_arm$tclassf)
+
+  reg_tclassf <- factor(c("1", "1", "1", "2", "2", "2", "2"), levels = c("2", "1"))  # should set NA to reference trtclass within each study
+  expect_equal(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_class = tclassc)$agd_regression$.trtclass,
+               reg_tclassf)
+
   expect_equal(combine_network(set_ipd(agd_arm, studyc, trtc, y = cont,
-                       trt_class = tclassc))$ipd$.trtclass,
+                                       trt_class = tclassc))$ipd$.trtclass,
                agd_arm$tclassf)
   expect_equal(combine_network(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos,
-                           trt_class = tclassc))$agd_arm$.trtclass,
+                                           trt_class = tclassc))$agd_arm$.trtclass,
                agd_arm$tclassf)
   expect_equal(combine_network(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff,
-                                trt_class = tclassc))$agd_contrast$.trtclass,
+                                                trt_class = tclassc))$agd_contrast$.trtclass,
                agd_contrast$tclassf)
   expect_equal(combine_network(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin),
-                                           trt_class = tclassc))$agd_arm$.trtclass,
+                                            trt_class = tclassc))$agd_arm$.trtclass,
                if (bmax) forcats::fct_relevel(agd_arm$tclassf, "b") else agd_arm$tclassf)
+  expect_equal(combine_network(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_class = tclassc))$agd_regression$.trtclass,
+               reg_tclassf)
 
   expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont,
                        trt_class = 11)$ipd$.trtclass,
@@ -821,8 +2858,10 @@ test_that("set_* returns correct .trtclass column", {
                                 trt_class = 11)$agd_contrast$.trtclass,
                agd_contrast$tclassf)
   expect_equal(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin),
-                           trt_class = 11)$agd_arm$.trtclass,
+                            trt_class = 11)$agd_arm$.trtclass,
                if (bmax) forcats::fct_relevel(agd_arm$tclassf, "b") else agd_arm$tclassf)
+  expect_equal(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_class = 9)$agd_regression$.trtclass,
+               reg_tclassf)
   expect_equal(combine_network(set_ipd(agd_arm, studyc, trtc, y = cont,
                                        trt_class = 11))$ipd$.trtclass,
                agd_arm$tclassf)
@@ -833,8 +2872,10 @@ test_that("set_* returns correct .trtclass column", {
                                                 trt_class = 11))$agd_contrast$.trtclass,
                agd_contrast$tclassf)
   expect_equal(combine_network(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin),
-                                           trt_class = 11))$agd_arm$.trtclass,
+                                            trt_class = 11))$agd_arm$.trtclass,
                if (bmax) forcats::fct_relevel(agd_arm$tclassf, "b") else agd_arm$tclassf)
+  expect_equal(combine_network(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_class = 9))$agd_regression$.trtclass,
+               reg_tclassf)
 
   expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont,
                        trt_class = tclassf)$ipd$.trtclass,
@@ -846,8 +2887,10 @@ test_that("set_* returns correct .trtclass column", {
                                 trt_class = tclassf)$agd_contrast$.trtclass,
                agd_contrast$tclassf)
   expect_equal(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin),
-                           trt_class = tclassf)$agd_arm$.trtclass,
+                            trt_class = tclassf)$agd_arm$.trtclass,
                if (bmax) forcats::fct_relevel(agd_arm$tclassf, "b") else agd_arm$tclassf)
+  expect_equal(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_class = tclassf)$agd_regression$.trtclass,
+               reg_tclassf)
   expect_equal(combine_network(set_ipd(agd_arm, studyc, trtc, y = cont,
                                        trt_class = tclassf))$ipd$.trtclass,
                agd_arm$tclassf)
@@ -858,8 +2901,10 @@ test_that("set_* returns correct .trtclass column", {
                                                 trt_class = tclassf))$agd_contrast$.trtclass,
                agd_contrast$tclassf)
   expect_equal(combine_network(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin),
-                                           trt_class = tclassf))$agd_arm$.trtclass,
+                                            trt_class = tclassf))$agd_arm$.trtclass,
                if (bmax) forcats::fct_relevel(agd_arm$tclassf, "b") else agd_arm$tclassf)
+  expect_equal(combine_network(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_class = tclassf))$agd_regression$.trtclass,
+               reg_tclassf)
 
   expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont, trt_ref = "B",
                        trt_class = tclassf2)$ipd$.trtclass,
@@ -871,8 +2916,13 @@ test_that("set_* returns correct .trtclass column", {
                                 trt_class = tclassf2)$agd_contrast$.trtclass,
                agd_contrast$tclassf2)
   expect_equal(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin), trt_ref = "B",
-                           trt_class = tclassf2)$agd_arm$.trtclass,
+                            trt_class = tclassf2)$agd_arm$.trtclass,
                agd_arm$tclassf2)
+
+  reg_tclassf2 <- factor(c(1, 1, 1, 2, 2, 2, 2), levels = c("1", "2"))
+  expect_equal(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_class = tclassf2, trt_ref = "a")$agd_regression$.trtclass,
+               reg_tclassf2)
+
   expect_equal(combine_network(set_ipd(agd_arm, studyc, trtc, y = cont,
                                        trt_class = tclassf2), trt_ref = "B")$ipd$.trtclass,
                agd_arm$tclassf2)
@@ -883,8 +2933,10 @@ test_that("set_* returns correct .trtclass column", {
                                                 trt_class = tclassf2), trt_ref = "B")$agd_contrast$.trtclass,
                agd_contrast$tclassf2)
   expect_equal(combine_network(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin),
-                                           trt_class = tclassf2), trt_ref = "B")$agd_arm$.trtclass,
+                                            trt_class = tclassf2), trt_ref = "B")$agd_arm$.trtclass,
                agd_arm$tclassf2)
+  expect_equal(combine_network(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_class = tclassf2), trt_ref = "a")$agd_regression$.trtclass,
+               reg_tclassf2)
 
   # Check that unused factor levels are dropped
   expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont,
@@ -897,8 +2949,10 @@ test_that("set_* returns correct .trtclass column", {
                                 trt_class = forcats::fct_expand(tclassf, "zzz"))$agd_contrast$.trtclass,
                agd_contrast$tclassf)
   expect_equal(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin),
-                           trt_class = forcats::fct_expand(tclassf, "zzz"))$agd_arm$.trtclass,
+                            trt_class = forcats::fct_expand(tclassf, "zzz"))$agd_arm$.trtclass,
                if (bmax) forcats::fct_relevel(agd_arm$tclassf, "b") else agd_arm$tclassf)
+  expect_equal(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_class = forcats::fct_expand(tclassf, "zzz"))$agd_regression$.trtclass,
+               reg_tclassf)
   expect_equal(combine_network(set_ipd(agd_arm, studyc, trtc, y = cont,
                                        trt_class = forcats::fct_expand(tclassf, "zzz")))$ipd$.trtclass,
                agd_arm$tclassf)
@@ -909,8 +2963,10 @@ test_that("set_* returns correct .trtclass column", {
                                                 trt_class = forcats::fct_expand(tclassf, "zzz")))$agd_contrast$.trtclass,
                agd_contrast$tclassf)
   expect_equal(combine_network(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin),
-                                           trt_class = forcats::fct_expand(tclassf, "zzz")))$agd_arm$.trtclass,
+                                            trt_class = forcats::fct_expand(tclassf, "zzz")))$agd_arm$.trtclass,
                if (bmax) forcats::fct_relevel(agd_arm$tclassf, "b") else agd_arm$tclassf)
+  expect_equal(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_class = forcats::fct_expand(tclassf, "zzz"))$agd_regression$.trtclass,
+               reg_tclassf)
 
   # Checks when default trt_ref not first in sort order
   expect_equal(set_ipd(aa, studyc, trtc, y = cont,
@@ -923,7 +2979,7 @@ test_that("set_* returns correct .trtclass column", {
                                 trt_class = tclassc)$agd_contrast$.trtclass,
                factor(ac$tclassc, levels = c("b", "a")))
   expect_equal(set_agd_surv(aa, studyc, trtc, Surv = Surv(cont_pos, bin),
-                           trt_class = tclassc)$agd_arm$.trtclass,
+                            trt_class = tclassc)$agd_arm$.trtclass,
                factor(aa$tclassc, levels = c("b", "a")))
   expect_equal(combine_network(set_ipd(aa, studyc, trtc, y = cont,
                                        trt_class = tclassc))$ipd$.trtclass,
@@ -935,12 +2991,13 @@ test_that("set_* returns correct .trtclass column", {
                                                 trt_class = tclassc))$agd_contrast$.trtclass,
                factor(ac$tclassc, levels = c("b", "a")))
   expect_equal(combine_network(set_agd_surv(aa, studyc, trtc, Surv = Surv(cont_pos, bin),
-                                           trt_class = tclassc))$agd_arm$.trtclass,
+                                            trt_class = tclassc))$agd_arm$.trtclass,
                factor(aa$tclassc, levels = c("b", "a")))
 })
 
 test_that("set_* returns classes factor variable", {
   f_class <- factor(c("a", "b", "b"))
+  f_classr <- factor(c(2, 1, 2), levels = c(2, 1))
   expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont, trt_class = tclassc)$classes,
                f_class)
   expect_equal(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos, trt_class = tclassc)$classes,
@@ -949,6 +3006,8 @@ test_that("set_* returns classes factor variable", {
                f_class)
   expect_equal(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin), trt_class = tclassc)$classes,
                if (bmax) factor(c("b", "a", "b"), levels = c("b", "a")) else f_class)
+  expect_equal(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_class = tclassc)$classes,
+               f_classr)
   expect_equal(combine_network(set_ipd(agd_arm, studyc, trtc, y = cont, trt_class = tclassc))$classes,
                f_class)
   expect_equal(combine_network(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos, trt_class = tclassc))$classes,
@@ -957,6 +3016,8 @@ test_that("set_* returns classes factor variable", {
                f_class)
   expect_equal(combine_network(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin), trt_class = tclassc))$classes,
                if (bmax) factor(c("b", "a", "b"), levels = c("b", "a")) else f_class)
+  expect_equal(combine_network(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_class = tclassc))$classes,
+               f_classr)
 
   # Using tclassf sets original_levels attribute
   attr(f_class, "original_levels") <- c("a", "b")
@@ -964,6 +3025,7 @@ test_that("set_* returns classes factor variable", {
     f_classs <- factor(c("b", "a", "b"), levels = c("b", "a"))
     attr(f_classs, "original_levels") <- c("a", "b")
   }
+  attr(f_classr, "original_levels") <- c("1", "2")
   expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont,
                        trt_class = recode_factor(trtc, A = "a", B = "b", C = "b"))$classes,
                f_class)
@@ -974,8 +3036,10 @@ test_that("set_* returns classes factor variable", {
                                 trt_class = recode_factor(trtc, A = "a", B = "b", C = "b"))$classes,
                f_class)
   expect_equal(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin),
-                           trt_class = recode_factor(trtc, A = "a", B = "b", C = "b"))$classes,
+                            trt_class = recode_factor(trtc, A = "a", B = "b", C = "b"))$classes,
                if (bmax) f_classs else f_class)
+  expect_equal(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_class = tclassf)$classes,
+               f_classr)
   expect_equal(combine_network(set_ipd(agd_arm, studyc, trtc, y = cont,
                                        trt_class = recode_factor(trtc, A = "a", B = "b", C = "b")))$classes,
                f_class)
@@ -986,10 +3050,13 @@ test_that("set_* returns classes factor variable", {
                                                 trt_class = recode_factor(trtc, A = "a", B = "b", C = "b")))$classes,
                f_class)
   expect_equal(combine_network(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin),
-                                           trt_class = recode_factor(trtc, A = "a", B = "b", C = "b")))$classes,
+                                            trt_class = recode_factor(trtc, A = "a", B = "b", C = "b")))$classes,
                if (bmax) f_classs else f_class)
+  expect_equal(combine_network(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_class = tclassf))$classes,
+               f_classr)
 
   f_class2 <- factor(c("b", "a", "b"), levels = c("b", "a"))
+  f_classr2 <- factor(c("1", "2", "2"), levels = c("1", "2"))
   expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont,
                        trt_class = tclassc, trt_ref = "B")$classes,
                f_class2)
@@ -1000,20 +3067,24 @@ test_that("set_* returns classes factor variable", {
                                 trt_class = tclassc, trt_ref = "B")$classes,
                f_class2)
   expect_equal(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin),
-                           trt_class = tclassc, trt_ref = "B")$classes,
+                            trt_class = tclassc, trt_ref = "B")$classes,
                f_class2)
+  expect_equal(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_class = tclassc, trt_ref = "a")$classes,
+               f_classr2)
   expect_equal(combine_network(set_ipd(agd_arm, studyc, trtc, y = cont,
-                       trt_class = tclassc), trt_ref = "B")$classes,
+                                       trt_class = tclassc), trt_ref = "B")$classes,
                f_class2)
   expect_equal(combine_network(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos,
-                           trt_class = tclassc), trt_ref = "B")$classes,
-               f_class2)
-  expect_equal(combine_network(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff,
-                                trt_class = tclassc), trt_ref = "B")$classes,
-               f_class2)
-  expect_equal(combine_network(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin),
                                            trt_class = tclassc), trt_ref = "B")$classes,
                f_class2)
+  expect_equal(combine_network(set_agd_contrast(agd_contrast, studyc, trtc, y = ydiff, se = sediff,
+                                                trt_class = tclassc), trt_ref = "B")$classes,
+               f_class2)
+  expect_equal(combine_network(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin),
+                                            trt_class = tclassc), trt_ref = "B")$classes,
+               f_class2)
+  expect_equal(combine_network(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_class = tclassc), trt_ref = "a")$classes,
+               f_classr2)
 
   # Checks when default trt_ref not first in sort order
   expect_equal(set_ipd(aa, studyc, trtc, y = cont,
@@ -1026,7 +3097,7 @@ test_that("set_* returns classes factor variable", {
                                 trt_class = tclassc)$classes,
                f_class2)
   expect_equal(set_agd_surv(aa, studyc, trtc, Surv = Surv(cont_pos, bin),
-                           trt_class = tclassc)$classes,
+                            trt_class = tclassc)$classes,
                f_class2)
   expect_equal(combine_network(set_ipd(aa, studyc, trtc, y = cont,
                                        trt_class = tclassc))$classes,
@@ -1038,10 +3109,11 @@ test_that("set_* returns classes factor variable", {
                                                 trt_class = tclassc))$classes,
                f_class2)
   expect_equal(combine_network(set_agd_surv(aa, studyc, trtc, Surv = Surv(cont_pos, bin),
-                                           trt_class = tclassc))$classes,
+                                            trt_class = tclassc))$classes,
                f_class2)
 
   attr(f_class2, "original_levels") <- c("a", "b")
+  attr(f_classr2, "original_levels") <- c("1", "2")
   expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont,
                        trt_class = recode_factor(trtc, A = "a", B = "b", C = "b"),
                        trt_ref = "B")$classes,
@@ -1055,9 +3127,11 @@ test_that("set_* returns classes factor variable", {
                                 trt_ref = "B")$classes,
                f_class2)
   expect_equal(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin),
-                           trt_class = recode_factor(trtc, A = "a", B = "b", C = "b"),
-                           trt_ref = "B")$classes,
+                            trt_class = recode_factor(trtc, A = "a", B = "b", C = "b"),
+                            trt_ref = "B")$classes,
                f_class2)
+  expect_equal(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_class = tclassf, trt_ref = "a")$classes,
+               f_classr2)
   expect_equal(combine_network(set_ipd(agd_arm, studyc, trtc, y = cont,
                                        trt_class = recode_factor(trtc, A = "a", B = "b", C = "b")),
                                trt_ref = "B")$classes,
@@ -1071,9 +3145,11 @@ test_that("set_* returns classes factor variable", {
                                trt_ref = "B")$classes,
                f_class2)
   expect_equal(combine_network(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin),
-                                           trt_class = recode_factor(trtc, A = "a", B = "b", C = "b")),
+                                            trt_class = recode_factor(trtc, A = "a", B = "b", C = "b")),
                                trt_ref = "B")$classes,
                f_class2)
+  expect_equal(combine_network(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_class = tclassf), trt_ref = "a")$classes,
+               f_classr2)
 
   # Checks when default trt_ref not first in sort order
   expect_equal(set_ipd(aa, studyc, trtc, y = cont,
@@ -1089,8 +3165,8 @@ test_that("set_* returns classes factor variable", {
                                 trt_ref = "B")$classes,
                f_class2)
   expect_equal(set_agd_surv(aa, studyc, trtc, Surv = Surv(cont_pos, bin),
-                           trt_class = recode_factor(trtc, A = "a", B = "b", C = "b"),
-                           trt_ref = "B")$classes,
+                            trt_class = recode_factor(trtc, A = "a", B = "b", C = "b"),
+                            trt_ref = "B")$classes,
                f_class2)
   expect_equal(combine_network(set_ipd(aa, studyc, trtc, y = cont,
                                        trt_class = recode_factor(trtc, A = "a", B = "b", C = "b")),
@@ -1105,7 +3181,7 @@ test_that("set_* returns classes factor variable", {
                                trt_ref = "B")$classes,
                f_class2)
   expect_equal(combine_network(set_agd_surv(aa, studyc, trtc, Surv = Surv(cont_pos, bin),
-                                           trt_class = recode_factor(trtc, A = "a", B = "b", C = "b")),
+                                            trt_class = recode_factor(trtc, A = "a", B = "b", C = "b")),
                                trt_ref = "B")$classes,
                f_class2)
 
@@ -1124,8 +3200,8 @@ test_that("set_* returns classes factor variable", {
                                 trt_ref = "B")$classes,
                f_class3)
   expect_equal(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin),
-                           trt_class = trtf2,
-                           trt_ref = "B")$classes,
+                            trt_class = trtf2,
+                            trt_ref = "B")$classes,
                f_class3)
   expect_equal(combine_network(set_ipd(agd_arm, studyc, trtc, y = cont,
                                        trt_class = trtf2),
@@ -1140,13 +3216,14 @@ test_that("set_* returns classes factor variable", {
                                trt_ref = "B")$classes,
                f_class3)
   expect_equal(combine_network(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin),
-                                           trt_class = trtf2),
+                                            trt_class = trtf2),
                                trt_ref = "B")$classes,
                f_class3)
 
   # Check that unused levels are dropped
   attr(f_class, "original_levels") <- c("a", "b", "zzz")
   if (bmax) attr(f_classs, "original_levels") <- c("a", "b", "zzz")
+  attr(f_classr, "original_levels") <- c("1", "2", "zzz")
   expect_equal(set_ipd(agd_arm, studyc, trtc, y = cont,
                        trt_class = forcats::fct_expand(tclassf, "zzz"))$classes,
                f_class)
@@ -1157,8 +3234,10 @@ test_that("set_* returns classes factor variable", {
                                 trt_class = forcats::fct_expand(tclassf, "zzz"))$classes,
                f_class)
   expect_equal(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin),
-                           trt_class = forcats::fct_expand(tclassf, "zzz"))$classes,
+                            trt_class = forcats::fct_expand(tclassf, "zzz"))$classes,
                if (bmax) f_classs else f_class)
+  expect_equal(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_class = forcats::fct_expand(tclassf, "zzz"))$classes,
+               f_classr)
   expect_equal(combine_network(set_ipd(agd_arm, studyc, trtc, y = cont,
                                        trt_class = forcats::fct_expand(tclassf, "zzz")))$classes,
                f_class)
@@ -1169,8 +3248,10 @@ test_that("set_* returns classes factor variable", {
                                                 trt_class = forcats::fct_expand(tclassf, "zzz")))$classes,
                f_class)
   expect_equal(combine_network(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin),
-                                           trt_class = forcats::fct_expand(tclassf, "zzz")))$classes,
+                                            trt_class = forcats::fct_expand(tclassf, "zzz")))$classes,
                if (bmax) f_classs else f_class)
+  expect_equal(combine_network(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_class = forcats::fct_expand(tclassf, "zzz")))$classes,
+               f_classr)
 })
 
 test_that("set_* checks for bad class variable work", {
@@ -1182,12 +3263,16 @@ test_that("set_* checks for bad class variable work", {
   ac2$tclassn <- c(1, 2, 2, 1, 2) # Trt 2 and 3 in two classes
   ac2$tclassc[1] <- NA
 
+  ar2 <- agd_reg
+  ar2$tclassn <- c(1, NA, 2, 2, 1, 1, 2) # Trt a in two classes
+
   m <- "Treatment present in more than one class"
 
   expect_error(set_ipd(aa2, studyc, trtc, y = cont, trt_class = tclassn), m)
   expect_error(set_agd_arm(aa2, studyc, trtc, y = cont, se = cont_pos, trt_class = tclassn), m)
   expect_error(set_agd_contrast(ac2, studyc, trtc, y = ydiff, se = sediff, trt_class = tclassn), m)
   expect_error(set_agd_surv(aa2, studyc, trtc, Surv = Surv(cont_pos, bin), trt_class = tclassn), m)
+  expect_error(set_agd_regression(ar2, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_class = tclassn), m)
 
   m2 <- "cannot contain missing values"
 
@@ -1201,6 +3286,8 @@ test_that("set_* checks for bad class variable work", {
   expect_error(set_agd_arm(agd_arm, studyc, trtc, y = cont, se = cont_pos, trt_class = cbind(trtc, trtc)), m3)
   expect_error(set_agd_contrast(agd_contrast, studyc, trtc, y = cont, se = cont_pos, trt_class = cbind(trtc, trtc)), m3)
   expect_error(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin), trt_class = cbind(trtc, trtc)), m3)
+  expect_error(set_agd_regression(ar2, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt, trt_class = cbind(trtc, trtc)), m3)
+
 })
 
 test_that("set_* return `studies` factor", {
@@ -1212,6 +3299,8 @@ test_that("set_* return `studies` factor", {
                factor(letters[1:2]))
   expect_equal(set_agd_surv(agd_arm, studyc, trtc, Surv = Surv(cont_pos, bin))$studies,
                factor(letters[1:2]))
+  expect_equal(set_agd_regression(agd_reg, studyc, trtc, estimate = est, se = se, cor = reg_cor, regression = ~x:.trt)$studies,
+               factor(c("A", "B")))
 })
 
 make_na <- function(x, n) {

@@ -19,6 +19,8 @@ Objects of class \code{nma_data} have the following components:
 \item{\code{agd_arm}}{data from studies with aggregate data (arm format)}
 \item{\code{agd_contrast}}{data from studies with aggregate data (contrast
 format)}
+\item{\code{agd_regression}}{data from studies reporting regression
+coefficients}
 \item{\code{ipd}}{data from studies with individual patient data}
 \item{\code{treatments}}{treatment coding factor for entire network}
 \item{\code{classes}}{treatment class coding factor (same length as \code{treatments}
@@ -27,7 +29,7 @@ for entire network)}
 \item{\code{outcome}}{outcome type for each data source, named list}
 }
 
-The \code{agd_arm}, \code{agd_contrast}, and \code{ipd} components are
+The \code{agd_arm}, \code{agd_contrast}, \code{agd_regression} and \code{ipd} components are
 tibbles with the following columns:
 \describe{
 \item{\code{.study}}{study (as factor)}
@@ -40,6 +42,9 @@ tibbles with the following columns:
 \item{\code{.E}}{time at risk (discrete)}
 \item{\code{.Surv}}{survival outcome of type \code{\link{Surv}} (time-to-event), nested by
 study arm}
+\item{\code{.estimate}}{regression coefficient estimate}
+\item{\code{.cov}}{regression coefficient covariance matrix, in compact
+lower-triangular storage format}
 \item{\code{.sample_size}}{sample size (\verb{agd_*} only)}
 \item{\code{...}}{other columns (typically covariates) from the original data
 frame}
