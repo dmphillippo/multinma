@@ -506,7 +506,7 @@ plot.pop_comp <- function(x, ...) {
     ggplot2::geom_tile() +
     ggplot2::scale_fill_viridis_c(name = label, limits = limits,
                                   direction = direction, option = "magma") +
-    ggplot2::scale_x_discrete(guide = ggplot2::guide_axis(angle = 90)) +
+    ggplot2::scale_x_discrete(guide = ggplot2::guide_axis(angle = 90), limits = levels(x$summary$study1)) +
     ggplot2::scale_y_discrete(limits = rev(levels(x$summary$study2))) +
     ggplot2::labs(x = "Study 1", y = "Study 2") +
     theme_multinma()
