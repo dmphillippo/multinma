@@ -72,6 +72,8 @@ terms, so that these can be averaged over correctly.
 models with a  Normal likelihood and IPD are now labelled informatively.
 * Fix: Error in `dic()` for models with IPD and a Normal likelihood, caused by
 dplyr deprecation.
+* Fix: Indexing error in class effects models with contrast data and integration
+points, thanks to @dmcalli2.
 
 # multinma 0.9.1
 
