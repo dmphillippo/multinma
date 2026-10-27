@@ -3396,6 +3396,8 @@ make_nma_model_matrix <- function(nma_formula,
       new_trt_levels <- c("..ref..", setdiff(new_trt_labels, "..ref.."))
       dat_all$.trt <- factor(new_trt_labels[as.character(dat_all$.trt)],
                              levels = new_trt_levels)
+
+      if (nlevels(dat_all$.trt) == 1) nma_formula <- update(nma_formula, ~ . -.trt)
     }
   }
 
@@ -3414,7 +3416,7 @@ make_nma_model_matrix <- function(nma_formula,
 
   # Explicitly set contrasts attribute for key variables
   fvars <- all.vars(nma_formula)
-  if (".trt" %in% fvars) stats::contrasts(dat_all$.trt) <- "contr.treatment"
+  if (".trt" %in% fvars && nlevels(dat_all$.trt) > 1) stats::contrasts(dat_all$.trt) <- "contr.treatment"
   if (".trtclass" %in% fvars) stats::contrasts(dat_all$.trtclass) <- "contr.treatment"
   if (".contr" %in% fvars) stats::contrasts(dat_all$.contr) <- "contr.treatment"
   if (".omega" %in% fvars) stats::contrasts(dat_all$.omega) <- "contr.treatment"
