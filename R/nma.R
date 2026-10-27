@@ -717,7 +717,7 @@ nma <- function(network,
   prior_defaults <- list()
   if (connect_baseline_random){
     if (has_intercepts && .is_default(prior_intercept_org))
-      prior_defaults$prior_intercept_org <- get_prior_call(prior_intercept_org)
+      prior_defaults$prior_intercept <- get_prior_call(prior_intercept_org)
   } else {
   if (has_intercepts && .is_default(prior_intercept))
     prior_defaults$prior_intercept <- get_prior_call(prior_intercept)
