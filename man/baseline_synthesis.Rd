@@ -39,6 +39,6 @@ study-specific intercept parameters of the NMA or ML-NMR model fitted by
 \code{\link[=nma]{nma()}}:
 \deqn{\mu_j \sim \mathrm{N}(m, \tau_\mu)}{\mu_j ~ N(m, \tau_\mu)}
 The prior distribution on the mean \eqn{m} is specified by the
-\code{prior_intercept} argument, and the prior for \eqn{\tau_\mu}$ by
+\code{prior_intercept} argument, and the prior for \eqn{\tau_\mu} by
 \code{prior_intercept_sd}.
 }
