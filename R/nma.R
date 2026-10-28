@@ -4124,6 +4124,9 @@ baseline_synthesis <- function(network,
   check_prior(prior_intercept)
   check_prior(prior_intercept_sd)
 
+  if (rlang::has_name(list(...), "connect_baseline"))
+    abort("`connect_baseline` argument should not be provided for baseline synthesis models.")
+
   fit <- nma(
     network = network,
     # The baseline subnetwork is always 1 — nma() reorders components so the
