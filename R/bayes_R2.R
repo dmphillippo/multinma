@@ -157,7 +157,7 @@ loo_predictive_metric.stan_nma <- function(x, metric, ...) {
 
   if (!has_ipd(x$network)) abort("No IPD present for which to calculate LOO predictive performance.")
   if (has_agd_arm(x$network) || has_agd_contrast(x$network))
-    inform("Note: R2 calculated on IPD portion of the model only.")
+    inform("Note: Predictive performance calculated on IPD portion of the model only.")
   if (x$likelihood %in% valid_lhood$survival) abort("Not supported for survival outcomes.")
 
   if (x$likelihood == "ordered") abort("Not supported for ordered outcomes.")
