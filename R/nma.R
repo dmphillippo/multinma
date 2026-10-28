@@ -4068,14 +4068,17 @@ apply_connect_fixed <- function(network, studies) {
   new_name <- paste(studies, collapse = " & ")
 
   if (has_ipd(network)) {
+    network$ipd$.study_orig <- network$ipd$.study
     network$ipd$.study <-
       forcats::fct_collapse(network$ipd$.study, !!new_name := studies)
   }
   if (has_agd_arm(network)) {
+    network$agd_arm$.study_orig <- network$agd_arm$.study
     network$agd_arm$.study <-
       forcats::fct_collapse(network$agd_arm$.study, !!new_name := studies)
   }
   if (has_agd_contrast(network)) {
+    network$agd_contrast$.study_orig <- network$agd_contrast$.study
     network$agd_contrast$.study <-
       forcats::fct_collapse(network$agd_contrast$.study, !!new_name := studies)
   }
