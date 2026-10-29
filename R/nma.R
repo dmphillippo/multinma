@@ -406,6 +406,11 @@ nma <- function(network,
           baseline_trt[idx] <- which(levels(network$treatments) == spec$baseline_trt)
         }
       }
+
+      if (QR)
+        inform(c('Note: Using `connect_baseline` with a random baseline bridge and QR = TRUE can be very slow.',
+                 `*` = "Turning off QR decomposition (QR = FALSE) is suggested.",
+                 `*` = "When doing so, sampling efficiency is improved by ensuring that covariates are approximately unit scale, and that center = TRUE (the default)."))
     }
 
     # Check connectedness
