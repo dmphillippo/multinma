@@ -899,10 +899,16 @@ predict.stan_nma <- function(object, ...,
                       '  - Produce aggregate predictions with level = "aggregate"',
                       sep = "\n"))
 
-        preddat <- get_model_data_columns(object$network$ipd,
+        preddat <- object$network$ipd
+
+        # A `.mu` column is expected if baseline risk meta-regression is used in this model
+        preddat$.mu <- 1
+
+        preddat <- get_model_data_columns(preddat,
                                           regression = object$regression,
                                           aux_regression = object$aux_regression,
-                                          keep = object$aux_by)
+                                          keep = object$aux_by,
+                                          label = "IPD")
 
         if (is_surv) {
           # Deal with times argument
@@ -1395,9 +1401,11 @@ predict.stan_nma <- function(object, ...,
       }
 
       # Design matrix, just treating all data as IPD
+      # The .mu column is an uncentred indicator; baseline risk terms are
+      # constructed as beta * (mu - xbar_mu) by make_lp_predict()
       X_list <- make_nma_model_matrix(nma_formula,
                                       dat_ipd = preddat,
-                                      xbar = object$xbar,
+                                      xbar = object$xbar[names(object$xbar) != ".mu"],
                                       consistency = object$consistency,
                                       classes = !is.null(object$network$classes),
                                       newdata = TRUE)
@@ -1487,6 +1495,39 @@ predict.stan_nma <- function(object, ...,
       if (length(baseline_type) == 1) baseline_type <- rep_len(baseline_type, n_studies)
       if (length(baseline_level) == 1) baseline_level <- rep_len(baseline_level, n_studies)
 
+      # With baseline risk meta-regression, the linear predictor on baseline_trt
+      # is mu + d_k + b_k * (mu - xbar_mu), where b_k is the baseline risk
+      # interaction coefficient for baseline_trt
+      if (baseline_trt != nrt && any(grepl("(^\\.mu\\:)|(\\:\\.mu$)", colnames(X_all)))) {
+        pd_trt_ref1 <- preddat[1, , drop = FALSE]
+        pd_trt_ref1$.trt <- factor(baseline_trt, levels = levels(object$network$treatments))
+        if (!is.null(object$network$classes)) {
+          pd_trt_ref1$.trtclass <- object$network$classes[as.numeric(pd_trt_ref1$.trt)]
+        }
+        X_trt_ref1 <- make_nma_model_matrix(nma_formula,
+                                            dat_ipd = pd_trt_ref1,
+                                            xbar = object$xbar[names(object$xbar) != ".mu"],
+                                            consistency = object$consistency,
+                                            classes = !is.null(object$network$classes),
+                                            newdata = TRUE)$X_ipd
+        brmr_trt_ref1 <- grepl("(^\\.mu\\:)|(\\:\\.mu$)", colnames(X_trt_ref1))
+        b_trt_ref <- tcrossprod_mcmc_array(
+          post_temp[ , , paste0("beta[", colnames(X_trt_ref1)[brmr_trt_ref1], "]"), drop = FALSE],
+          X_trt_ref1[ , brmr_trt_ref1, drop = FALSE])
+      } else {
+        b_trt_ref <- NULL
+      }
+
+      # Convert baseline samples on baseline_trt to the network reference treatment
+      mu_to_nrt <- function(m) {
+        m <- sweep(m, 1:2, post_temp[ , , paste0("d[", baseline_trt, "]"), drop = FALSE], FUN = "-")
+        if (!is.null(b_trt_ref)) {
+          m <- sweep(m, 1:2, b_trt_ref * object$xbar[[".mu"]], FUN = "+")
+          m <- sweep(m, 1:2, 1 + b_trt_ref, FUN = "/")
+        }
+        return(m)
+      }
+
       if (!inherits(object, "stan_mlnmr") && !has_ipd(object$network)) {
         # AgD-only regression, ignore baseline_level = "individual"
         # if (baseline_level == "individual")
@@ -1499,7 +1540,7 @@ predict.stan_nma <- function(object, ...,
 
         # Convert to samples on network ref trt if baseline_trt given
         if (baseline_trt != nrt) {
-          mu <- sweep(mu, 1:2, post_temp[ , , paste0("d[", baseline_trt, "]"), drop = FALSE], FUN = "-")
+          mu <- mu_to_nrt(mu)
         }
       } else { # ML-NMR or IPD NMR
         if (any(baseline_level == "individual")) {
@@ -1511,7 +1552,7 @@ predict.stan_nma <- function(object, ...,
 
           # Convert to samples on network ref trt if baseline_trt given
           if (baseline_trt != nrt) {
-            mu[ , , baseline_level == "individual" & baseline_level == "individual"] <- sweep(mu[ , , baseline_level == "individual" & baseline_level == "individual", drop = FALSE], 1:2, post_temp[ , , paste0("d[", baseline_trt, "]"), drop = FALSE], FUN = "-")
+            mu[ , , baseline_level == "individual"] <- mu_to_nrt(mu[ , , baseline_level == "individual", drop = FALSE])
           }
 
         }
@@ -1544,10 +1585,17 @@ predict.stan_nma <- function(object, ...,
 
           range_mu <- range(as.array(object, pars = "mu"))
 
+          # Baseline risk regression terms contribute beta * (mu - xbar_mu)
+          brmr_trt_ref <- grepl("(^\\.mu\\:)|(\\:\\.mu$)", colnames(X_beta_trt_ref))
+          xbar_mu <- if (any(brmr_trt_ref)) object$xbar[[".mu"]] else 0
+
           # Aggregate response on natural scale, use numerical solver
           # Define function to solve for mu
           mu_solve <- function(mu, mu0, post_beta, post_d, X_beta, offset, link) {
-            lp <- mu + X_beta %*% post_beta + post_d + offset
+            lp <- mu + X_beta[ , !brmr_trt_ref, drop = FALSE] %*% post_beta[!brmr_trt_ref] + post_d + offset
+            if (any(brmr_trt_ref)) {
+              lp <- lp + (X_beta[ , brmr_trt_ref, drop = FALSE] %*% post_beta[brmr_trt_ref]) * (mu - xbar_mu)
+            }
             ginv_lp <- inverse_link(lp, link = link)
             return(mu0 - mean(ginv_lp))
           }
@@ -1778,7 +1826,7 @@ predict.stan_nma <- function(object, ...,
           ss <- ss_uncol[pd_col$.undup]
 
           # Linear predictor array for this study
-          eta_pred_array <- tcrossprod_mcmc_array(post, X_all[ss, , drop = FALSE])
+          eta_pred_array <- make_lp_predict(post, X_all[ss, , drop = FALSE], xbar_mu = object$xbar[[".mu"]])
 
           if (!is.null(offset_all))
             eta_pred_array <- sweep(eta_pred_array, 3, offset_all[ss], FUN = "+")
@@ -1907,7 +1955,7 @@ predict.stan_nma <- function(object, ...,
     } else if (level == "individual") {
 
       # Get prediction array
-      pred_array <- tcrossprod_mcmc_array(post, X_all)
+      pred_array <- make_lp_predict(post, X_all, xbar_mu = object$xbar[[".mu"]])
 
       if (!is.null(offset_all))
         pred_array <- sweep(pred_array, 3, offset_all, FUN = "+")
@@ -1967,8 +2015,6 @@ predict.stan_nma <- function(object, ...,
                           dim = dim_pred_array,
                           dimnames = dimnames_pred_array)
 
-      brmr <- grepl("(^\\.mu\\:)|(\\:\\.mu$)", colnames(X_all))
-
       for (s in 1:n_studies) {
 
         # if (progress) cglue("\rCalculating predictions for {studies[s]} [{s} / {n_studies}]", sep = "")
@@ -1977,24 +2023,7 @@ predict.stan_nma <- function(object, ...,
         ss <- preddat$.study == studies[s]
 
         # Get prediction array for this study
-        s_pred_array <- tcrossprod_mcmc_array(
-          post[, , !brmr, drop = FALSE],
-          X_all[ss, !brmr, drop = FALSE]
-        )
-
-        if (any(brmr)) {
-          s_pred_array <- s_pred_array +
-            tcrossprod_mcmc_array(
-              post[, , brmr, drop = FALSE],
-              X_all[ss, brmr, drop = FALSE]
-            ) * (
-              tcrossprod_mcmc_array(
-                post[, , grepl("^mu\\[", colnames(X_all)), drop = FALSE],
-                X_all[ss, grepl("^mu\\[", colnames(X_all)), drop = FALSE]
-              ) - object$xbar[[".mu"]]
-            )
-
-        }
+        s_pred_array <- make_lp_predict(post, X_all[ss, , drop = FALSE], xbar_mu = object$xbar[[".mu"]])
 
         if (!is.null(offset_all))
           s_pred_array <- sweep(s_pred_array, 3, offset_all[ss], FUN = "+")
@@ -2184,6 +2213,31 @@ predict.stan_nma_surv <- function(object, times = NULL,
              baseline_level = "individual",
              baseline_type = "link",
              progress = progress)
+}
+
+#' Construct the linear predictor from posterior samples and a design matrix
+#'
+#' Handles baseline risk meta-regression terms (interactions with `.mu`), which
+#' contribute `beta_k * (mu_j - xbar_mu)` rather than `beta_k * .mu`. The `.mu`
+#' columns of `X` must be uncentred indicators (i.e. `.mu = 1`).
+#'
+#' @param post 3D MCMC array of posterior samples, with parameters in the same
+#'   order as the columns of `X`
+#' @param X Design matrix
+#' @param xbar_mu Centring value for `.mu`
+#'
+#' @noRd
+make_lp_predict <- function(post, X, xbar_mu = NULL) {
+  brmr <- grepl("(^\\.mu\\:)|(\\:\\.mu$)", colnames(X))
+
+  if (!any(brmr)) return(tcrossprod_mcmc_array(post, X))
+
+  # Study baselines mu_j, selected by posterior parameter name
+  col_mu <- grepl("^mu\\[", dimnames(post)[[3]])
+
+  tcrossprod_mcmc_array(post[, , !brmr, drop = FALSE], X[, !brmr, drop = FALSE]) +
+    tcrossprod_mcmc_array(post[, , brmr, drop = FALSE], X[, brmr, drop = FALSE]) *
+    (tcrossprod_mcmc_array(post[, , col_mu, drop = FALSE], X[, col_mu, drop = FALSE]) - xbar_mu)
 }
 
 #' Produce survival predictions from arrays of linear predictors and auxiliary parameters
