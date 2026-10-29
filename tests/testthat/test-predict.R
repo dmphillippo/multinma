@@ -3706,3 +3706,159 @@ test_that("baseline and aux are escaped correctly", {
     par2)
 
 })
+
+# Baseline risk meta-regression (.mu) ----------------------------------------
+
+# Expected linear predictor mu_j + d_k + beta_k (mu_j - xbar_mu) for study j, treatment k
+brmr_lp <- function(draws, xbar_mu, mu, trt, trt_ref) {
+  if (trt == trt_ref) return(mu)
+  mu + draws[ , , paste0("d[", trt, "]")] +
+    draws[ , , paste0("beta[.trt", trt, ":.mu]")] * (mu - xbar_mu)
+}
+
+cert_net <- set_agd_arm(certolizumab, study, trt, r = r, n = n, trt_ref = "Placebo")
+
+cert_fit_brmr <- suppressWarnings(nma(cert_net,
+                                      trt_effects = "fixed",
+                                      regression = ~.mu:.trt,
+                                      prior_intercept = normal(scale = 10),
+                                      prior_trt = normal(scale = 10),
+                                      prior_reg = normal(scale = 1),
+                                      init_r = 0.1,
+                                      iter = 10))
+
+cert_draws <- as.array(cert_fit_brmr)
+cert_xbar_mu <- cert_fit_brmr$xbar[[".mu"]]
+
+test_that("BRMR predictions without baseline match the fitted model (AgD)", {
+  pred <- predict(cert_fit_brmr, summary = FALSE)$sims
+
+  # Agree with fitted values from Stan for every observed arm
+  fitted <- qlogis(sweep(as.array(cert_fit_brmr$stanfit, pars = "fitted_agd_arm"), 3,
+                         cert_net$agd_arm$.n, FUN = "/"))
+  arms <- paste0("pred[", cert_net$agd_arm$.study, ": ", cert_net$agd_arm$.trt, "]")
+  expect_equal(unname(pred[ , , arms]), unname(fitted))
+
+  # And with mu_j + d_k + beta_k (mu_j - xbar_mu) for every study and treatment
+  for (s in levels(cert_net$agd_arm$.study)) {
+    for (k in levels(cert_net$treatments)) {
+      expect_equal(pred[ , , paste0("pred[", s, ": ", k, "]")],
+                   brmr_lp(cert_draws, cert_xbar_mu, cert_draws[ , , paste0("mu[", s, "]")],
+                           k, "Placebo"))
+    }
+  }
+})
+
+test_that("BRMR relative effects depend on the specified baseline (AgD)", {
+  log_or <- function(p0) {
+    predict(cert_fit_brmr, summary = FALSE,
+            baseline = distr(qunif, min = p0, max = p0),
+            baseline_type = "response")$sims[ , , "pred[New 1: CZP]"] - qlogis(p0)
+  }
+
+  for (p0 in c(0.1, 0.6)) {
+    expect_equal(log_or(p0),
+                 cert_draws[ , , "d[CZP]"] +
+                   cert_draws[ , , "beta[.trtCZP:.mu]"] * (qlogis(p0) - cert_xbar_mu))
+  }
+  expect_false(isTRUE(all.equal(log_or(0.1), log_or(0.6))))
+})
+
+test_that("BRMR baseline_trt reproduces the baseline on that treatment (AgD)", {
+  p0 <- 0.4
+  pred <- predict(cert_fit_brmr, summary = FALSE,
+                  baseline = distr(qunif, min = p0, max = p0),
+                  baseline_type = "response",
+                  baseline_trt = "CZP")$sims
+
+  expect_equal(as.vector(pred[ , , "pred[New 1: CZP]"]),
+               rep(qlogis(p0), prod(dim(pred)[1:2])))
+
+  mu <- pred[ , , "pred[New 1: Placebo]"]
+  expect_equal(pred[ , , "pred[New 1: Adalimumab]"],
+               brmr_lp(cert_draws, cert_xbar_mu, mu, "Adalimumab", "Placebo"))
+})
+
+test_that("BRMR baseline from a network study matches that study's predictions (AgD)", {
+  s <- levels(cert_net$agd_arm$.study)[1]
+  pred_bl <- predict(cert_fit_brmr, summary = FALSE, baseline = s)$sims
+  pred <- predict(cert_fit_brmr, summary = FALSE)$sims
+  expect_equal(unname(pred_bl),
+               unname(pred[ , , paste0("pred[", s, ": ", levels(cert_net$treatments), "]")]))
+})
+
+pso_fit_brmr <- suppressWarnings(nma(pso_net,
+                                     trt_effects = "fixed",
+                                     regression = ~(durnpso + .mu):.trt,
+                                     prior_intercept = normal(scale = 10),
+                                     prior_trt = normal(scale = 10),
+                                     prior_reg = normal(scale = 1),
+                                     init_r = 0.1,
+                                     iter = 10))
+
+pso_draws <- as.array(pso_fit_brmr)
+pso_xbar <- pso_fit_brmr$xbar
+pso_ref <- levels(pso_net$treatments)[1]
+pso_trt <- levels(pso_net$treatments)[2]
+
+test_that("BRMR individual predictions without baseline match the fitted model (IPD)", {
+  pred <- predict(pso_fit_brmr, level = "individual", expand = FALSE, summary = FALSE)$sims
+  fitted <- qlogis(as.array(pso_fit_brmr$stanfit, pars = "fitted_ipd"))
+  expect_equal(unname(pred), unname(fitted))
+})
+
+test_that("BRMR individual predictions with baseline and newdata (IPD)", {
+  mu <- -1
+  pred <- predict(pso_fit_brmr, level = "individual", summary = FALSE,
+                  newdata = data.frame(durnpso = c(5, 20)),
+                  baseline = distr(qunif, min = mu, max = mu))$sims
+
+  expect_equal(pred[ , , paste0("pred[New 1: ", pso_trt, ", 2]")],
+               brmr_lp(pso_draws, pso_xbar[[".mu"]], mu, pso_trt, pso_ref) +
+                 pso_draws[ , , paste0("beta[.trt", pso_trt, ":durnpso]")] *
+                 (20 - pso_xbar[["durnpso"]]))
+})
+
+test_that("BRMR baseline_trt reproduces the baseline on that treatment (IPD)", {
+  p0 <- 0.3
+
+  # Individual-level baseline, at the mean covariate value
+  pred <- predict(pso_fit_brmr, level = "individual", summary = FALSE,
+                  newdata = data.frame(durnpso = pso_xbar[["durnpso"]]),
+                  baseline = distr(qunif, min = qlogis(p0), max = qlogis(p0)),
+                  baseline_trt = pso_trt)$sims
+  expect_equal(as.vector(pred[ , , paste0("pred[New 1: ", pso_trt, "]")]),
+               rep(qlogis(p0), prod(dim(pred)[1:2])))
+
+  # Aggregate-level baseline, averaged over a population
+  pred_agg <- predict(pso_fit_brmr, level = "aggregate", type = "response", summary = FALSE,
+                      newdata = data.frame(durnpso = c(2, 10, 30)),
+                      baseline = distr(qunif, min = p0, max = p0),
+                      baseline_type = "response",
+                      baseline_level = "aggregate",
+                      baseline_trt = pso_trt)$sims
+  expect_equal(as.vector(pred_agg[ , , paste0("pred[New 1: ", pso_trt, "]")]),
+               rep(p0, prod(dim(pred_agg)[1:2])), tolerance = 1e-4)
+})
+
+ndmm_fit_brmr <- suppressWarnings(nma(ndmm_net,
+                                      likelihood = "exponential",
+                                      regression = ~.mu:.trt,
+                                      class_interactions = "independent",
+                                      prior_intercept = normal(0, 100),
+                                      prior_trt = normal(0, 10),
+                                      prior_reg = normal(0, 1),
+                                      iter = 10))
+
+test_that("BRMR survival linear predictor includes the study baseline", {
+  ndmm_draws <- as.array(ndmm_fit_brmr)
+  ndmm_ref <- levels(ndmm_net$treatments)[1]
+  s <- as.character(ndmm_net$ipd$.study[1])
+  pred <- predict(ndmm_fit_brmr, type = "link", level = "individual", summary = FALSE)$sims
+
+  for (k in levels(ndmm_net$treatments)) {
+    expect_equal(pred[ , , paste0("pred[", s, ": ", k, ", 1]")],
+                 brmr_lp(ndmm_draws, ndmm_fit_brmr$xbar[[".mu"]],
+                         ndmm_draws[ , , paste0("mu[", s, "]")], k, ndmm_ref))
+  }
+})

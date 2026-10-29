@@ -14,6 +14,12 @@ terms, so that these can be averaged over correctly.
 dplyr deprecation.
 * Fix: Indexing error in class effects models with contrast data and integration
 points, thanks to @dmcalli2.
+* Fix: `predict()` for baseline risk meta-regression models (`regression = ~.mu:.trt`)
+did not include the study baseline $\mu_j$ in the baseline risk interaction
+$\beta_k(\mu_j - \bar{x}_\mu)$, so predictions did not match the fitted model
+and predicted relative effects did not depend on `baseline`. Baseline risk
+interactions are now handled correctly for aggregate, individual, and survival
+predictions, including with `baseline_trt` and `baseline_level = "aggregate"`.
 
 # multinma 0.9.1
 
