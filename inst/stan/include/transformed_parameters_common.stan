@@ -21,7 +21,7 @@ vector[nX] allbeta = QR ? R_inv * beta_tilde : beta_tilde;
 // Study baselines
 vector[totns] mu;
 // Treatment effects
-vector[nt - 1] d = allbeta[(totns +1):(totns + nt - 1)];
+vector[nt - 1] d;
 // Node-splitting omega ()
 vector[nodesplit] omega; // nodesplit ? allbeta[totns + ns] : vector(0);
 // Regression predictors
@@ -33,11 +33,24 @@ vector[nX - totns - (nt - 1) - nodesplit] beta;
 vector[nint_max > 1 ? nint * ni_agd_contrast : 0] eta_agd_contrast_ii;
 vector[ni_agd_contrast] eta_agd_contrast_bar;
 
+// -- Random baseline effect --
+vector[random_baseline ? totns : 0] f_baseline;
 
 // -- Study baselines --
 // Pull out mu from allbeta
 if (totns) {
   mu = allbeta[1:totns];
+}
+
+if (random_baseline) {
+  f_baseline = rep_vector(0.0, totns);
+  f_baseline[baseline_study_idx] = baseline_mean[1] - mu[baseline_study_idx] + baseline_sd[1] * z_baseline;
+  mu[baseline_study_idx] = baseline_mean[1] + baseline_sd[1] * z_baseline;
+}
+
+// -- Treatment effects --
+if (nt > 1) {
+  d = allbeta[(totns +1):(totns + nt - 1)];
 }
 
 // -- Regression predictors --
@@ -98,6 +111,11 @@ if (ni_ipd) {
         eta_ipd[i] += f_class[which_fclass[ipd_trt[ipd_arm[i]] - 1]];
       }
     }
+  }
+
+  // Add random baseline contribution
+  if (random_baseline) {
+    eta_ipd += f_baseline[ipd_study[ipd_arm]];
   }
 }
 
