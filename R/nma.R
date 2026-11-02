@@ -571,6 +571,7 @@ nma <- function(network,
 
   # When only AgD-Reg data are available, update the likelihood to use the appropriate Stan file.
   # To skip unnecessary checks and auxiliary parameter/data requirements.
+  likelihood_org <- likelihood
   if ( !has_ipd(network) && !has_agd_arm(network) && !has_agd_contrast(network) && has_agd_regression(network) ){
     if (likelihood %in% c('exponential', 'weibull', 'gompertz','mspline', 'pexp')){
       likelihood <- 'exponential'
@@ -994,8 +995,8 @@ nma <- function(network,
       purrr::map_lgl(~ .x %>% dplyr::filter(!is.na(.estimate)) %>%
                 dplyr::summarise(.cov_known =  all(.cov_known)) %>% dplyr::pull(.cov_known) )
 
-    if ( sum(!agd_regression_cov_known) && likelihood %in%
-         c("lognormal", "loglogistic", "gamma", "gengamma",   'exponential', 'weibull', 'gompertz','mspline', 'pexp') ) {
+    if ( sum(!agd_regression_cov_known) && likelihood_org %in%
+         c("lognormal", "loglogistic", "gamma", "gengamma") ) {
       abort("Reconstructing the variance-covariance matrix of coefficient estimates is not yet supported for certain likelihoods. For each regression model, specify `se` and `cor`, or `cov`.")
     } else if( any( miss_names <- !agd_regression_cov_known &  !agd_regression_qmc_known ) ){
       abort(glue::glue("Integration points are not provided to reconstruct the covariance matrix of the coefficients",
