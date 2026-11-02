@@ -1078,15 +1078,17 @@ nma <- function(network,
 
       # Maps each position in agd_regression_est (which includes all intercepts/cutpoints)
       # to its corresponding position in the version excluding them (needed for Stan)
-      agd_regression_est_map_cc <- agd_regression_intercept_rnk
-      agd_regression_est_map_cc[ agd_regression_est_map_cc <= 1] <- 1:sum(agd_regression_intercept_rnk <= 1)
-      tmp_std <- rep(1:ns_agd_regression,agd_regression_ncoef)
-      for(i in 1:length(agd_regression_est_map_cc) ){
-        if( agd_regression_intercept_rnk[i] >1 ){
-          agd_regression_est_map_cc[i] <-
-            agd_regression_est_map_cc[ (agd_regression_intercept_rnk == 1) & (tmp_std == tmp_std[i]) ]
-        }
-      }
+      # rnk: c(1,2,3,0,0,0) ->  c(1,1,1,2,3,4)
+      # rnk: c(0,3,0,0,1,0) ->  c(1,4,2,3,4,5)
+      agd_regression_est_map_cc <-
+        split(
+          agd_regression_intercept_rnk,
+          rep(names(agd_regression_ncoef),times = agd_regression_ncoef)
+        ) %>% purrr::map(~{
+          tmp <- cumsum(.x %in% 0:1 )
+          tmp[.x>1] <- tmp[.x==1]
+          tmp
+        }) %>% unlist()
 
     }else if( likelihood %in% c('exponential', 'weibull', 'gompertz','mspline', 'pexp') ){
       if ( any(agd_regression_ncoef_cpt >1) )

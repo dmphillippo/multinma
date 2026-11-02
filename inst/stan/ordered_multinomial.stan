@@ -19,7 +19,7 @@ data {
 
   // -- AgD regression coefficients --
   matrix[ns_agd_regression ? nc_agd_regression : 0, ns_agd_regression ? (ncat-1) : 0] X_agd_regression_cc; // Complementary design matrix for cc
-  array [no_agd_regression ? nc_agd_regression : 0] int agd_regression_est_map_cc; // Map each position in the coefficient vector with intercepts to its position in the vector without intercepts (except study baseline)
+  array [ns_agd_regression ? nc_agd_regression : 0] int agd_regression_est_map_cc; // Map each position in the coefficient vector with intercepts to its position in the vector without intercepts (except study baseline)
 
   // Prior on differences between cutpoints
   int<lower=0,upper=6> prior_aux_dist;
@@ -380,7 +380,7 @@ transformed parameters {
               allbeta[XO_col_vec[(c_o+1):(c_o+agd_regression_ncoef_omt[i])]] +
               block(agd_regression_OVB_mat_hat[i]  , 1, 1,agd_regression_ncoef_inc[i] ,agd_regression_nx[i] ) *
               lp_err[(c_x+1):(c_x+agd_regression_nx[i])]
-            )[agd_regression_est_map_cc] + X_agd_regression_cc[(c_c+1):(c_c+agd_regression_ncoef[i]), ] * cc;
+            )[agd_regression_est_map_cc[(c_c+1):(c_c+agd_regression_ncoef[i])]] + X_agd_regression_cc[(c_c+1):(c_c+agd_regression_ncoef[i]), ] * cc;
 
           }else if (link == 2){ // probit link
 
@@ -402,7 +402,7 @@ transformed parameters {
               allbeta[XO_col_vec[(c_o+1):(c_o+agd_regression_ncoef_omt[i])]] +
               block(agd_regression_OVB_mat_hat[i]  , 1, 1,agd_regression_ncoef_inc[i] ,agd_regression_nx[i] ) *
               lp_err[(c_x+1):(c_x+agd_regression_nx[i])]
-            )[agd_regression_est_map_cc] + X_agd_regression_cc[(c_c+1):(c_c+agd_regression_ncoef[i]), ] * cc;
+            )[agd_regression_est_map_cc[(c_c+1):(c_c+agd_regression_ncoef[i])]] + X_agd_regression_cc[(c_c+1):(c_c+agd_regression_ncoef[i]), ] * cc;
 
           }else if (link == 3){ // cloglog link
 
@@ -424,7 +424,7 @@ transformed parameters {
               allbeta[XO_col_vec[(c_o+1):(c_o+agd_regression_ncoef_omt[i])]] +
               block(agd_regression_OVB_mat_hat[i]  , 1, 1,agd_regression_ncoef_inc[i] ,agd_regression_nx[i] ) *
               lp_err[(c_x+1):(c_x+agd_regression_nx[i])]
-            )[agd_regression_est_map_cc] + X_agd_regression_cc[(c_c+1):(c_c+agd_regression_ncoef[i]), ] * cc;
+            )[agd_regression_est_map_cc[(c_c+1):(c_c+agd_regression_ncoef[i])]] + X_agd_regression_cc[(c_c+1):(c_c+agd_regression_ncoef[i]), ] * cc;
 
           }
         } else {
