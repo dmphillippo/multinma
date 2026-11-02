@@ -1207,10 +1207,8 @@ nma <- function(network,
           se_recon   <- dat_agd_regression_nonbl$.se       [ (tmp_c + 1):(tmp_c + agd_regression_ncoef[i]) ]
           eta_recon  <- as.vector(x_reg%*%coef_recon)
 
-          if(likelihood %in% c('exponential-aft','weibull-aft') ){
+          if(likelihood %in% c('exponential-aft','weibull-aft',  'exponential', 'weibull', 'gompertz','mspline', 'pexp') ){
             XtWX_inv_recon <- solve(t(x_reg)%*%x_reg)
-
-          # }else if(likelihood %in% c('lognormal','loglogistic','gamma','gengamma', 'exponential','weibull','mspline' ,'pexp') ){
 
           }else if(likelihood %in% c('bernoulli','bernoulli2') && link=='logit'){
             mu_recon <- exp(eta_recon)/(1+exp(eta_recon))
