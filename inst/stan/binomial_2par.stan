@@ -366,7 +366,7 @@ model {
 
             (
               ((X_agd_regression_int[(c_x+1):(c_x+agd_regression_nx[i]) , XI_col_vec[(c_i+1):(c_i+agd_regression_ncoef_inc[i])]])' *
-              (mu_err[(c_x+1):(c_x+agd_regression_nx[i])] .* agd_regression_OVB_w)) / agd_regression_nx[i]
+              (mu_err[(c_x+1):(c_x+agd_regression_nx[i])] .* agd_regression_OVB_w[(c_x+1):(c_x+agd_regression_nx[i])])) / agd_regression_nx[i]
               ) ~ normal( 0 , 0.01) ;
 
           }
