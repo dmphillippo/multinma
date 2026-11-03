@@ -83,8 +83,20 @@ dic <- function(x, penalty = c("pD", "pV"), ...) {
     nr_agd_contrast <- nf_agd_contrast <- 0
   }
 
+  if (has_agd_regression(net)) {
+    # Number of residual deviances is equal to the number of studies
+    nr_agd_regression <- length(unique(net$agd_regression$.study))
+    # Number of fitted values is equal to the number of estimates
+    nf_agd_regression <- nrow(dplyr::filter(net$agd_regression, !is.na(.data$.estimate)))
+
+    resdev_agd_regression <- resdev[n_ipd + n_agd_arm + nr_agd_contrast + (1:nr_agd_regression)]
+    fitted_agd_regression <- colMeans(as.matrix(x, pars = "fitted_agd_regression"))
+  } else {
+    nr_agd_regression <- nf_agd_regression <- 0
+  }
+
   has_df <- FALSE
-  df_ipd <- df_agd_arm <- df_agd_contrast <- 1
+  df_ipd <- df_agd_arm <- df_agd_contrast <- df_agd_regression <- 1
 
   if (x$likelihood %in% c("bernoulli", "bernoulli2", "binomial", "binomial2") && penalty != "pV") {
     if (has_ipd(net)) {
@@ -240,12 +252,46 @@ dic <- function(x, penalty = c("pD", "pV"), ...) {
     leverage_agd_contrast <- NULL
   }
 
+  if (has_agd_regression(net)) {
+
+    ul <- function(x) if (is.list(x)) x[[1]] else x
+
+    agd_regression_resdev_dat <-
+      net$agd_regression %>%
+      dplyr::filter(!is.na(.data$.estimate)) %>%
+      dplyr::mutate(.fitted = fitted_agd_regression,
+                    .study_inorder = forcats::fct_inorder(forcats::fct_drop(.data$.study))) %>%
+      dplyr::group_by(.data$.study_inorder, .data$.study) %>%
+      dplyr::summarise(fitted = list(.data$.fitted),
+                       est = list(.data$.estimate),
+                       n_coef = dplyr::n() - 1,  ### *** Assumes intercept included - to fix ***
+                       cov = list(unpack_tri(.data$.cov))) %>%
+      dplyr::ungroup() %>%
+      dplyr::mutate(resdev = resdev_agd_regression) %>%
+      dplyr::rowwise() %>%
+      dplyr::mutate(resdevfit = drop(crossprod(.data$est - .data$fitted,
+                                               solve(ul(.data$cov),
+                                                     .data$est - .data$fitted))),
+                    leverage = .data$resdev - .data$resdevfit)
+
+    leverage_agd_regression <- agd_regression_resdev_dat$leverage
+
+    # df with more than 1 coefficient
+    if (any(agd_regression_resdev_dat$n_coef > 1)) {
+      has_df <- TRUE
+      df_agd_regression <- agd_regression_resdev_dat$n_coef
+    }
+  } else {
+    leverage_agd_regression <- NULL
+  }
+
   # Get pointwise contributions for pV
   if (penalty == "pV") {
     leverage <- colSums(var(matrix(resdev_array, ncol = dim(resdev_array)[3])))/2
     if (has_ipd(net)) leverage_ipd <- leverage[1:n_ipd]
     if (has_agd_arm(net)) leverage_agd_arm <- leverage[n_ipd + (1:n_agd_arm)]
     if (has_agd_contrast(net)) leverage_agd_contrast <- leverage[n_ipd + n_agd_arm + (1:nr_agd_contrast)]
+    if (has_agd_regression(net)) leverage_agd_regression <- leverage[n_ipd + n_agd_arm + nr_agd_contrast + (1:nr_agd_regression)]
   }
 
   # Set pointwise contributions
@@ -298,11 +344,26 @@ dic <- function(x, penalty = c("pD", "pV"), ...) {
     pw$agd_contrast <- NULL
   }
 
+  if (has_agd_regression(net)) {
+    pw$agd_regression <- tibble::tibble(
+      .study = agd_regression_resdev_dat$.study,
+      n_coef = agd_regression_resdev_dat$n_coef,
+      resdev = resdev_agd_regression,
+      leverage = leverage_agd_regression,
+      dic = resdev_agd_regression + leverage_agd_regression,
+      fitted = agd_regression_resdev_dat$fitted,
+      observed = agd_regression_resdev_dat$est)
+
+    if (has_df) pw$agd_regression$df <- df_agd_regression
+  } else {
+    pw$agd_regression <- NULL
+  }
+
   # Calculate pD, DIC
   totresdev <- sum(resdev)
 
   if (penalty == "pD") {
-    pd <- sum(leverage_ipd, leverage_agd_arm, leverage_agd_contrast)
+    pd <- sum(leverage_ipd, leverage_agd_arm, leverage_agd_contrast, leverage_agd_regression)
     dic <- totresdev + pd
     pv <- NULL
   } else if (penalty == "pV") {

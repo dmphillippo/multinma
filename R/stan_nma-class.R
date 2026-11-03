@@ -79,6 +79,7 @@ print.stan_nma <- function(x, ...) {
                                     "fitted_ipd",
                                     "fitted_agd_arm",
                                     "fitted_agd_contrast",
+                                    "fitted_agd_regression",
                                     "theta_bar_cum_agd_arm",
                                     "theta_bar_cum_agd_contrast",
                                     "theta2_bar_cum",
@@ -156,6 +157,7 @@ summary.stan_nma <- function(object, ...,
     if (has_ipd(object$network)) pars <- c(pars, "fitted_ipd")
     if (has_agd_arm(object$network)) pars <- c(pars, "fitted_agd_arm")
     if (has_agd_contrast(object$network)) pars <- c(pars, "fitted_agd_contrast")
+    if (has_agd_regression(object$network)) pars <- c(pars, "fitted_agd_regression")
     if (inherits(object, "stan_mlnmr")) {
       if (has_agd_arm(object$network)) pars <- c(pars, "theta_bar_cum_agd_arm")
       if (has_agd_contrast(object$network)) pars <- c(pars, "theta_bar_cum_agd_contrast")

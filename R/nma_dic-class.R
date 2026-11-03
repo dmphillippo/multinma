@@ -52,7 +52,8 @@ print.nma_dic <- function(x, digits = 1, ...) {
 
   n <- sum(if (rlang::has_name(x$pointwise$ipd, "df")) x$pointwise$ipd$df else nrow(x$pointwise$ipd),
            if (rlang::has_name(x$pointwise$agd_arm, "df")) x$pointwise$agd_arm$df else nrow(x$pointwise$agd_arm),
-           if (rlang::has_name(x$pointwise$agd_contrast, "df")) x$pointwise$agd_contrast$df else x$pointwise$agd_contrast$n_contrast)
+           if (rlang::has_name(x$pointwise$agd_contrast, "df")) x$pointwise$agd_contrast$df else x$pointwise$agd_contrast$n_contrast,
+           if (rlang::has_name(x$pointwise$agd_regression, "df")) x$pointwise$agd_regression$df else x$pointwise$agd_regression$n_coef)
 
   cglue("Residual deviance: {round(x$resdev, digits)}", subtle(" (on {n} data points)", sep = ""))
   if (penalty == "pD")
@@ -251,7 +252,8 @@ plot.nma_dic <- function(x, y, ...,
 
   Type <- c(rep("IPD", NROW(x$pointwise$ipd)),
             rep("AgD (arm-based)", NROW(x$pointwise$agd_arm)),
-            rep("AgD (contrast-based)", NROW(x$pointwise$agd_contrast)))
+            rep("AgD (contrast-based)", NROW(x$pointwise$agd_contrast)),
+            rep("AgD (regression)", NROW(x$pointwise$agd_regression)))
 
   resdev_post$Type <- rep(Type, each = prod(dim(x$resdev_array)[1:2]))
 
@@ -259,12 +261,14 @@ plot.nma_dic <- function(x, y, ...,
   has_df_ipd <- rlang::has_name(x$pointwise$ipd, "df")
   has_df_agd_arm <- rlang::has_name(x$pointwise$agd_arm, "df")
   has_df_agd_contrast <- rlang::has_name(x$pointwise$agd_contrast, "df")
+  has_df_agd_regression <- rlang::has_name(x$pointwise$agd_regression, "df")
 
-  has_df <- has_df_ipd || has_df_agd_arm || has_df_agd_contrast
+  has_df <- has_df_ipd || has_df_agd_arm || has_df_agd_contrast || has_df_agd_contrast
 
   df <- c(if (has_df_ipd) x$pointwise$ipd$df else rep(1, NROW(x$pointwise$ipd)),
           if (has_df_agd_arm) x$pointwise$agd_arm$df else rep(1, NROW(x$pointwise$agd_arm)),
-          if (has_df_agd_contrast) x$pointwise$agd_contrast$df else rep(1, NROW(x$pointwise$agd_contrast)))
+          if (has_df_agd_contrast) x$pointwise$agd_contrast$df else rep(1, NROW(x$pointwise$agd_contrast)),
+          if (has_df_agd_regression) x$pointwise$agd_regression$df else rep(1, NROW(x$pointwise$agd_regression)))
 
   resdev_post$df <- rep(df, each = prod(dim(x$resdev_array)[1:2]))
   resdev_post$df_label <- paste0("df = ", resdev_post$df)
@@ -404,7 +408,9 @@ plot.nma_dic <- function(x, y, ...,
         do.call(tb_geom, args = purrr::list_modify(geom_dots, data = ~dplyr::filter(., .data$Type == "AgD (arm-based)"), orientation = "vertical")) +
         do.call(tb_geom, args = purrr::list_modify(geom_dots, data = ~dplyr::filter(., .data$Type == "AgD (arm-based)"), orientation = "horizontal")) +
         do.call(tb_geom, args = purrr::list_modify(geom_dots, data = ~dplyr::filter(., .data$Type == "AgD (contrast-based)"), orientation = "vertical")) +
-        do.call(tb_geom, args = purrr::list_modify(geom_dots, data = ~dplyr::filter(., .data$Type == "AgD (contrast-based)"), orientation = "horizontal"))
+        do.call(tb_geom, args = purrr::list_modify(geom_dots, data = ~dplyr::filter(., .data$Type == "AgD (contrast-based)"), orientation = "horizontal")) +
+        do.call(tb_geom, args = purrr::list_modify(geom_dots, data = ~dplyr::filter(., .data$Type == "AgD (regression)"), orientation = "vertical")) +
+        do.call(tb_geom, args = purrr::list_modify(geom_dots, data = ~dplyr::filter(., .data$Type == "AgD (regression)"), orientation = "horizontal"))
     } else {
       p <- p + ggplot2::geom_point(...)
     }
@@ -540,10 +546,23 @@ plot.nma_dic <- function(x, y, ...,
                                         ),
                                         by = "parameter")
       }
+      if (NROW(x$pointwise$agd_regression)) {
+        resdev_post_ar <- dplyr::right_join(resdev_post,
+                                            dplyr::transmute(x$pointwise$agd_regression,
+                                                             parameter = .data$.study,
+                                                             .data$dic,
+                                                             .data$leverage,
+                                                             ssrd = purrr::map2_dbl(.data$observed,
+                                                                                    .data$fitted,
+                                                                                    ~sign(sum(.x - .y))) * sqrt(.data$resdev)
+                                            ),
+                                            by = "parameter")
+      }
 
       resdev_post <- dplyr::bind_rows(if (NROW(x$pointwise$ipd)) resdev_post_ipd else tibble::tibble(),
                                       if (NROW(x$pointwise$agd_arm)) resdev_post_aa else tibble::tibble(),
-                                      if (NROW(x$pointwise$agd_contrast)) resdev_post_ac else tibble::tibble())
+                                      if (NROW(x$pointwise$agd_contrast)) resdev_post_ac else tibble::tibble(),
+                                      if (NROW(x$pointwise$agd_regression)) resdev_post_ar else tibble::tibble())
 
       # Standardise sqrt residual deviances and leverages by df (e.g. for multi-arm trials)
       resdev_post$ssrd <- resdev_post$ssrd / sqrt(resdev_post$df)
