@@ -16,7 +16,7 @@
 #'   variable `.mu` can be used for baseline risk meta-regression: `~.mu:.trt`.
 #' @param OVB_adj Character string controlling omitted variable bias (OVB)
 #'   adjustment for reduced models.
-#'   `"all"` (the default) apply OVB adjustment to all reduced models. Quasi–Monte Carlo (QMC) integration points must be available for all reduced model(s).
+#'   `"all"` (the default) apply OVB adjustment to all reduced models. QMC integration points must be available for all reduced model(s).
 #'   `"auto"` apply OVB adjustment only to reduced models which the QMC integration points are available.
 #'   `"none"` do not apply OVB adjustment for reduced model(s), even if QMC integration points are provided.
 #' @param class_interactions Character string specifying whether effect modifier

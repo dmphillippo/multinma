@@ -137,14 +137,64 @@ need not be provided in the \code{cor} argument.
 \item Provide standard errors and a correlation matrix,
 so the study's covariance matrix need not be provided in the \code{cov} argument.
 \item Only provide standard errors, so the study's correlation and covariance matrices
-need not be provided in the \code{cor} and \code{cov} arguments, and the covariance matrix must be reconstructed,
+need not be provided in the \code{cor} and \code{cov} arguments, and the covariance matrix will be reconstructed,
 requiring QMC integration points using \code{\link[=add_integration]{add_integration()}}.
-This reconstruction of the covariance matrix is currently available for non-survival likelihoods.
+This reconstruction of the covariance matrix is currently available for all likelihoods except "lognormal", "loglogistic", "gamma", and "gengamma".
 }
 }
 
 \examples{
-## will be added
+# Simulate data
+n     <- 2*1000
+Sigma <- matrix(c(1,0.1,0.1,1),2,2)
+dat   <- data.frame(
+  X1 = rnorm(n),
+  X2 = rnorm(n),
+  trt = sample(c('A','B'),n, replace = T)
+)
+
+dat$eta <- model.matrix( ~ 1 + trt + X1 + X2, data = dat ) \%*\% c(-2,0.5,1,1)
+dat$y   <- dat$eta + rnorm(n,0, 1)
+
+# Fit models
+fit_1 <- lm( y ~ trt + X1 + X2, data = dat[   1:1000,])
+fit_2 <- lm( y ~ trt + X2     , data = dat[1001:2000,])
+
+est_1 <- coef(fit_1)
+est_2 <- coef(fit_2)
+
+se_1 <- summary(fit_1)$coefficients[, "Std. Error"]
+se_2 <- summary(fit_2)$coefficients[, "Std. Error"]
+
+# Preparation
+reg_covariates <- data.frame(study=paste0('reg_',1:2),
+                             X1_mean = rep(0,2),
+                             X2_mean = rep(0,2),
+                             X1_sd   = rep(1,2),
+                             X2_sd   = rep(1,2))
+
+reg_coef <- data.frame(
+  trt = c("A", NA, "B", NA, NA, "A", NA, "B", NA),
+  X1  = c(0,   NA, NA,  1,  NA,   0, NA,  NA, NA),
+  X2  = c(0,   NA, NA,  NA,  1,   0, NA,  NA,  1)
+)
+
+reg_coef$estimate <- c(NA,est_1,NA,est_2)
+reg_coef$se       <- c(NA,se_1 ,NA,se_2)
+reg_coef$study    <- rep(paste0('reg_',1:2),c(length(est_1)+1,length(est_2)+1))
+
+
+set_agd_regression(
+  data       = reg_coef,
+  study      = "study",
+  trt        = "trt",
+  estimate   = "estimate",
+  se         = "se",
+  cov        = list(reg_1 = vcov(fit_1), reg_2 = vcov(fit_2)),
+  covariates = reg_covariates,
+  regression = list(reg_1 = ~ trt + X1 + X2,
+                    reg_2 = ~ trt + X2),
+  trt_ref    = "A")
 }
 \seealso{
 \code{\link[=set_ipd]{set_ipd()}} for individual patient data, \code{\link[=set_agd_arm]{set_agd_arm()}} and
