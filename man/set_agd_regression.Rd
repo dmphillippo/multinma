@@ -145,15 +145,15 @@ This reconstruction of the covariance matrix is currently available for all like
 
 \examples{
 # Simulate data
+set.seed(123)
 n     <- 2*1000
-Sigma <- matrix(c(1,0.1,0.1,1),2,2)
 dat   <- data.frame(
   X1 = rnorm(n),
   X2 = rnorm(n),
-  trt = sample(c('A','B'),n, replace = T)
+  trt = factor(sample(c('A','B'),n, replace = TRUE), levels = c("A", "B"))
 )
 
-dat$eta <- model.matrix( ~ 1 + trt + X1 + X2, data = dat ) \%*\% c(-2,0.5,1,1)
+dat$eta <- drop(model.matrix( ~ 1 + trt + X1 + X2, data = dat ) \%*\% c(-2,0.5,1,1))
 dat$y   <- dat$eta + rnorm(n,0, 1)
 
 # Fit models
