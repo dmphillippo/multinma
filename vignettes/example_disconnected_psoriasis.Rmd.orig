@@ -1,0 +1,431 @@
+---
+title: "Example: Plaque psoriasis ML-NMR with disconnected networks"
+output: rmarkdown::html_vignette
+link-citations: yes
+bibliography: ../inst/REFERENCES.bib
+params:
+  run_tests: FALSE
+---
+
+```{r, code=readLines("children/knitr_setup.R"), include=FALSE}
+```
+
+```{r setup}
+library(multinma)
+library(dplyr)      # dplyr and tidyr for data manipulation
+library(tidyr)
+library(ggplot2)    # ggplot2 for plotting
+```
+```{r, eval = FALSE}
+options(mc.cores = parallel::detectCores())
+```
+```{r, echo = FALSE}
+nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")),
+             "true" =, "warn" = 2,
+             parallel::detectCores())
+options(mc.cores = nc)
+```
+
+<!-- TODO (Sam): add a citation for the ML-NMR-B paper once it has a reference -->
+
+Network meta-analysis (NMA) and multilevel network meta-regression (ML-NMR) require a *connected* network of treatments, so that every treatment can be compared through randomised evidence.
+In practice networks are often *disconnected*: some treatments are only compared within a separate sub-network, or are only studied in single-arm studies.
+This vignette demonstrates how to reconnect a disconnected network with ML-NMR, an approach we call ML-NMR with bridging (ML-NMR-B).
+
+Bridging relies on the assumption of *conditional constancy of absolute effects*: after adjusting for the observed covariates, the absolute outcomes on a common treatment are exchangeable between the bridged study populations.
+This assumption cannot be tested directly, so alongside the bridging methods we show how to assess its plausibility.
+We demonstrate three ways of bridging:
+
+* A [random baseline bridge](#random_bridge), which estimates a predictive distribution for the baseline of a new study from the reference sub-network (*baseline synthesis*), and uses it as an informative prior on the baselines of the disconnected studies.
+* A [fixed baseline bridge](#fixed_bridge), which assumes that the adjusted baselines of two studies, one from each sub-network, are identical.
+* An [external bridge](#external_bridge), which is a fixed baseline bridge using a study from outside the network, such as an observational cohort.
+
+These methods are related to the approaches of @Thom2022 and @Beliveau2017, but adjust for differences between study populations at the individual level using ML-NMR.
+
+We use the plaque psoriasis network of @Phillippo2022 (see `vignette("example_plaque_psoriasis")`), which is connected.
+We deliberately disconnect it by removing arms, so that the results of each bridging method can be compared with those from the full, connected network as a gold standard.
+
+# Setup
+## Preparing the data
+We transform the covariates in the IPD and AgD as in `vignette("example_plaque_psoriasis")`.
+As well as the five effect modifiers used there, we also include age, sex, and baseline PASI score as prognostic factors.
+
+```{r}
+pso_ipd <- plaque_psoriasis_ipd %>%
+  mutate(
+    # Variable transformations
+    bsa = bsa / 100,
+    weight = weight / 10,
+    durnpso = durnpso / 10,
+    prevsys = as.numeric(prevsys),
+    psa = as.numeric(psa),
+    male = as.numeric(male),
+    age = age / 10,
+    pasi_w0 = pasi_w0 / 10,
+    # Treatment classes
+    trtclass = case_when(trtn == 1 ~ "Placebo",
+                         trtn %in% c(2, 3, 5, 6) ~ "IL-17 blocker",
+                         trtn == 4 ~ "TNFa blocker",
+                         trtn == 7 ~ "IL-12/23 blocker"),
+    # Check complete cases for covariates of interest
+    is_complete = complete.cases(durnpso, prevsys, bsa, weight, psa)
+  ) %>%
+  filter(is_complete) %>%
+  arrange(studyc, trtn)
+
+pso_agd <- plaque_psoriasis_agd %>%
+  mutate(
+    # Variable transformations
+    bsa_mean = bsa_mean / 100,
+    bsa_sd = bsa_sd / 100,
+    weight_mean = weight_mean / 10,
+    weight_sd = weight_sd / 10,
+    durnpso_mean = durnpso_mean / 10,
+    durnpso_sd = durnpso_sd / 10,
+    prevsys = prevsys / 100,
+    psa = psa / 100,
+    male = male / 100,
+    age_mean = age_mean / 10,
+    age_sd = age_sd / 10,
+    pasi_w0_mean = pasi_w0_mean / 10,
+    pasi_w0_sd = pasi_w0_sd / 10,
+    # Treatment classes
+    trtclass = case_when(trtn == 1 ~ "Placebo",
+                         trtn %in% c(2, 3, 5, 6) ~ "IL-17 blocker",
+                         trtn == 4 ~ "TNFa blocker",
+                         trtn == 7 ~ "IL-12/23 blocker")
+  ) %>%
+  arrange(studyc, trtn)
+```
+
+The outcomes are ordered categorical (achieving PASI 75, PASI 90, and PASI 100).
+We write a small helper to set up a network from IPD and AgD data frames, since we will create several networks.
+
+```{r}
+make_pso_net <- function(ipd, agd) {
+  combine_network(
+    set_ipd(ipd,
+            study = studyc,
+            trt = trtc,
+            r = multi(r0 = 1,
+                      PASI75 = pasi75,
+                      PASI90 = pasi90,
+                      PASI100 = pasi100,
+                      type = "ordered", inclusive = TRUE),
+            trt_class = trtclass),
+    set_agd_arm(agd,
+                study = studyc,
+                trt = trtc,
+                r = multi(r0 = pasi75_n,
+                          PASI75 = pasi75_r,
+                          PASI90 = pasi90_r,
+                          PASI100 = pasi100_r,
+                          type = "ordered", inclusive = TRUE),
+                trt_class = trtclass),
+    trt_ref = "PBO"
+  )
+}
+
+add_pso_integration <- function(net) {
+  add_integration(net,
+    durnpso = distr(qgamma, mean = durnpso_mean, sd = durnpso_sd),
+    prevsys = distr(qbern, prob = prevsys),
+    bsa = distr(qlogitnorm, mean = bsa_mean, sd = bsa_sd),
+    weight = distr(qgamma, mean = weight_mean, sd = weight_sd),
+    psa = distr(qbern, prob = psa),
+    age = distr(qgamma, mean = age_mean, sd = age_sd),
+    male = distr(qbern, prob = male),
+    pasi_w0 = distr(qgamma, mean = pasi_w0_mean, sd = pasi_w0_sd),
+    n_int = 64)
+}
+```
+
+## The full network
+The full network is connected, and serves as the gold standard against which we compare the bridging methods.
+
+```{r pso_full_net}
+pso_net <- add_pso_integration(make_pso_net(pso_ipd, pso_agd))
+pso_net
+```
+
+## Creating a disconnected network
+We disconnect the network by removing the placebo arms of ERASURE, FEATURE, and JUNCTURE, and the secukinumab arms of FIXTURE, and dropping CLEAR.
+This leaves two sub-networks:
+
+* Sub-network 1, containing placebo, etanercept, ixekizumab, and ustekinumab (FIXTURE, IXORA-S, UNCOVER-1, UNCOVER-2, UNCOVER-3);
+* Sub-network 2, containing only the two doses of secukinumab (ERASURE, FEATURE, JUNCTURE).
+
+```{r}
+pso_agd_disc <- pso_agd %>%
+  filter(
+    studyc != "CLEAR",
+    !(studyc == "ERASURE" & trtc == "PBO"),
+    !(studyc == "FEATURE" & trtc == "PBO"),
+    !(studyc == "FIXTURE" & trtc %in% c("SEC_150", "SEC_300")),
+    !(studyc == "JUNCTURE" & trtc == "PBO")
+  )
+
+pso_net_disc <- add_pso_integration(make_pso_net(pso_ipd, pso_agd_disc))
+pso_net_disc
+```
+
+```{r pso_disc_net_plot, fig.width=8, fig.height=6}
+plot(pso_net_disc, weight_nodes = TRUE, weight_edges = TRUE, show_trt_class = TRUE) +
+  ggplot2::theme(legend.position = "bottom", legend.box = "vertical")
+```
+
+Without bridging, the relative effects of secukinumab against the treatments in sub-network 1 cannot be estimated.
+
+# Assessing population overlap
+Bridging assumes that, after adjusting for the observed covariates, the bridged study populations are exchangeable.
+Where two study populations overlap poorly on the observed covariates, the outcome model must extrapolate further, and it is more likely that the populations also differ on unobserved factors.
+We assess the overlap between each pair of study populations with `compare_populations()`.
+This fits a propensity score model to the full joint covariate distributions (using the integration points for AgD studies) and reports the *overlap effective sample size* (overlap ESS%) for each pair of studies; higher values indicate more similar populations.
+
+```{r pso_overlap}
+pso_overlap <- compare_populations(pso_net_disc,
+                                   covariates = c("durnpso", "prevsys", "bsa", "weight", "psa",
+                                                  "age", "male", "pasi_w0"),
+                                   method = "propensity")
+pso_overlap
+```
+
+```{r pso_overlap_plot, fig.width=8, fig.height=6}
+plot(pso_overlap)
+```
+
+The three UNCOVER studies have high overlap with all of the studies in sub-network 2, and UNCOVER-3 with ERASURE is the most similar pair.
+JUNCTURE and IXORA-S is the least similar pair.
+These overlap measures guide which studies we choose to bridge in the following sections.
+
+# Reference: full network ML-NMR {#full_network}
+For comparison, we first fit the ML-NMR model to the full connected network.
+As in `vignette("example_plaque_psoriasis")`, we include covariate-treatment interactions for the five effect modifiers with common interactions within each treatment class, and here also main effects for age, sex, and baseline PASI score.
+
+```{r pso_fit_full}
+pso_regression <- ~(durnpso + prevsys + bsa + weight + psa)*.trt + pasi_w0 + age + male
+
+pso_fit_full <- nma(pso_net,
+                    trt_effects = "fixed",
+                    link = "probit",
+                    regression = pso_regression,
+                    class_interactions = "common",
+                    prior_intercept = normal(scale = 10),
+                    prior_trt = normal(scale = 10),
+                    prior_reg = normal(scale = 10),
+                    prior_aux = flat(),
+                    QR = TRUE,
+                    init_r = 0.2)
+```
+
+# Random baseline bridge {#random_bridge}
+The random baseline bridge has two stages.
+
+## Stage 1: Baseline synthesis
+In the first stage, we use `baseline_synthesis()` to fit an ML-NMR model to the whole network with a random effect on the study baselines $\mu_j$ in the reference sub-network (sub-network 1):
+$$\mu_j \sim \mathrm{N}(m_\mu, \tau_\mu^2).$$
+The between-study standard deviation $\tau_\mu$ captures residual variation in the adjusted baselines due to unobserved differences between studies.
+Studies in other sub-networks are included with independent baselines, so they inform the baseline synthesis only through the shared regression coefficients.
+The random effect is placed on the network reference treatment, placebo, which is well informed in sub-network 1.
+
+```{r pso_fit_stage1}
+pso_fit_bs <- baseline_synthesis(pso_net_disc,
+                                 trt_effects = "fixed",
+                                 link = "probit",
+                                 regression = pso_regression,
+                                 class_interactions = "common",
+                                 prior_intercept = normal(scale = 10),
+                                 prior_intercept_sd = half_normal(scale = 5),
+                                 prior_trt = normal(scale = 10),
+                                 prior_reg = normal(scale = 10),
+                                 prior_aux = flat(),
+                                 QR = TRUE,
+                                 init_r = 0.2)
+pso_fit_bs
+```
+
+The output shows the posterior for the mean study baseline `baseline_mean` ($m_\mu$), the between-study SD `baseline_sd` ($\tau_\mu$), and the predictive distribution for the baseline in a new study `baseline_new` ($\mu_\mathrm{new}$).
+All are on the latent probit scale, at the reference level of the covariates.
+
+The predictive distribution $\mu_\mathrm{new} \mid m_\mu, \tau_\mu \sim \mathrm{N}(m_\mu, \tau_\mu^2)$ is normal only conditional on $m_\mu$ and $\tau_\mu$.
+The posterior predictive distribution also includes the uncertainty in these parameters, which gives it heavier tails than a normal distribution, particularly when few studies inform the baseline synthesis.
+`baseline_synthesis()` therefore approximates the posterior draws of `baseline_new` with a Student t distribution, fitted by maximum likelihood, and prints it at the end of the output.
+This is stored in the fitted model as `baseline_prior`, ready to use as a prior in Stage 2:
+
+```{r}
+pso_fit_bs$baseline_prior
+```
+
+### Assessing heterogeneity in baseline risk
+The size of $\tau_\mu$ indicates how much unexplained variation there is between the adjusted study baselines, and should be judged relative to the treatment effects being estimated.
+A small $\tau_\mu$ supports the exchangeability of the study baselines.
+Comparing the prior and posterior distributions shows whether $\tau_\mu$ is informed by the data, or is only weakly identified (with a posterior close to the prior).
+
+```{r pso_bs_tau_prior_post}
+plot_prior_posterior(pso_fit_bs, prior = "intercept_sd")
+```
+
+<!-- TODO (Sam): check against the plot once precompiled. -->
+
+Here the posterior has concentrated well below the $\textrm{half-N}(0, 5^2)$ prior, so $\tau_\mu$ is both small and well estimated from the data.
+
+## Stage 2: ML-NMR with predictive prior distributions
+In the second stage we fit a standard ML-NMR model to the disconnected network, with independent baselines for every study.
+The disconnected studies in sub-network 2 receive the Stage 1 predictive distribution as an informative prior on their baselines, which reconnects the network.
+This is specified with the `connect_baseline` argument and `con(type = "random")`, giving the studies to receive the predictive prior.
+
+Which studies to apply the predictive prior to depends on how plausible the conditional constancy of absolute effects assumption is judged to be for each.
+Here all three studies in sub-network 2 have high overlap with sub-network 1, so we apply it to all three.
+
+```{r pso_fit_random_3}
+pso_fit_random_3 <- nma(pso_net_disc,
+                        trt_effects = "fixed",
+                        link = "probit",
+                        regression = pso_regression,
+                        class_interactions = "common",
+                        connect_baseline = con(type = "random",
+                                               studies = c("ERASURE", "FEATURE", "JUNCTURE"),
+                                               prior_baseline = pso_fit_bs$baseline_prior),
+                        prior_intercept = normal(scale = 10),
+                        prior_trt = normal(scale = 10),
+                        prior_reg = normal(scale = 10),
+                        prior_aux = flat(),
+                        init_r = 0.2)
+```
+
+For comparison, we also apply the predictive prior to a single anchor study, ERASURE, which has the greatest overlap with sub-network 1.
+
+```{r pso_fit_random_1}
+pso_fit_random_1 <- nma(pso_net_disc,
+                        trt_effects = "fixed",
+                        link = "probit",
+                        regression = pso_regression,
+                        class_interactions = "common",
+                        connect_baseline = con(type = "random",
+                                               studies = "ERASURE",
+                                               prior_baseline = pso_fit_bs$baseline_prior),
+                        prior_intercept = normal(scale = 10),
+                        prior_trt = normal(scale = 10),
+                        prior_reg = normal(scale = 10),
+                        prior_aux = flat(),
+                        init_r = 0.2)
+```
+
+# Fixed baseline bridge {#fixed_bridge}
+A fixed baseline bridge assumes that the adjusted baselines of two studies, one from each sub-network, are identical.
+This is equivalent to treating the two studies as arms of a single study.
+We use `con(type = "fixed")`, naming the two studies to bridge.
+We choose UNCOVER-3 and ERASURE, the pair with the greatest overlap ESS%.
+
+```{r pso_fit_fixed}
+pso_fit_fixed <- nma(pso_net_disc,
+                     trt_effects = "fixed",
+                     link = "probit",
+                     regression = pso_regression,
+                     class_interactions = "common",
+                     connect_baseline = con(type = "fixed",
+                                            studies = c("UNCOVER-3", "ERASURE")),
+                     prior_intercept = normal(scale = 10),
+                     prior_trt = normal(scale = 10),
+                     prior_reg = normal(scale = 10),
+                     prior_aux = flat(),
+                     QR = TRUE,
+                     init_r = 0.2)
+```
+
+Unlike the random baseline bridge, the fixed baseline bridge carries no additional uncertainty for between-study variation in the baselines, so it allows for no unobserved differences between the two bridged studies.
+
+# External bridge {#external_bridge}
+Bridging studies can also come from outside the network.
+Here we add the PROSPECT cohort study [@Thaci2019], a single-arm study of secukinumab 300 mg, and bridge it to IXORA-S in sub-network 1 with a fixed baseline bridge.
+The PROSPECT outcomes and covariate summaries are entered on the same scales as the other AgD studies.
+
+```{r}
+prospect <- tibble(
+  studyc = "PROSPECT", trtc_long = "Secukinumab 300 mg", trtc = "SEC_300", trtn = 6,
+  trtclass = "IL-17 blocker",
+  pasi75_r = 1156, pasi75_n = 1509, pasi90_r = 801, pasi90_n = 1509, pasi100_r = 337, pasi100_n = 1509,
+  bsa_mean = 0.187, bsa_sd = 0.184,
+  weight_mean = 8.75, weight_sd = 2.03,
+  durnpso_mean = 1.96, durnpso_sd = 1.35,
+  prevsys = 0.9095, psa = 0.202,
+  age_mean = 4.81, age_sd = 1.37,
+  male = 0.624,
+  pasi_w0_mean = 1.77, pasi_w0_sd = 1.25
+)
+
+pso_net_ext <- add_pso_integration(make_pso_net(pso_ipd, bind_rows(pso_agd_disc, prospect)))
+```
+
+We check the overlap between PROSPECT and the studies in sub-network 1, to choose the study to bridge it with.
+
+```{r}
+pso_overlap_ext <- compare_populations(pso_net_ext,
+                                       covariates = c("durnpso", "prevsys", "bsa", "weight", "psa",
+                                                      "age", "male", "pasi_w0"),
+                                       method = "propensity")
+pso_overlap_ext
+```
+
+PROSPECT has its greatest overlap with IXORA-S, so we bridge these two studies.
+
+```{r pso_fit_external}
+pso_fit_ext <- nma(pso_net_ext,
+                   trt_effects = "fixed",
+                   link = "probit",
+                   regression = pso_regression,
+                   class_interactions = "common",
+                   connect_baseline = con(type = "fixed",
+                                          studies = c("PROSPECT", "IXORA-S")),
+                   prior_intercept = normal(scale = 10),
+                   prior_trt = normal(scale = 10),
+                   prior_reg = normal(scale = 10),
+                   prior_aux = flat(),
+                   QR = TRUE,
+                   init_r = 0.2)
+```
+
+# Comparing the bridging methods
+We now compare the population-average relative effects against placebo from each bridging method with those from the full connected network.
+We focus on two study populations: FEATURE (a disconnected study in sub-network 2) and FIXTURE (a connected study in sub-network 1).
+The relative effects of etanercept, ixekizumab, and ustekinumab are estimated within sub-network 1, whereas those of secukinumab rely on the bridge.
+
+```{r}
+pso_fits <- list("Full network" = pso_fit_full,
+                 "Random (3 studies)" = pso_fit_random_3,
+                 "Random (1 study)" = pso_fit_random_1,
+                 "Fixed (UNCOVER-3/ERASURE)" = pso_fit_fixed,
+                 "External (PROSPECT/IXORA-S)" = pso_fit_ext)
+
+pso_releff <- bind_rows(lapply(pso_fits, function(f) {
+  as_tibble(relative_effects(f))
+}), .id = "Bridge") %>%
+  filter(.study %in% c("FEATURE", "FIXTURE")) %>%
+  mutate(Bridge = factor(Bridge, levels = rev(names(pso_fits))))
+```
+
+```{r pso_releff_compare, fig.width=8, fig.height=6}
+ggplot(pso_releff, aes(x = mean, xmin = `2.5%`, xmax = `97.5%`, y = Bridge, colour = Bridge)) +
+  geom_vline(xintercept = 0, colour = "grey60") +
+  geom_pointrange(size = 0.3) +
+  facet_grid(.trtb ~ .study) +
+  labs(x = "Relative effect vs. placebo (probit scale)", y = NULL) +
+  theme_multinma() +
+  theme(legend.position = "none", strip.text.y = element_text(angle = 0))
+```
+
+<!-- TODO (Sam): check this interpretation against the plot once precompiled. It follows the Chapter 3 paper results (marginal effects), whereas this plot shows conditional relative effects. -->
+
+For etanercept, ixekizumab, and ustekinumab, all methods agree with the full network, since these comparisons do not depend on the bridge.
+For secukinumab, the estimates depend on the bridging method:
+
+* The random baseline bridge applied to all three disconnected studies gives estimates closest to the full network.
+  Applying the predictive prior to a single study gives similar point estimates but wider credible intervals, because fewer study baselines are assumed exchangeable and so fewer studies contribute evidence to the bridge.
+* The fixed baseline bridge between UNCOVER-3 and ERASURE gives narrow credible intervals, but estimates further from the full network, despite this pair having the greatest observed overlap.
+  This suggests that UNCOVER-3 and ERASURE differ on unobserved factors, which the fixed bridge cannot allow for.
+* The external bridge with PROSPECT differs more again from the full network.
+
+High observed overlap does not guarantee that the conditional constancy of absolute effects assumption holds, since this depends on unobserved as well as observed differences.
+We therefore recommend the random baseline bridge where the data allow, since it allows for unobserved differences between studies, and recommend sensitivity analyses across a range of plausible bridging choices.
+
+# References

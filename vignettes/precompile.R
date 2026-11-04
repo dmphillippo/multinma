@@ -70,3 +70,5 @@ precompile("example_certolizumab.Rmd")
 # precompile("example_ndmm.Rmd.orig", write_tests = FALSE)
 precompile("example_ndmm.Rmd", write_tests = FALSE)
 
+# Disconnected network example: fits several ML-NMR models, so knit from .Rmd.orig to a static .Rmd
+# precompile("example_disconnected_psoriasis.Rmd.orig", write_tests = FALSE)
