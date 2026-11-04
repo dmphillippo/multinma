@@ -2,9 +2,7 @@
 % Please edit documentation in R/bayes_R2.R
 \name{bayes_R2.stan_nma}
 \alias{bayes_R2.stan_nma}
-\alias{bayes_R2}
 \alias{loo_R2.stan_nma}
-\alias{loo_R2}
 \alias{loo_predictive_metric.stan_nma}
 \alias{loo_predictive_metric}
 \title{Predictive performance}

@@ -15,7 +15,6 @@
 #'   TRUE`, otherwise a 3D MCMC array of samples of the Bayesian or LOO
 #'   \eqn{R^2}. For `loo_predictive_metric()`: a list with the estimate and
 #'   standard error.
-#' @aliases bayes_R2
 #' @importFrom rstantools bayes_R2
 #' @export
 bayes_R2.stan_nma <- function(object, ..., probs = c(0.025, 0.5, 0.975), summary = TRUE) {
@@ -74,7 +73,6 @@ bayes_R2.stan_nma <- function(object, ..., probs = c(0.025, 0.5, 0.975), summary
 }
 
 #' @rdname bayes_R2.stan_nma
-#' @aliases loo_R2
 #' @importFrom rstantools loo_R2
 #' @export
 loo_R2.stan_nma <- function(object, ..., probs = c(0.025, 0.5, 0.975), summary = TRUE) {
