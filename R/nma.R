@@ -4106,6 +4106,17 @@ apply_connect_fixed <- function(network, studies) {
 #'   `prior_intercept` argument, and the prior for \eqn{\tau_\mu} by
 #'   `prior_intercept_sd`.
 #'
+#'   The posterior predictive distribution for the baseline in a new study,
+#'   `baseline_new`, integrates over the uncertainty in \eqn{m} and
+#'   \eqn{\tau_\mu}, and so has heavier tails than a normal distribution. To
+#'   use it as an informative prior on disconnected study baselines (via the
+#'   `prior_baseline` argument of [con()]), it is approximated by a Student t
+#'   distribution fitted to the posterior draws of `baseline_new` by maximum
+#'   likelihood (using [MASS::fitdistr()]). This is stored in the returned
+#'   object as `baseline_prior`, and is shown when the object is printed. If
+#'   the Student t fit fails, a normal approximation is used instead, with a
+#'   warning.
+#'
 #' @name baseline_synthesis
 #' @param network A `multinma` network object.
 #' @param prior_intercept Prior for the mean of the random effects distribution
@@ -4113,7 +4124,11 @@ apply_connect_fixed <- function(network, studies) {
 #' @param prior_intercept_sd Prior for standard deviation of the random effects
 #'   distribution on the study-specific intercepts.
 #' @param ... Additional arguments passed directly to [nma()].
-#' @return A `stan_baseline` object, inheriting from [stan_nma].
+#' @return A `stan_baseline` object, inheriting from [stan_nma]. This has an
+#'   additional component `baseline_prior`: an [nma_prior] object giving the
+#'   Student t (or, if that fit fails, normal) approximation to the predictive
+#'   distribution `baseline_new`, ready to pass to `con(prior_baseline = )`.
+#'   This is `NULL` if the model has no posterior draws.
 #' @export
 
 baseline_synthesis <- function(network,
@@ -4136,5 +4151,41 @@ baseline_synthesis <- function(network,
   )
 
   class(fit) <- c("stan_baseline", class(fit))
+  fit$baseline_prior <- fit_baseline_prior(fit)
   fit
+}
+
+#' Approximate the baseline predictive distribution by a Student t prior
+#'
+#' Fits a Student t distribution by maximum likelihood (using
+#' [MASS::fitdistr()]) to the posterior draws of `baseline_new` from a baseline
+#' synthesis model, and returns it as an [nma_prior] object for use as the
+#' `prior_baseline` in [con()]. Falls back to a normal distribution with the
+#' mean and SD of the draws, with a warning, if the Student t fit fails.
+#'
+#' @param fit A `stan_baseline` object
+#' @return An [nma_prior] object, or `NULL` if the model has no posterior draws
+#'   (e.g. when run with `test_grad = TRUE`).
+#' @noRd
+fit_baseline_prior <- function(fit) {
+  sf <- as.stanfit(fit)
+  if (!inherits(sf, "stanfit") || sf@mode != 0) return(NULL)
+
+  draws <- as.vector(as.array(sf, pars = "baseline_new"))
+  draws <- draws[is.finite(draws)]
+  if (length(draws) < 2 || !(stats::sd(draws) > 0)) return(NULL)
+
+  tf <- tryCatch(suppressWarnings(MASS::fitdistr(draws, "t")),
+                 error = function(e) e)
+
+  if (inherits(tf, "error") || !all(is.finite(tf$estimate)) || !all(tf$estimate[c("s", "df")] > 0)) {
+    warn(c("Student t approximation to the baseline predictive distribution failed; using a normal approximation instead.",
+           i = if (inherits(tf, "error")) conditionMessage(tf) else "Non-finite or non-positive parameter estimates."),
+         class = "baseline_prior_normal")
+    return(normal(location = mean(draws), scale = stats::sd(draws)))
+  }
+
+  student_t(location = tf$estimate[["m"]],
+            scale = tf$estimate[["s"]],
+            df = tf$estimate[["df"]])
 }

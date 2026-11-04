@@ -53,6 +53,7 @@ Imports:
     ggplot2 (>= 3.3.0),
     ggdist (>= 2.1.1),
     truncdist,
+    MASS,
     bayesplot
 LinkingTo: 
     BH (>= 1.66.0),

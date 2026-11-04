@@ -23,7 +23,11 @@ distribution on the study-specific intercepts.}
 \item{...}{Additional arguments passed directly to \code{\link[=nma]{nma()}}.}
 }
 \value{
-A \code{stan_baseline} object, inheriting from \link{stan_nma}.
+A \code{stan_baseline} object, inheriting from \link{stan_nma}. This has an
+additional component \code{baseline_prior}: an \link{nma_prior} object giving the
+Student t (or, if that fit fails, normal) approximation to the predictive
+distribution \code{baseline_new}, ready to pass to \code{con(prior_baseline = )}.
+This is \code{NULL} if the model has no posterior draws.
 }
 \description{
 Runs a baseline synthesis model, placing a random effect on the
@@ -41,4 +45,15 @@ study-specific intercept parameters of the NMA or ML-NMR model fitted by
 The prior distribution on the mean \eqn{m} is specified by the
 \code{prior_intercept} argument, and the prior for \eqn{\tau_\mu} by
 \code{prior_intercept_sd}.
+
+The posterior predictive distribution for the baseline in a new study,
+\code{baseline_new}, integrates over the uncertainty in \eqn{m} and
+\eqn{\tau_\mu}, and so has heavier tails than a normal distribution. To
+use it as an informative prior on disconnected study baselines (via the
+\code{prior_baseline} argument of \code{\link[=con]{con()}}), it is approximated by a Student t
+distribution fitted to the posterior draws of \code{baseline_new} by maximum
+likelihood (using \code{\link[MASS:fitdistr]{MASS::fitdistr()}}). This is stored in the returned
+object as \code{baseline_prior}, and is shown when the object is printed. If
+the Student t fit fails, a normal approximation is used instead, with a
+warning.
 }
