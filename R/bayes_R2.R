@@ -192,3 +192,11 @@ loo_predictive_metric.stan_nma <- function(x, metric, ...) {
 
   loo::loo_predictive_metric(mu_pred, ..., y = y, metric = metric, log_lik = log_lik, r_eff = r_eff)
 }
+
+#' @importFrom rstantools loo_R2
+#' @export
+rstantools::loo_R2
+
+#' @importFrom rstantools bayes_R2
+#' @export
+rstantools::bayes_R2
