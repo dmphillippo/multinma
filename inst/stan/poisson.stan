@@ -54,6 +54,12 @@ transformed parameters {
         }
       }
 
+      if (random_baseline == 1) {
+        for (i in 1:ni_agd_arm) {
+          eta_agd_arm_noRE[(1 + (i-1)*nint_max):((i-1)*nint_max + nint)] += f_baseline[agd_arm_study[i]];
+        }
+      }
+
       if (RE) {
 
         if (link == 1) { // log link
@@ -79,16 +85,22 @@ transformed parameters {
           theta_agd_arm_bar[i] = mean(theta_agd_arm_ii[(1 + (i-1)*nint):(i*nint)]);
         }
       }
+
     } else { // -- If no integration --
-      if (RE) {
-        if (class_effects) {
-          for (i in 1:ni_agd_arm) {
-            if (agd_arm_trt[i] > 1 && which_CE[agd_arm_trt[i] - 1]) {
-            eta_agd_arm_noRE[i] += f_class[which_fclass[agd_arm_trt[i] - 1]];
-            }
+
+      if (class_effects) {
+        for (i in 1:ni_agd_arm) {
+          if (agd_arm_trt[i] > 1 && which_CE[agd_arm_trt[i] - 1]) {
+          eta_agd_arm_noRE[i] += f_class[which_fclass[agd_arm_trt[i] - 1]];
           }
         }
+      }
 
+      if (random_baseline) {
+        eta_agd_arm_noRE += f_baseline[agd_arm_study];
+      }
+
+      if (RE) {
         if (link == 1) { // log link
           for (i in 1:ni_agd_arm) {
             if (which_RE[narm_ipd + i])
@@ -98,15 +110,6 @@ transformed parameters {
           }
         }
       } else {
-
-        if (class_effects) {
-          for (i in 1:ni_agd_arm) {
-            if (agd_arm_trt[i] > 1 && which_CE[agd_arm_trt[i] - 1]) {
-              eta_agd_arm_noRE[i] += f_class[which_fclass[agd_arm_trt[i] - 1]];
-            }
-          }
-        }
-
         if (link == 1) // log link
           theta_agd_arm_bar = exp(eta_agd_arm_noRE);
       }

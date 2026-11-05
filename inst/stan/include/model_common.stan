@@ -2,7 +2,30 @@
 
 // -- Priors --
 // Study-specific baselines
-prior_select_lp(mu, prior_intercept_dist, prior_intercept_location, prior_intercept_scale, prior_intercept_df);
+if (random_baseline == 0) {
+  if (baseline_priors == 1) {
+    for (s in 1:totns) {
+      if (baseline_trt[s] > 1) {
+        prior_select2_lp(mu[s] + d[baseline_trt[s] - 1], prior_intercept_dist[s], prior_intercept_location[s], prior_intercept_scale[s], prior_intercept_df[s]);
+      } else {
+        prior_select2_lp(mu[s], prior_intercept_dist[s], prior_intercept_location[s], prior_intercept_scale[s], prior_intercept_df[s]);
+      }
+    }
+  } else {
+    prior_select_lp(mu, prior_intercept_dist[1], prior_intercept_location[1], prior_intercept_scale[1], prior_intercept_df[1]);
+  }
+} else {
+  prior_select_lp(baseline_mean, prior_intercept_dist[1], prior_intercept_location[1], prior_intercept_scale[1], prior_intercept_df[1]);
+  prior_select_lp(baseline_sd, prior_intercept_sd_dist, prior_intercept_sd_location, prior_intercept_sd_scale, prior_intercept_sd_df);
+
+  for (s in 1:totns) {
+    if (in_baseline_subnet[s]) {
+      allbeta[s] ~ std_normal();
+    } else {
+      prior_select2_lp(mu[s], prior_intercept_dist[1], prior_intercept_location[1], prior_intercept_scale[1], prior_intercept_df[1]);
+    }
+  }
+}
 // Treatment effects
   if (class_effects == 0) {
     prior_select_lp(d, prior_trt_dist, prior_trt_location, prior_trt_scale, prior_trt_df);
@@ -64,3 +87,4 @@ if (class_effects) {
 
 // Draw auxiliary variables from standard normal
 z_class ~ std_normal();
+z_baseline ~ std_normal();

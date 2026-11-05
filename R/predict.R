@@ -886,10 +886,14 @@ predict.stan_nma <- function(object, ...,
         abort("Baseline response `baseline` should be a single distr() specification or character string naming a study in the network, a list of such specifications, or NULL.")
     }
 
+    fixed_con <- FALSE
+
     ## Without baseline and newdata specified ----------------------------------
     if (is.null(baseline) && is.null(newdata)) {
 
       if (is_surv) times <- rlang::eval_tidy(times)
+
+      fixed_con <- !is.null(object$connect_baseline) && any(purrr::map(object$connect_baseline, "type") == "fixed")
 
       # Get data for prediction
       if (level == "individual") {
@@ -981,20 +985,27 @@ predict.stan_nma <- function(object, ...,
         }
 
         if (has_agd_arm(object$network)) {
+
+          dat_agd_arm <- object$network$agd_arm
+
+          if (fixed_con) {
+            # If any fixed baseline connections, predict into original study populations
+            dat_agd_arm$.study_fix <- dat_agd_arm$.study
+            dat_agd_arm$.study <- dat_agd_arm$.study_orig
+          }
+
           if (!is_surv) {
             if (inherits(object$network, "mlnmr_data")) {
-              dat_agd_arm <- .unnest_integration(object$network$agd_arm) %>%
+              dat_agd_arm <- .unnest_integration(dat_agd_arm) %>%
                 dplyr::mutate(.sample_size = .data$.sample_size / object$network$n_int)
-            } else {
-              dat_agd_arm <- object$network$agd_arm
             }
           } else {
             if (type %in% c("survival", "hazard", "cumhaz") && is.null(times)) {
               if (is.null(times_seq)) {
                 # Use times from network, unnest
-                dat_agd_arm <- object$network$agd_arm %>%
+                dat_agd_arm <- dat_agd_arm %>%
                   # Drop duplicated names in outer dataset from .data_orig before unnesting
-                  dplyr::mutate(.data_orig = purrr::map(.data$.data_orig, ~ dplyr::select(., -dplyr::any_of(names(object$network$agd_arm))))) %>%
+                  dplyr::mutate(.data_orig = purrr::map(.data$.data_orig, ~ dplyr::select(., -dplyr::any_of(names(dat_agd_arm))))) %>%
                   tidyr::unnest(cols = c(".Surv", ".data_orig")) %>%
                   dplyr::mutate(!!! get_Surv_data(.$.Surv),
                                 .time = .data$time) %>%
@@ -1005,26 +1016,26 @@ predict.stan_nma <- function(object, ...,
 
               } else {
                 # Calculate times sequence if times_seq specified
-                agd_times <- object$network$agd_arm %>%
+                agd_times <- dat_agd_arm %>%
                   tidyr::unnest(cols = ".Surv") %>%
                   dplyr::mutate(!!! get_Surv_data(.$.Surv), .time = .data$time) %>%
                   dplyr::group_by(.data$.study) %>%
                   dplyr::summarise(.time = list(seq(from = 0, to = max(.data$.time), length.out = times_seq)),
                                    .obs_id = list(1:times_seq))
 
-                dat_agd_arm <- object$network$agd_arm %>%
+                dat_agd_arm <- dat_agd_arm %>%
                   # Drop duplicated names in outer dataset from .data_orig before unnesting
                   # Take only one row of .data_orig (all duplicated anyway)
-                  dplyr::mutate(.data_orig = purrr::map(.data$.data_orig, ~ dplyr::select(., -dplyr::any_of(names(object$network$agd_arm)))[1,])) %>%
+                  dplyr::mutate(.data_orig = purrr::map(.data$.data_orig, ~ dplyr::select(., -dplyr::any_of(names(dat_agd_arm)))[1,])) %>%
                   dplyr::left_join(agd_times, by = ".study") %>%
                   tidyr::unnest(cols = c(".time", ".obs_id", ".data_orig"))
               }
             } else {
               # Use provided times
-              dat_agd_arm <- object$network$agd_arm %>%
+              dat_agd_arm <- dat_agd_arm %>%
                 # Drop duplicated names in outer dataset from .data_orig before unnesting
                 # Take only one row of .data_orig (all duplicated anyway)
-                dplyr::mutate(.data_orig = purrr::map(.data$.data_orig, ~ dplyr::select(., -dplyr::any_of(names(object$network$agd_arm)))[1,]),
+                dplyr::mutate(.data_orig = purrr::map(.data$.data_orig, ~ dplyr::select(., -dplyr::any_of(names(dat_agd_arm)))[1,]),
                               # Use provided time vector
                               .time = if (type %in% c("survival", "hazard", "cumhaz", "rmst")) list(times) else NA,
                               .obs_id = if (type %in% c("survival", "hazard", "cumhaz", "rmst")) list(1:length(times)) else NA) %>%
@@ -1055,7 +1066,16 @@ predict.stan_nma <- function(object, ...,
         }
 
         if (has_ipd(object$network)) {
+
           dat_ipd <- object$network$ipd
+
+          if (fixed_con) {
+            # If any fixed baseline connections, predict into original study populations
+            dat_ipd$.study_fix <- dat_ipd$.study
+            dat_ipd$.study <- dat_ipd$.study_orig
+          }
+
+
           if (is_surv) {
             # For aggregate survival predictions we average the entire survival
             # curve over the population (i.e. over every individual), so we need
@@ -1160,8 +1180,11 @@ predict.stan_nma <- function(object, ...,
 
       # Design matrix, just treating all data as IPD
       # Contrast data is included just so that the correct columns are excluded
+      # For fixed baseline connection, use combined study factor
+      preddatX <- preddat
+      if (fixed_con) preddatX$.study <- preddatX$.study_fix
       X_list <- make_nma_model_matrix(nma_formula,
-                                      dat_ipd = preddat,
+                                      dat_ipd = preddatX,
                                       dat_agd_contrast = dat_agd_contrast,
                                       xbar = object$xbar[names(object$xbar) != ".mu"],
                                       consistency = object$consistency,
@@ -1184,6 +1207,11 @@ predict.stan_nma <- function(object, ...,
         } else {
           aux_array <- as.array(object, pars = aux_pars)
         }
+      }
+
+      if (fixed_con) {
+        sf <- dplyr::distinct(preddat, .data$.study_orig, .data$.study_fix)
+        study_fix <- setNames(sf$.study_fix, sf$.study_orig)
       }
 
     ## With baseline and newdata specified -------------------------------------
@@ -1697,9 +1725,11 @@ predict.stan_nma <- function(object, ...,
       n_trt <- length(treatments)
 
       if (!is.null(object$aux_regression)) {
+        preddatX <- preddat
+        if (fixed_con) preddatX$.study <- preddatX$.study_fix
         X_aux <- make_nma_model_matrix(object$aux_regression,
                                        xbar = object$xbar,
-                                       dat_ipd = preddat)$X_ipd
+                                       dat_ipd = preddatX)$X_ipd
         beta_aux <- as.array(object, pars = "beta_aux")
       }
 
@@ -1731,10 +1761,11 @@ predict.stan_nma <- function(object, ...,
 
         # Basis for mspline models
         if (object$likelihood %in% c("mspline", "pexp")) {
+          studies_s <- if (fixed_con) study_fix[studies[s]] else studies[s]
           if (!is.null(aux)) {
-            basis <- object$basis[[aux[[studies[s]]]]]
+            basis <- object$basis[[aux[[studies_s]]]]
           } else {
-            basis <- object$basis[[studies[s]]]
+            basis <- object$basis[[studies_s]]
           }
         } else {
           basis <- NULL
@@ -1784,8 +1815,13 @@ predict.stan_nma <- function(object, ...,
             eta_pred_array <- sweep(eta_pred_array, 3, offset_all[ss], FUN = "+")
 
           # Aux select
-          aux_l <- get_aux_labels(preddat[ss, ], by = object$aux_by)
-          aux_id <- get_aux_id(preddat[ss, ], by = object$aux_by)
+          if (fixed_con) {
+            aux_l <- get_aux_labels(preddatX[ss, ], by = object$aux_by)
+            aux_id <- get_aux_id(preddatX[ss, ], by = object$aux_by)
+          } else {
+            aux_l <- get_aux_labels(preddat[ss, ], by = object$aux_by)
+            aux_id <- get_aux_id(preddat[ss, ], by = object$aux_by)
+          }
 
           if (!aux_int) { #(length(setdiff(object$aux_by, c(".study", ".trt"))) == 0) {
             aux_s <- grepl(paste0("\\[(\\Q", paste(aux_l, collapse = "\\E|\\Q"), if (object$likelihood %in% c("mspline", "pexp")) "\\E)," else "\\E)\\]"),

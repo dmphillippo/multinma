@@ -155,6 +155,44 @@ print.nma_data <- function(x, ..., n = 10) {
     # cat("\n")
   }
 
+  # Check for single-arm studies
+  # Initialize variables to empty vectors
+  single_arm_studies_ipd <- character(0)
+  single_arm_studies_agd <- character(0)
+  single_arm_studies_agd_cont <- character(0)
+
+  if (!is.null(x$ipd) && nrow(x$ipd) > 0){
+    single_arm_studies_ipd <- x$ipd %>%
+      dplyr::select(".study", ".trt") %>%
+      dplyr::distinct(.data$.study, .data$.trt) %>%
+      dplyr::group_by(.data$.study) %>%
+      dplyr::filter(dplyr::n() == 1) %>%
+      dplyr::pull(".study") %>%
+      as.character()
+  }
+  if (!is.null(x$agd_arm) && nrow(x$agd_arm) > 0) {
+    single_arm_studies_agd <- x$agd_arm %>%
+      dplyr::select(".study", ".trt") %>%
+      dplyr::group_by(.data$.study) %>%
+      dplyr::filter(dplyr::n() == 1) %>%
+      dplyr::pull(".study") %>%
+      as.character()
+  }
+  if (!is.null(x$agd_contrast) && nrow(x$agd_contrast) > 0) {
+    single_arm_studies_agd_cont <- x$agd_contrast %>%
+      dplyr::select(".study", ".trt") %>%
+      dplyr::group_by(.data$.study) %>%
+      dplyr::filter(dplyr::n() == 1) %>%
+      dplyr::pull(".study") %>%
+      as.character()
+  }
+
+  single_arm_studies <- unique(
+    c(single_arm_studies_ipd,
+      single_arm_studies_agd,
+      single_arm_studies_agd_cont)
+  )
+
   sec_header()
   if (!is.null(x$classes)) {
     cglue("Total number of treatments: {length(x$treatments)}, in {nlevels(x$classes)} classes")
@@ -164,7 +202,9 @@ print.nma_data <- function(x, ..., n = 10) {
   cglue("Total number of studies: {length(x$studies)}")
   cglue("Reference treatment is: {levels(x$treatments)[1]}")
   cglue("Network is {if (is_network_connected(x)) green('connected') else red('disconnected')}")
-
+  if (length(single_arm_studies) > 0) {
+    cglue("Single-arm studies: {paste(single_arm_studies, collapse = ', ')}")
+  }
   invisible(x)
 }
 
@@ -272,18 +312,8 @@ as.igraph.nma_data <- function(x, ..., collapse = TRUE) {
     abort("`collapse` must be TRUE or FALSE.")
 
   if (has_ipd(x)) {
-    e_ipd <- x$ipd %>%
-      dplyr::distinct(.data$.study, .data$.trt) %>%
-      dplyr::group_by(.data$.study) %>%
-      dplyr::group_modify(~make_contrasts(.x$.trt))
-
-    if (collapse) {
-      e_ipd <- e_ipd %>%
-        dplyr::group_by(.data$.trt, .data$.trt_b) %>%
-        dplyr::summarise(.nstudy = dplyr::n_distinct(.data$.study), .type = "IPD")
-    } else {
-      e_ipd$.type <- "IPD"
-    }
+    e_ipd <- dplyr::distinct(x$ipd, .data$.study, .data$.trt)
+    e_ipd$.type <- "IPD"
 
     v_ipd <- x$ipd %>%
       dplyr::group_by(.data$.trt) %>%
@@ -294,17 +324,8 @@ as.igraph.nma_data <- function(x, ..., collapse = TRUE) {
 
   if (has_agd_arm(x) || has_agd_contrast(x)) {
     agd_all <- dplyr::bind_rows(x$agd_arm, x$agd_contrast)
-    e_agd <- agd_all %>%
-      dplyr::group_by(.data$.study) %>%
-      dplyr::group_modify(~make_contrasts(.x$.trt))
-
-    if (collapse) {
-      e_agd <- e_agd %>%
-        dplyr::group_by(.data$.trt, .data$.trt_b) %>%
-        dplyr::summarise(.nstudy = dplyr::n_distinct(.data$.study), .type = "AgD")
-    } else {
-      e_agd$.type <- "AgD"
-    }
+    e_agd <- agd_all
+    e_agd$.type <- "AgD"
 
     if (has_agd_sample_size(x)) {
       v_agd <- agd_all %>%
@@ -317,13 +338,20 @@ as.igraph.nma_data <- function(x, ..., collapse = TRUE) {
     e_agd <- v_agd <- tibble::tibble()
   }
 
-  e_all <- dplyr::bind_rows(e_ipd, e_agd) %>%
+  e_all <- dplyr::bind_rows(e_ipd, e_agd)  %>%
+    dplyr::group_by(.data$.study) %>%
+    dplyr::summarise(ctr = list(make_contrasts(.data$.trt)),
+                     .type = dplyr::if_else(dplyr::n_distinct(.data$.type) == 1, .data$.type[1], "Mixed")) %>%
+    tidyr::unnest(cols = "ctr") %>%
     dplyr::rename(from = ".trt_b", to = ".trt") %>%
     dplyr::select("from", "to", dplyr::everything())
 
   if (collapse) {
     e_all <- e_all %>%
-      dplyr::mutate(.nstudy = dplyr::if_else(is.na(.data$.nstudy), 0L, .data$.nstudy))
+      dplyr::group_by(.data$from, .data$to, .data$.type) %>%
+      dplyr::summarise(.nstudy = dplyr::n_distinct(.data$.study)) %>%
+      dplyr::mutate(.nstudy = dplyr::if_else(is.na(.data$.nstudy), 0L, .data$.nstudy)) %>%
+      dplyr::arrange(dplyr::desc(.data$.type), .data$to, .data$from)
   }
 
   if (has_agd_sample_size(x)) {
@@ -570,7 +598,6 @@ get_nodesplits <- function(network, include_consistency = FALSE) {
 #' @export
 #' @rdname get_nodesplits
 has_direct <- function(network, trt1, trt2) {
-
   # Check network
   if (!inherits(network, "nma_data")) {
     abort("`network` must be an `nma_data` object, as created by the functions `set_*`, `combine_network`, or `add_integration`.")
@@ -693,6 +720,9 @@ has_indirect <- function(network, trt1, trt2) {
 #'   `FALSE`.
 #' @param show_trt_class Colour treatment nodes by class, if `trt_class` is set?
 #'   Default is `FALSE`.
+#' @param show_single_arm Label single-arm studies? Default is `FALSE`. When
+#'   `TRUE`, each treatment node with single-arm studies is marked with a
+#'   footnote listing the single-arm studies on that treatment.
 #' @param level Display network at the `"treatment"` (default) or `"class"` level.
 #' @param nudge Numeric value to nudge the treatment labels away from the nodes
 #'   when `weight_nodes = TRUE`. Default is `0` (no adjustment to label
@@ -754,6 +784,7 @@ plot.nma_data <- function(x, ..., layout, circular,
                           weight_edges = TRUE,
                           weight_nodes = FALSE,
                           show_trt_class = FALSE,
+                          show_single_arm = FALSE,
                           level = c("treatment", "class"),
                           nudge = 0) {
   level <- rlang::arg_match(level)
@@ -778,6 +809,9 @@ plot.nma_data <- function(x, ..., layout, circular,
 
   if (!rlang::is_bool(show_trt_class))
     abort("`show_trt_class` must be TRUE or FALSE.")
+
+  if (!rlang::is_bool(show_single_arm))
+    abort("`show_single_arm` must be TRUE or FALSE.")
 
   if (show_trt_class && is.null(x$classes))
     abort(paste("Treatment classes not specified in network.",
@@ -805,10 +839,29 @@ plot.nma_data <- function(x, ..., layout, circular,
     x$treatments <- x$classes
   }
 
-  dat_mixed <- has_ipd(x) && (has_agd_arm(x) || has_agd_contrast(x))
-  g <- ggraph::ggraph(igraph::as.igraph(x), layout = layout, circular = circular, ...)
+  sa_nodes <- NULL
+  if (show_single_arm) {
+    g_full <- igraph::as.igraph(x, collapse = FALSE)
+    e_full <- igraph::as_data_frame(g_full, what = "edges")
+    sa_edges <- e_full[e_full$from == e_full$to, c("from", ".study")]
+    if (nrow(sa_edges) > 0) {
+      sa_nodes <- sa_edges %>%
+        dplyr::group_by(.data$from) %>%
+        dplyr::summarise(study = paste(.data$.study, collapse = ", "), .groups = "drop") %>%
+        dplyr::rename(name = "from")
 
-  if (weight_edges) {
+      sa_nodes$mark <- if (nrow(sa_nodes) < 4) c("*", "\u2020", "\u2021")[1:nrow(sa_nodes)] else paste0("[", 1:nrow(sa_nodes), "]")
+    }
+  }
+
+  dat_mixed <- has_ipd(x) && (has_agd_arm(x) || has_agd_contrast(x))
+  ig <- igraph::as.igraph(x)
+  g <- ggraph::ggraph(ig, layout = layout, circular = circular, ...)
+
+  # catch networks with no edges (single arms only)
+  no_edges <- igraph::ecount(ig) - igraph::count_loops(ig) == 0
+
+  if (!no_edges && weight_edges) {
     g <- g +
       ggraph::geom_edge_fan(ggplot2::aes(edge_width = .data$.nstudy,
                                        edge_colour = .data$.type),
@@ -868,14 +921,34 @@ plot.nma_data <- function(x, ..., layout, circular,
     }
   }
 
+  if (!is.null(sa_nodes)) {
+    g_tmp <- dplyr::left_join(g$data[, c("name", "x", "y")], sa_nodes,
+                               by = "name") %>%
+      dplyr::mutate(name = dplyr::if_else(!is.na(.data$mark), paste(.data$name, .data$mark), .data$name))
+    g$data$name <- g_tmp$name
+
+    g <- g +
+      ggplot2::labs(caption = paste0("Single-arm studies:\n", paste(sa_nodes$mark, sa_nodes$study, collapse = "\n")))
+  }
+
   if (show_trt_class) {
     g <- g + ggplot2::scale_fill_discrete(name = "Treatment Class", aesthetics = c("fill", "colour"))
   }
 
+  if (show_single_arm && !is.null(sa_nodes)) {
+    g <- g +
+      ggplot2::scale_shape_discrete(
+        "Single-arm studies",
+        breaks = sa_nodes$name,
+        labels = sa_nodes$study
+      )
+  }
+
   g <- g +
-    ggraph::scale_edge_colour_manual("Data", values = c(AgD = "#113259", IPD = "#55A480"),
-                                     guide = if (dat_mixed) "legend" else "none") +
-    ggraph::theme_graph(base_family = "") +
+    ggraph::scale_edge_colour_manual("Data", values = c(AgD = "#113259", IPD = "#55A480", Mixed = "#E5A93C"),
+                                     guide = if (dat_mixed & !no_edges) "legend" else "none") +
+    ggraph::theme_graph(base_family = "")  +
+    ggplot2::theme(plot.caption = ggplot2::element_text(hjust = 0)) +
     ggplot2::coord_fixed(clip = "off")
   return(g)
 }

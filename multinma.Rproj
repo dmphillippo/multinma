@@ -21,3 +21,5 @@ PackageUseDevtools: Yes
 PackageCleanBeforeInstall: No
 PackageInstallArgs: --no-multiarch --with-keep.source
 PackageRoxygenize: rd,collate,namespace
+
+UseNativePipeOperator: No

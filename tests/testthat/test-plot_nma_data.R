@@ -361,3 +361,34 @@ test_that("Duplicated study arms plotted correctly", {
   net3 <- set_agd_contrast(dat_c, study, trt, y = y, se = se)
   expect_doppelganger("Duplicated AgD contrasts network", plot(net3))
 })
+
+test_that("Single-arm studies labelled", {
+  # basic plots
+  dat1 <- data.frame(study = c("A", "A", "B", "B", "C"), trt = c("a", "b", "a", "c", "c"), r = 1, n = 10)
+  net1 <- set_agd_arm(dat1, study, trt, r = r, n = n, allow_single_arm = TRUE)
+  expect_doppelganger("1 SA, no label", plot(net1, weight_nodes = TRUE, show_single_arm = FALSE))
+  expect_doppelganger("1 SA, weight nodes", plot(net1, weight_nodes = TRUE, show_single_arm = TRUE))
+  expect_doppelganger("1 SA, no weight nodes", plot(net1, weight_nodes = FALSE, show_single_arm = TRUE))
+
+  # multiple single-arm studies
+  dat2 <- data.frame(study = c("A", "A", "B", "B", "C", "D"), trt = c("a", "b", "a", "c", "c", "c"), r = 1, n = 10)
+  net2 <- set_agd_arm(dat2, study, trt, r = r, n = n, allow_single_arm = TRUE)
+  expect_doppelganger("2 SA, same node", plot(net2, weight_nodes = TRUE, show_single_arm = TRUE))
+
+  dat3 <- data.frame(study = c("A", "A", "B", "B", "C", "D"), trt = c("a", "b", "a", "c", "c", "b"), r = 1, n = 10)
+  net3 <- set_agd_arm(dat3, study, trt, r = r, n = n, allow_single_arm = TRUE)
+  expect_doppelganger("2 SA, different nodes", plot(net3, weight_nodes = TRUE, show_single_arm = TRUE))
+
+  dat4 <- data.frame(study = c("A", "A", "B", "C", "D", "E"), trt = c("a", "b", "c", "d", "e", "f"), r = 1, n = 10)
+  net4 <- set_agd_arm(dat4, study, trt, r = r, n = n, allow_single_arm = TRUE)
+  expect_doppelganger("4 SA, different nodes", plot(net4, weight_nodes = TRUE, show_single_arm = TRUE))
+
+  # disconnected single arm
+  dat5 <- data.frame(study = c("A", "B", "C"), trt = c("a", "b", "c"), r = 1, n = 10)
+  net5 <- set_agd_arm(dat5, study, trt, r = r, n = n, allow_single_arm = TRUE)
+  expect_doppelganger("3 SA, fully disconnected", plot(net5, weight_nodes = TRUE, show_single_arm = TRUE))
+
+  dat6 <- data.frame(study = c("A", "A", "B"), trt = c("a", "b", "c"), r = 1, n = 10)
+  net6 <- set_agd_arm(dat6, study, trt, r = r, n = n, allow_single_arm = TRUE)
+  expect_doppelganger("1 SA, partially disconnected", plot(net6, weight_nodes = TRUE, show_single_arm = TRUE))
+})
