@@ -55,6 +55,14 @@ test_that("default summmary for correct parameters", {
   expect_equal(fit$baseline_studies, factor("S1"))
 })
 
+test_that("baseline_trt argument", {
+  fit <- suppressWarnings(baseline_synthesis(disc_net, test_grad = TRUE))
+  expect_equal(levels(fit$network$treatments)[1], "A")
+
+  fit <- suppressWarnings(baseline_synthesis(disc_net, baseline_trt = "D", test_grad = TRUE))
+  expect_equal(levels(fit$network$treatments)[1], "D")
+})
+
 # Minimal disconnected, AgD-arm-only network with three subnetworks, no shared treatments
 disc_dat_3 <- tibble(study = c("S1", "S1", "S2", "S2", "S3", "S3"),
                      trt   = c("A", "B", "C", "D", "E", "F"),
@@ -264,6 +272,41 @@ test_that("TSD5 smoking cessation - simultaneous modelling", {
   smknet <- set_agd_arm(smoking, studyn, trtc, r = r, n = n,
                         trt_ref = "No intervention")
   fit <- baseline_synthesis(smknet,
+                            trt_effects = "random",
+                            prior_intercept = normal(scale = 100),
+                            prior_trt = normal(scale = 100),
+                            prior_het = normal(scale = 5),
+                            prior_intercept_sd = half_normal(2.5),
+                            iter = 10000)
+
+
+  tol <- 0.05
+
+  s_mean <- as.data.frame(summary(fit, pars = "baseline_mean"))
+  expect_equal(s_mean$mean, -2.49, tolerance = tol)
+  expect_equal(s_mean$sd, 0.13, tolerance = tol)
+  expect_equal(s_mean$`2.5%`, -2.75, tolerance = tol)
+  expect_equal(s_mean$`97.5%`, -2.25, tolerance = tol)
+
+  s_sd <- as.data.frame(summary(fit, pars = "baseline_sd"))
+  expect_equal(s_sd$`50%`, 0.45, tolerance = tol)
+  expect_equal(s_sd$sd, 0.11, tolerance = tol)
+  expect_equal(s_sd$`2.5%`, 0.29, tolerance = tol)
+  expect_equal(s_sd$`97.5%`, 0.71, tolerance = tol)
+
+  s_new <- as.data.frame(summary(fit, pars = "baseline_new"))
+  expect_equal(s_new$mean, -2.49, tolerance = tol)
+  expect_equal(s_new$sd, 0.49, tolerance = tol)
+  expect_equal(s_new$`2.5%`, -3.48, tolerance = tol)
+  expect_equal(s_new$`97.5%`, -1.52, tolerance = tol)
+})
+
+
+test_that("TSD5 smoking cessation - simultaneous modelling, baseline_trt", {
+  smknet <- set_agd_arm(smoking, studyn, trtc, r = r, n = n,
+                        trt_ref = "Individual counselling")
+  fit <- baseline_synthesis(smknet,
+                            baseline_trt = "No intervention",
                             trt_effects = "random",
                             prior_intercept = normal(scale = 100),
                             prior_trt = normal(scale = 100),

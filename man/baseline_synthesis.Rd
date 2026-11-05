@@ -6,6 +6,7 @@
 \usage{
 baseline_synthesis(
   network,
+  baseline_trt = NULL,
   prior_intercept = .default(normal(scale = 100)),
   prior_intercept_sd = .default(half_normal(scale = 5)),
   ...
@@ -13,6 +14,10 @@ baseline_synthesis(
 }
 \arguments{
 \item{network}{A \code{multinma} network object.}
+
+\item{baseline_trt}{Baseline treatment on which to place the random effect
+for baseline synthesis. If not specified, the network reference treatment
+will be used.}
 
 \item{prior_intercept}{Prior for the mean of the random effects distribution
 on the study-specific intercepts.}
@@ -28,10 +33,11 @@ A \code{stan_baseline} object, inheriting from \link{stan_nma}.
 \description{
 Runs a baseline synthesis model, placing a random effect on the
 study-specific intercepts to obtain a pooled estimate of the absolute
-outcomes on the network reference treatment. This can be combined with a
-regression model to obtain an adjusted estimate. Estimates of both the
-overall mean and standard deviation (\code{baseline_mean} and \code{baseline_sd}) as
-well as the predictive distribution (\code{baseline_new}) are returned.
+outcomes on the network reference treatment (or the baseline treatment
+specified by \code{baseline_trt}). This can be combined with a regression model to
+obtain an adjusted estimate. Estimates of both the overall mean and standard
+deviation (\code{baseline_mean} and \code{baseline_sd}) as well as the predictive
+distribution (\code{baseline_new}) are returned.
 }
 \details{
 The baseline synthesis model places a random effect on the

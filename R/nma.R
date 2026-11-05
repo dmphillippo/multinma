@@ -4098,10 +4098,11 @@ apply_connect_fixed <- function(network, studies) {
 #'
 #' Runs a baseline synthesis model, placing a random effect on the
 #' study-specific intercepts to obtain a pooled estimate of the absolute
-#' outcomes on the network reference treatment. This can be combined with a
-#' regression model to obtain an adjusted estimate. Estimates of both the
-#' overall mean and standard deviation (`baseline_mean` and `baseline_sd`) as
-#' well as the predictive distribution (`baseline_new`) are returned.
+#' outcomes on the network reference treatment (or the baseline treatment
+#' specified by `baseline_trt`). This can be combined with a regression model to
+#' obtain an adjusted estimate. Estimates of both the overall mean and standard
+#' deviation (`baseline_mean` and `baseline_sd`) as well as the predictive
+#' distribution (`baseline_new`) are returned.
 #'
 #' @details The baseline synthesis model places a random effect on the
 #'   study-specific intercept parameters of the NMA or ML-NMR model fitted by
@@ -4113,6 +4114,9 @@ apply_connect_fixed <- function(network, studies) {
 #'
 #' @name baseline_synthesis
 #' @param network A `multinma` network object.
+#' @param baseline_trt Baseline treatment on which to place the random effect
+#'   for baseline synthesis. If not specified, the network reference treatment
+#'   will be used.
 #' @param prior_intercept Prior for the mean of the random effects distribution
 #'   on the study-specific intercepts.
 #' @param prior_intercept_sd Prior for standard deviation of the random effects
@@ -4122,6 +4126,7 @@ apply_connect_fixed <- function(network, studies) {
 #' @export
 
 baseline_synthesis <- function(network,
+                               baseline_trt = NULL,
                                prior_intercept = .default(normal(scale = 100)),
                                prior_intercept_sd = .default(half_normal(scale = 5)),
                                ...) {
@@ -4131,6 +4136,8 @@ baseline_synthesis <- function(network,
 
   if (rlang::has_name(list(...), "connect_baseline"))
     abort("`connect_baseline` argument should not be provided for baseline synthesis models.")
+
+  if (!is.null(baseline_trt)) network <- combine_network(network, trt_ref = baseline_trt)
 
   fit <- nma(
     network = network,
