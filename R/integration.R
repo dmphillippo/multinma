@@ -160,9 +160,21 @@ add_integration.data.frame <- function(x, ...,
 
       if (!is.numeric(cor) ||
           !isSymmetric(cor) ||
-          !isTRUE(all.equal(diag(cor), rep(1, nrow(cor)), check.names = FALSE)) ||
-          !all(eigen(cor, symmetric = TRUE)$values > 0))
+          !isTRUE(all.equal(diag(cor), rep(1, nrow(cor)), check.names = FALSE))) {
         abort("`cor` should be a correlation matrix or NULL")
+      }
+
+      # Check for multicollinearity using eigenvalues
+      eigenvalues <- eigen(cor, symmetric = TRUE)$values
+      if (any(is.na(eigenvalues) | eigenvalues <= 0)) {
+        abort(
+          glue::glue(
+            "Multicollinearity detected in the provided correlation matrix `cor`.\n",
+            "This often occurs when covariates are perfectly or nearly perfectly correlated.\n",
+            "Check for redundant variables or ensure no one-hot encoded variables sum to a constant."
+          )
+        )
+      }
 
       if (ncol(cor) != nx)
         abort("Dimensions of correlation matrix `cor` and number of covariates specified in `...` do not match.")

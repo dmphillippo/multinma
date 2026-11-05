@@ -683,3 +683,38 @@ test_that("non positive definite cor matrices are fixed up", {
     "Adjusted correlation matrix not positive definite; using Matrix::nearPD()."
   )
 })
+
+test_that("add_integration detects multicollinearity in correlation matrix", {
+  df <- tibble::tibble(
+    covariate1 = c(0.1, 0.2, 0.3),
+    covariate2 = c(0.4, 0.5, 0.6),
+    covariate3 = c(0.7, 0.8, 0.9)
+  )
+
+  # Create a correlation matrix with multicollinearity (perfectly correlated variables)
+  cor_matrix <- matrix(
+    c(1, 1, 1,
+      1, 1, 1,
+      1, 1, 1),
+    nrow = 3,
+    ncol = 3
+  )
+  colnames(cor_matrix) <- c("covariate1", "covariate2", "covariate3")
+  rownames(cor_matrix) <- c("covariate1", "covariate2", "covariate3")
+
+  distr_args <- list(
+    covariate1 = distr(qnorm, mean = 0, sd = 1),
+    covariate2 = distr(qnorm, mean = 0, sd = 1),
+    covariate3 = distr(qnorm, mean = 0, sd = 1)
+  )
+
+  expect_error(
+    add_integration.data.frame(
+      df,
+      !!! distr_args,
+      cor = cor_matrix,
+      n_int = 64L
+    ),
+    regexp = "Multicollinearity detected in the provided correlation matrix `cor`"
+  )
+})
