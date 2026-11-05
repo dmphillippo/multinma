@@ -84,6 +84,16 @@ aggregate data study in the network.
   [`qlogitnorm()`](https://dmphillippo.github.io/multinma/dev/reference/logitNormal.md)
   : The logit Normal distribution
 
+## Comparing study population covariate distributions
+
+Functions for comparing the (joint) covariate distribution of the
+studies in the network.
+
+- [`compare_populations()`](https://dmphillippo.github.io/multinma/dev/reference/compare_populations.md)
+  [`print(`*`<pop_comp>`*`)`](https://dmphillippo.github.io/multinma/dev/reference/compare_populations.md)
+  [`plot(`*`<pop_comp>`*`)`](https://dmphillippo.github.io/multinma/dev/reference/compare_populations.md)
+  : Compare population covariate distributions
+
 ## Prior distributions
 
 Specify and summarise prior distributions.
@@ -145,6 +155,9 @@ function.
   [`stan_mlnmr`](https://dmphillippo.github.io/multinma/dev/reference/stan_nma-class.md)
   : The stan_nma class
 
+- [`con()`](https://dmphillippo.github.io/multinma/dev/reference/connect_baseline.md)
+  : Specify baseline connections
+
 - [`adapt_delta`](https://dmphillippo.github.io/multinma/dev/reference/adapt_delta.md)
   : Target average acceptance probability
 
@@ -155,6 +168,13 @@ function.
 - [`.default()`](https://dmphillippo.github.io/multinma/dev/reference/default_values.md)
   [`.is_default()`](https://dmphillippo.github.io/multinma/dev/reference/default_values.md)
   : Set default values
+
+## Baseline synthesis
+
+Fitting of models on the baseline risk.
+
+- [`baseline_synthesis()`](https://dmphillippo.github.io/multinma/dev/reference/baseline_synthesis.md)
+  : Baseline synthesis models
 
 ## Model checking and comparison
 
@@ -303,6 +323,16 @@ arrays and matrices.
   [`cbind(`*`<stan_nma>`*`)`](https://dmphillippo.github.io/multinma/dev/reference/bind_chains.md)
   [`cbind(`*`<mcmc_array>`*`)`](https://dmphillippo.github.io/multinma/dev/reference/bind_chains.md)
   : Bind chains
+
+## Assessing predictive perforomance
+
+Functions for assessing predictive performance of a fitted regression
+model.
+
+- [`bayes_R2(`*`<stan_nma>`*`)`](https://dmphillippo.github.io/multinma/dev/reference/bayes_R2.stan_nma.md)
+  [`loo_R2(`*`<stan_nma>`*`)`](https://dmphillippo.github.io/multinma/dev/reference/bayes_R2.stan_nma.md)
+  [`loo_predictive_metric(`*`<stan_nma>`*`)`](https://dmphillippo.github.io/multinma/dev/reference/bayes_R2.stan_nma.md)
+  : Predictive performance
 
 ## M-spline hazards
 

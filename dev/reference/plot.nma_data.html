@@ -74,6 +74,7 @@
 <span>  weight_edges <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  weight_nodes <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  show_trt_class <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  show_single_arm <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  level <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"treatment"</span>, <span class="st">"class"</span><span class="op">)</span>,</span>
 <span>  nudge <span class="op">=</span> <span class="fl">0</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -115,6 +116,12 @@ layout functions provided by <a href="https://r.igraph.org/reference/aaa-igraph-
 <dt id="arg-show-trt-class">show_trt_class<a class="anchor" aria-label="anchor" href="#arg-show-trt-class"></a></dt>
 <dd><p>Colour treatment nodes by class, if <code>trt_class</code> is set?
 Default is <code>FALSE</code>.</p></dd>
+
+
+<dt id="arg-show-single-arm">show_single_arm<a class="anchor" aria-label="anchor" href="#arg-show-single-arm"></a></dt>
+<dd><p>Label single-arm studies? Default is <code>FALSE</code>. When
+<code>TRUE</code>, each treatment node with single-arm studies is marked with a
+footnote listing the single-arm studies on that treatment.</p></dd>
 
 
 <dt id="arg-level">level<a class="anchor" aria-label="anchor" href="#arg-level"></a></dt>

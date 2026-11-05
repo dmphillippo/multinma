@@ -77,7 +77,8 @@ sources may be combined once created using <code><a href="combine_network.html">
 <span>  E <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  Surv <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  trt_ref <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  trt_class <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  trt_class <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">allow_single_arm</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -127,6 +128,16 @@ will be chosen (see details).</p></dd>
 <dt id="arg-trt-class">trt_class<a class="anchor" aria-label="anchor" href="#arg-trt-class"></a></dt>
 <dd><p>column of <code>data</code> specifying treatment classes, coded using
 integers, strings, or factors. By default, no classes are specified.</p></dd>
+
+
+<dt id="arg-allow-single-arm">allow_single_arm<a class="anchor" aria-label="anchor" href="#arg-allow-single-arm"></a></dt>
+<dd><p>Should single-arm studies be allowed? If <code>"warn"</code>
+a warning is given when single-arm studies are present. If <code>"error"</code> or
+<code>FALSE</code>, an error is given when single-arm studies are present. If <code>TRUE</code> or
+<code>"inform"</code>, an informative note is given. The default is <code>"warn"</code>, except for
+survival data for which the default is <code>TRUE</code> to allow convenient prediction
+for external
+data sources. Can be set globally via option <code>multinma.allow_single_arm</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">

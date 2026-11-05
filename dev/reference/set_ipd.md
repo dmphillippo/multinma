@@ -16,7 +16,8 @@ set_ipd(
   E = NULL,
   Surv = NULL,
   trt_ref = NULL,
-  trt_class = NULL
+  trt_class = NULL,
+  allow_single_arm
 )
 ```
 
@@ -66,6 +67,16 @@ set_ipd(
 
   column of `data` specifying treatment classes, coded using integers,
   strings, or factors. By default, no classes are specified.
+
+- allow_single_arm:
+
+  Should single-arm studies be allowed? If `"warn"` a warning is given
+  when single-arm studies are present. If `"error"` or `FALSE`, an error
+  is given when single-arm studies are present. If `TRUE` or `"inform"`,
+  an informative note is given. The default is `"warn"`, except for
+  survival data for which the default is `TRUE` to allow convenient
+  prediction for external data sources. Can be set globally via option
+  `multinma.allow_single_arm`.
 
 ## Value
 

@@ -14,6 +14,7 @@ plot(
   weight_edges = TRUE,
   weight_nodes = FALSE,
   show_trt_class = FALSE,
+  show_single_arm = FALSE,
   level = c("treatment", "class"),
   nudge = 0
 )
@@ -57,6 +58,12 @@ plot(
 
   Colour treatment nodes by class, if `trt_class` is set? Default is
   `FALSE`.
+
+- show_single_arm:
+
+  Label single-arm studies? Default is `FALSE`. When `TRUE`, each
+  treatment node with single-arm studies is marked with a footnote
+  listing the single-arm studies on that treatment.
 
 - level:
 

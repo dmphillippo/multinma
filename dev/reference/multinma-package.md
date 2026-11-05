@@ -107,6 +107,11 @@ Useful links:
 **Maintainer**: David M. Phillippo <david.phillippo@bristol.ac.uk>
 ([ORCID](https://orcid.org/0000-0003-2672-7841))
 
+Authors:
+
+- David M. Phillippo <david.phillippo@bristol.ac.uk>
+  ([ORCID](https://orcid.org/0000-0003-2672-7841))
+
 Other contributors:
 
 - Samuel J. Perren <samuel.perren@bristol.ac.uk>

@@ -31,7 +31,8 @@ plot_prior_posterior(
 
   Character vector selecting the prior and posterior distribution(s) to
   plot. May include `"intercept"`, `"trt"`, `"het"`, `"reg"`, `"aux"`,
-  `"class_mean"` or `"class_sd"` as appropriate.
+  `"class_mean"`, `"class_sd"`, `"baseline_mean"` or `"baseline_sd"` as
+  appropriate.
 
 - post_args:
 

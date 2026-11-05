@@ -10,7 +10,7 @@ can be combined into a single network for analysis.
 ## Usage
 
 ``` r
-combine_network(..., trt_ref)
+combine_network(..., trt_ref, allow_mixed_studies = FALSE)
 ```
 
 ## Arguments
@@ -23,6 +23,12 @@ combine_network(..., trt_ref)
 
   reference treatment for the entire network, as a string (or coerced as
   such) referring to the levels of the treatment factor variable
+
+- allow_mixed_studies:
+
+  Logical scalar (default `FALSE`), whether to allow the same study
+  label to appear in more than one data source. By default, studies with
+  the same label found in multiple data sources will produce an error.
 
 ## Value
 

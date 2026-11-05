@@ -60,12 +60,41 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.9.1.9000" id="multinma-0919000">multinma 0.9.1.9000<a class="anchor" aria-label="anchor" href="#multinma-0919000"></a></h2>
+<div class="section level3">
+<h3 id="feature-models-for-connecting-disconnected-networkssingle-arm-studies-0-9-1-9000">Feature: Models for connecting disconnected networks/single-arm studies<a class="anchor" aria-label="anchor" href="#feature-models-for-connecting-disconnected-networkssingle-arm-studies-0-9-1-9000"></a></h3>
+<ul><li><p>A new <code>connect_baseline</code> argument to <code><a href="../reference/nma.html">nma()</a></code> allows users to connect networks that are disconnected or include single-arm studies, under strong assumptions about predicting absolute outcomes between disconnected components/studies.</p></li>
+<li>
+<p>The new <code><a href="../reference/connect_baseline.html">con()</a></code> function specifies the type of baseline connection to use, either:</p>
+<ul><li>Fixed baseline connections where the (adjusted) study baselines are assumed to be equal between the specified studies; or</li>
+<li>Random baseline connections where an informative prior distribution is placed on the (adjusted) study baseline(s) specified.</li>
+</ul><p>The latter allows for additional uncertainty due to residual variation in baseline risk (i.e. unobserved prognostic factors or effect modifiers) to be incorporated. The random baseline distribution may be estimated first by fitting a baseline synthesis model, with the new <code><a href="../reference/baseline_synthesis.html">baseline_synthesis()</a></code> function (see below).</p>
+</li>
+<li>
+<p>The strong assumption of (conditional, with a regression model) constancy of absolute effects may be assessed by:</p>
+<ul><li>Comparing study populations prior to model fitting, using the new <code><a href="../reference/compare_populations.html">compare_populations()</a></code> function to compute the effective sample size overlap between the joint covariate distributions, or the standardised Euclidean distance between the mean covariate values.</li>
+<li>Considering the magnitude of the heterogeneity standard deviation estimated in the baseline synthesis model, and the predictive interval for a new study baseline.</li>
+<li>Investigating the predictive performance of the model using Bayesian or leave-one-out <span class="math inline">R^2</span> statistics, implemented in the new <code><a href="https://mc-stan.org/rstantools/reference/bayes_R2.html" class="external-link">bayes_R2()</a></code> and <code><a href="https://mc-stan.org/rstantools/reference/bayes_R2.html" class="external-link">loo_R2()</a></code> functions, and/or investigating the leave-one-out cross validation predictive performance with the new <code><a href="../reference/bayes_R2.stan_nma.html">loo_predictive_metric()</a></code> function.</li>
+</ul></li>
+<li><p>The new <code>allow_single_arm</code> argument to the <code>set_*()</code> functions (and associated global option <code>multinma.allow_single_arm</code>) controls the behaviour when single-arm studies are included in the network at setup stage. By default a warning will be given (except for survival data), but this can be changed to an error or an information message.</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="feature-baseline-synthesis-models-0-9-1-9000">Feature: Baseline synthesis models<a class="anchor" aria-label="anchor" href="#feature-baseline-synthesis-models-0-9-1-9000"></a></h3>
+<ul><li>The new <code><a href="../reference/baseline_synthesis.html">baseline_synthesis()</a></code> function fits baseline synthesis models. A random effect is placed on the (adjusted) study-specific baseline (intercept) parameters, to obtain a pooled estimate of the absolute outcomes on the network reference treatment.</li>
+<li>Estimates of both the overall baseline mean and standard deviation are returned, as well as the predictive distribution for outcomes in a new study.</li>
+<li>The predictive distribution may be used to connect a network that is disconnected or includes single-arm studies, as the input to the <code>connect_baseline</code> argument of <code><a href="../reference/nma.html">nma()</a></code>, and to judge the magnitude of unexplained variation in absolute outcomes between studies.</li>
+<li>Baseline synthesis models are also useful in standard NMA for obtaining a distribution on baseline risk for which to produce absolute predictions against, see TSD 5.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="other-updates-0-9-1-9000">Other updates<a class="anchor" aria-label="anchor" href="#other-updates-0-9-1-9000"></a></h3>
 <ul><li>Feature: New function <code><a href="../reference/bind_chains.html">bind_chains()</a></code> combines multiple runs of the same model into a single model object. For MCMC arrays, a new <code><a href="../reference/bind_chains.html">cbind.mcmc_array()</a></code> method combines multiple MCMC arrays containing samples of the same parameters into a single MCMC array.</li>
 <li>Feature: Added <code>debug</code> option to <code><a href="../reference/nma.html">nma()</a></code>. When <code>TRUE</code>, the model will not be fitted and instead a list of input data to Stan is returned.</li>
+<li>Feature: New <code>allow_mixed_studies</code> argument to <code><a href="../reference/combine_network.html">combine_network()</a></code> allows studies to be included in more than one data type.</li>
 <li>Improvement: <code><a href="../reference/relative_effects.html">relative_effects()</a></code> now works when <code>newdata</code> contains integration points. Furthermore, <code><a href="../reference/relative_effects.html">relative_effects()</a></code> will now ask for integration points to be provided for models that involve non-linear covariate terms, so that these can be averaged over correctly.</li>
+<li>Improvement: The arm-level outcome standard deviation parameters <code>sigma</code> in models with a Normal likelihood and IPD are now labelled informatively.</li>
 <li>Fix: Error in <code><a href="../reference/dic.html">dic()</a></code> for models with IPD and a Normal likelihood, caused by dplyr deprecation.</li>
 <li>Fix: Indexing error in class effects models with contrast data and integration points, thanks to <a href="https://github.com/dmcalli2" class="external-link">@dmcalli2</a>.</li>
 </ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.9.1" id="multinma-091">multinma 0.9.1<a class="anchor" aria-label="anchor" href="#multinma-091"></a></h2><p class="text-muted">CRAN release: 2026-04-16</p>
 <ul><li>Fix: UBSAN warnings in CRAN additional tests, caused by unnecessary indexing of zero-dimensional matrices.</li>

@@ -14,6 +14,7 @@ nma(
   class_interactions = c("common", "exchangeable", "independent"),
   class_effects = c("independent", "common", "exchangeable"),
   class_sd = c("independent", "common"),
+  connect_baseline = NULL,
   likelihood = NULL,
   link = NULL,
   ...,
@@ -88,6 +89,14 @@ nma(
   describe a set classes for which to share a common class SD; any list
   names will be used to name the output parameters, otherwise the name
   will be taken from the first class in each set.
+
+- connect_baseline:
+
+  Baseline connections created by
+  [`con()`](https://dmphillippo.github.io/multinma/dev/reference/connect_baseline.md),
+  used to connect a disconnected network. Multiple
+  [`con()`](https://dmphillippo.github.io/multinma/dev/reference/connect_baseline.md)
+  specifications may be provided as a list.
 
 - likelihood:
 
@@ -526,7 +535,7 @@ smk_fit_FE
 #> d[Self-help]                  0.31     0.47  2973    1
 #> lp__                      -5856.68 -5853.07  1929    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Mon Oct 26 11:15:50 2026.
+#> Samples were drawn using NUTS(diag_e) at Thu Nov  5 16:15:15 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -559,7 +568,7 @@ smk_fit_RE
 #> lp__                      -5763.37 -5756.69  1071    1
 #> tau                           0.94     1.26   976    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Mon Oct 26 11:15:56 2026.
+#> Samples were drawn using NUTS(diag_e) at Thu Nov  5 16:15:23 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -609,7 +618,7 @@ smk_fit_RE_UME
 #> lp__                                            -5753.99  1010 1.01
 #> tau                                                 1.47  1021 1.00
 #> 
-#> Samples were drawn using NUTS(diag_e) at Mon Oct 26 11:16:04 2026.
+#> Samples were drawn using NUTS(diag_e) at Thu Nov  5 16:15:31 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -938,7 +947,7 @@ pso_fit
 #> d[SEC_300]                              2.45     2.53     2.68  5719    1
 #> lp__                                -1576.05 -1573.88 -1570.57  1619    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Mon Oct 26 11:17:20 2026.
+#> Samples were drawn using NUTS(diag_e) at Thu Nov  5 16:17:53 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -1013,7 +1022,7 @@ ndmm_fit
 #> shape[Morgan2012]       0.94  5126    1
 #> shape[Palumbo2014]      1.16  4504    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Mon Oct 26 11:21:34 2026.
+#> Samples were drawn using NUTS(diag_e) at Thu Nov  5 16:22:38 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).

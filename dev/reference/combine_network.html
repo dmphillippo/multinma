@@ -68,7 +68,7 @@ set_agd_contrast() can be combined into a single network for analysis."><meta pr
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">combine_network</span><span class="op">(</span><span class="va">...</span>, <span class="va">trt_ref</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">combine_network</span><span class="op">(</span><span class="va">...</span>, <span class="va">trt_ref</span>, allow_mixed_studies <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -82,6 +82,13 @@ set_agd_contrast() can be combined into a single network for analysis."><meta pr
 <dt id="arg-trt-ref">trt_ref<a class="anchor" aria-label="anchor" href="#arg-trt-ref"></a></dt>
 <dd><p>reference treatment for the entire network, as a string (or
 coerced as such) referring to the levels of the treatment factor variable</p></dd>
+
+
+<dt id="arg-allow-mixed-studies">allow_mixed_studies<a class="anchor" aria-label="anchor" href="#arg-allow-mixed-studies"></a></dt>
+<dd><p>Logical scalar (default <code>FALSE</code>), whether to
+allow the same study label to appear in more than one data source. By
+default, studies with the same label found in multiple data sources will
+produce an error.</p></dd>
 
 </dl></div>
     <div class="section level2">
