@@ -3764,6 +3764,20 @@ test_that("BRMR relative effects depend on the specified baseline (AgD)", {
   expect_false(isTRUE(all.equal(log_or(0.1), log_or(0.6))))
 })
 
+test_that("BRMR predictions agree with relative effects at the specified baseline (AgD)", {
+  for (p0 in c(0.1, 0.6)) {
+    pred <- predict(cert_fit_brmr, summary = FALSE,
+                    baseline = distr(qunif, min = p0, max = p0),
+                    baseline_type = "response")$sims
+    re <- relative_effects(cert_fit_brmr,
+                           newdata = data.frame(.mu = qlogis(p0)),
+                           summary = FALSE)$sims
+
+    expect_equal(pred[ , , "pred[New 1: CZP]"] - pred[ , , "pred[New 1: Placebo]"],
+                 re[ , , "d[New 1: CZP]"])
+  }
+})
+
 test_that("BRMR baseline_trt reproduces the baseline on that treatment (AgD)", {
   p0 <- 0.4
   pred <- predict(cert_fit_brmr, summary = FALSE,
