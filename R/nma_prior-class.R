@@ -24,6 +24,7 @@ print.nma_prior <- function(x, ...) {
     cglue("An implicit flat prior distribution over the entire parameter support.")
   } else {
     p <- purrr::list_modify(x, dist = purrr::zap(), fun = purrr::zap())
+    if (stringr::str_starts(x$dist, "half-|Exponential")) p <- purrr::list_modify(p, location = purrr::zap())
     p <- p[!is.na(p)]
     cglue("A{if (stringr::str_starts(x$dist, '[aeiouAEIOU]')) 'n' else ''} {x$dist} prior distribution: {paste(names(p), p, sep = ' = ', collapse = ', ')}.")
   }

@@ -69,9 +69,15 @@ Useful links:
 \author{
 \strong{Maintainer}: David M. Phillippo \email{david.phillippo@bristol.ac.uk} (\href{https://orcid.org/0000-0003-2672-7841}{ORCID})
 
+Authors:
+\itemize{
+  \item David M. Phillippo \email{david.phillippo@bristol.ac.uk} (\href{https://orcid.org/0000-0003-2672-7841}{ORCID})
+}
+
 Other contributors:
 \itemize{
   \item Samuel J. Perren \email{samuel.perren@bristol.ac.uk} (\href{https://orcid.org/0009-0005-1921-6957}{ORCID}) [contributor]
+  \item Niels Dunnewind (\href{https://orcid.org/0009-0009-8675-9109}{ORCID}) [contributor]
 }
 
 }

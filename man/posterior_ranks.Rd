@@ -12,7 +12,8 @@ posterior_ranks(
   lower_better = TRUE,
   probs = c(0.025, 0.25, 0.5, 0.75, 0.975),
   sucra = FALSE,
-  summary = TRUE
+  summary = TRUE,
+  subset = NULL
 )
 
 posterior_rank_probs(
@@ -21,7 +22,8 @@ posterior_rank_probs(
   study = NULL,
   lower_better = TRUE,
   cumulative = FALSE,
-  sucra = FALSE
+  sucra = FALSE,
+  subset = NULL
 )
 }
 \arguments{
@@ -46,6 +48,10 @@ summary, default \code{c(0.025, 0.25, 0.5, 0.75, 0.975)}}
 curve (SUCRA) for each treatment? Default \code{FALSE}.}
 
 \item{summary}{Logical, calculate posterior summaries? Default \code{TRUE}.}
+
+\item{subset}{Names of treatments to include in the rank calculation, e.g. if
+the decision set is smaller than the analysis set. By default, all
+treatments in the network will be included.}
 
 \item{cumulative}{Logical, return cumulative rank probabilities? Default is
 \code{FALSE}, return posterior probabilities of each treatment having a given

@@ -573,7 +573,7 @@ plot.nma_dic <- function(x, y, ...,
                      ~ggplot2::geom_function(fun = function(x, c) c - x^2, args = list(c = .),
                                             colour = "grey60", inherit.aes = FALSE,
                                             xlim = c(-rmax, rmax)*1.2)) +
-          ggplot2::annotate("label", vjust = 0, label.size = 0,  colour = "grey60", fill = NA,
+          ggplot2::annotate("label", vjust = 0, linewidth = 0,  colour = "grey60", fill = NA,
                             x = 0, y = dic_contours, label = paste0("DIC = ", dic_contours))
       }
 

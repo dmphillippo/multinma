@@ -8,35 +8,34 @@ skip_on_cran()
 params <-
 list(run_tests = FALSE, eval_multinomial = FALSE)
 
-## ----code=readLines("children/knitr_setup.R"), include=FALSE------------------
+## ----code=readLines("children/knitr_setup.R"), include=FALSE--------------------------------------
 
 
-## ----include=FALSE, setup-----------------------------------------------------
+## ----include=FALSE, setup-------------------------------------------------------------------------
 library(multinma)
 library(dplyr)      # dplyr and tidyr for data manipulation
 library(tidyr)
 library(ggplot2)    # ggplot2 for plotting
 
-## ----include=FALSE------------------------------------------------------------
+## ----include=FALSE--------------------------------------------------------------------------------
 options(mc.cores = parallel::detectCores())
 
-## ----include=FALSE------------------------------------------------------------
+## ----include=FALSE--------------------------------------------------------------------------------
 nc <- switch(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_")), 
              "true" =, "warn" = 2, 
              parallel::detectCores())
 options(mc.cores = nc)
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 head(social_anxiety)
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 sa_net <- set_agd_contrast(social_anxiety,
                            study = studyc, 
                            trt = trtc,
-                           y = y, 
-                           sample_size = 1,
+                           y = y,
                            se = se,
                            trt_class = classc,
                            trt_ref = "Waitlist")
@@ -44,12 +43,12 @@ sa_net <- set_agd_contrast(social_anxiety,
 sa_net
 
 
-## -----------------------------------------------------------------------------
-plot(sa_net, level = "class", weight_nodes = TRUE) + 
+## -------------------------------------------------------------------------------------------------
+plot(sa_net, level = "class") + 
   theme(legend.position = "bottom", legend.box = "vertical")
 
 
-## ----echo=TRUE, results='hide'------------------------------------------------
+## ----echo=TRUE, results='hide'--------------------------------------------------------------------
 set.seed(951)
 sa_fit_FE <- nma(sa_net,
                  trt_effects = "fixed",
@@ -64,12 +63,12 @@ sa_fit_RE <- nma(sa_net,
 )
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 (sa_dic_FE <- dic(sa_fit_FE))
 (sa_dic_RE <- dic(sa_fit_RE))
 
 
-## ----echo=TRUE, results='hide'------------------------------------------------
+## ----echo=TRUE, results='hide'--------------------------------------------------------------------
 sa_UME_RE <- nma(sa_net,
                  trt_effects = "random",
                  consistency = "ume",
@@ -77,7 +76,7 @@ sa_UME_RE <- nma(sa_net,
                  prior_het = half_normal(5))
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 (sa_dic_RE <- dic(sa_fit_RE))
 (sa_dic_ume_RE <- dic(sa_UME_RE))
 
@@ -85,19 +84,19 @@ summary(sa_UME_RE, pars = "tau")
 summary(sa_fit_RE, pars = "tau")
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 plot(sa_dic_RE, sa_dic_ume_RE, show_uncertainty = FALSE) +
   xlab("Residual deviance - No Class model") +
   ylab("Residual deviance - UME model")
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 as.data.frame(sa_dic_RE) %>%
   arrange(desc(resdev)) %>%
   head(5)
 
 
-## ----echo=TRUE, results='hide', eval=!params$run_tests------------------------
+## ----echo=TRUE, results='hide', eval=!params$run_tests--------------------------------------------
 # EMMELKAMP2006 <- data.frame(
 #   Treatment_1 = c("CBT individual", "Waitlist", "Waitlist"),
 #   Treatment_2 = c("Psychodynamic psychotherapy", "Psychodynamic psychotherapy", "CBT individual")
@@ -125,12 +124,12 @@ as.data.frame(sa_dic_RE) %>%
 # )
 
 
-## ----eval=!params$run_tests---------------------------------------------------
+## ----eval=!params$run_tests-----------------------------------------------------------------------
 # summary(sa_fit_RE_nodesplit_ALDEN)
 # summary(sa_fit_RE_nodesplit_EMMELKAMP)
 
 
-## ----echo=TRUE, results='hide'------------------------------------------------
+## ----echo=TRUE, results='hide'--------------------------------------------------------------------
 sa_fit_EXclass_RE <- nma(sa_net,
                          trt_effects = "random",
                          prior_trt = normal(0, 100),
@@ -148,7 +147,7 @@ sa_fit_EXclass_RE <- nma(sa_net,
                          )
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 (sa_dic_EXclass_RE <- dic(sa_fit_EXclass_RE))
 (sa_dic_RE <- dic(sa_fit_RE))
 
@@ -156,13 +155,13 @@ summary(sa_fit_RE, pars = "tau")
 summary(sa_fit_EXclass_RE, pars = "tau")
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 plot(sa_dic_EXclass_RE, sa_dic_RE, show_uncertainty = FALSE) +
   xlab("Residual deviance - Exchangeable Class model") +
   ylab("Residual deviance - No Class model")
 
 
-## ----echo=TRUE, results='hide'------------------------------------------------
+## ----echo=TRUE, results='hide'--------------------------------------------------------------------
 sa_fit_COclass_RE <- nma(sa_net,
                          trt_effects = "random",
                          prior_trt = normal(0, 100),
@@ -186,7 +185,7 @@ sa_fit_EXclass_FE <- nma(sa_net,
                          )
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 (sa_dic_COclass_RE <- dic(sa_fit_COclass_RE))
 (sa_dic_EXclass_FE <- dic(sa_fit_EXclass_FE))
 (sa_dic_EXclass_RE <- dic(sa_fit_EXclass_RE))
@@ -195,23 +194,23 @@ summary(sa_fit_COclass_RE, pars = "tau")
 summary(sa_fit_EXclass_RE, pars = "tau")
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 plot(sa_dic_COclass_RE, sa_dic_EXclass_RE, show_uncertainty = FALSE) +
   xlab("Residual deviance - Common Class model") +
   ylab("Residual deviance - Exchangeable Class model")
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 plot(relative_effects(sa_fit_EXclass_RE), ref_line = 0)
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 plot(sa_fit_EXclass_RE,
      pars = "class_mean",
      ref_line = 0)
 
 
-## ----fig.height=8-------------------------------------------------------------
+## ----fig.height=8---------------------------------------------------------------------------------
 # Relative treatment effects
 trt_eff <- as_tibble(relative_effects(sa_fit_EXclass_RE)) %>% 
   # Add in class details
@@ -240,7 +239,7 @@ bind_rows(trt_eff, class_eff) %>%
   theme(strip.text.y = element_text(angle = 0))
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 # Class means
 EXclass_mean <- as.matrix(sa_fit_EXclass_RE, pars = "class_mean")
 
@@ -266,7 +265,7 @@ xlab("Class") + ylab("Posterior Ranks") +
 theme_multinma()
 
 
-## -----------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 EXranks_df <- as.data.frame(EXranks)
 
 # Rank probabilities for class
@@ -293,7 +292,7 @@ ggplot(rank_probs_long_EX, aes(x = Rank, y = Probability)) +
        y = "Probability")
 
 
-## ----smoking_tests, include=FALSE, eval=params$run_tests----------------------
+## ----socialanxiety_tests, include=FALSE, eval=params$run_tests------------------------------------
 #--- Test against TSD 4 results ---
 library(testthat)
 library(dplyr)

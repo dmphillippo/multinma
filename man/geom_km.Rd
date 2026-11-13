@@ -24,7 +24,7 @@ transformation; other options are \code{"cloglog"} for \eqn{\log(-\log(S))},
 \eqn{-\log(S)}.}
 
 \item{curve_args}{Optional list of arguments to customise the curves plotted
-with \code{\link[ggplot2:geom_path]{ggplot2::geom_step()}}}
+with \code{\link[ggplot2:geom_step]{ggplot2::geom_step()}}}
 
 \item{cens_args}{Optional list of arguments to customise the censoring marks
 plotted with \code{\link[ggplot2:geom_point]{ggplot2::geom_point()}}}
@@ -65,7 +65,7 @@ ggplot() +
           curve_args = list(linewidth = 0.5),
           cens_args = list(size = 3, shape = 124)) +
   facet_wrap(vars(Study)) +
-  labs(xlab = "Time", ylab = "Survival Probability") +
+  labs(x = "Time", y = "Survival Probability") +
   theme_multinma()
 
 # Using the transform argument to produce log-log plots (e.g. to assess the

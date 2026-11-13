@@ -25,7 +25,7 @@ ndmm_net <- combine_network(
                covariates = ndmm_agd_covs))
 \donttest{
 # Fit Weibull (PH) model
-ndmm_fit <- nma(ndmm_net, \dontshow{refresh = if (interactive()) 200 else 0,}
+ndmm_fit <- nma(ndmm_net, 
                 likelihood = "weibull",
                 prior_intercept = normal(scale = 100),
                 prior_trt = normal(scale = 10),

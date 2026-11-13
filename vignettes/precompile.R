@@ -64,6 +64,7 @@ precompile("example_bcg_vaccine.Rmd")
 precompile("example_plaque_psoriasis.Rmd")
 precompile("example_hta_psoriasis.Rmd")
 precompile("example_social_anxiety.Rmd")
+precompile("example_certolizumab.Rmd")
 
 # NDMM example is fully static (for pkgdown as well as cran)
 # precompile("example_ndmm.Rmd.orig", write_tests = FALSE)

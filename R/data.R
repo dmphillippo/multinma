@@ -424,3 +424,22 @@
 #'   \insertAllCited{}
 #'
 "social_anxiety"
+
+#' Certolizumab
+#'
+#' Data frame containing the results of 12 trials comparing 7 treatments for rheumatoid arthritis, analysed in \insertCite{TSD3}{multinma}.
+#'
+#' @format A data frame with 24 rows and 5 variables:
+#' \describe{
+#'   \item{study}{study name}
+#'   \item{trt}{treatment name}
+#'   \item{r}{number of patients achieving ACR50 at 6 months}
+#'   \item{n}{sample size}
+#'   \item{disease_duration}{mean disease duration in years}
+#' }
+#'
+#' @references
+#'   \insertAllCited{}
+#'
+
+"certolizumab"

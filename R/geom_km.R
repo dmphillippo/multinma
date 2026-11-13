@@ -35,7 +35,7 @@
 #'           curve_args = list(linewidth = 0.5),
 #'           cens_args = list(size = 3, shape = 124)) +
 #'   facet_wrap(vars(Study)) +
-#'   labs(xlab = "Time", ylab = "Survival Probability") +
+#'   labs(x = "Time", y = "Survival Probability") +
 #'   theme_multinma()
 #'
 #' # Using the transform argument to produce log-log plots (e.g. to assess the

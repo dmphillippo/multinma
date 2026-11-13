@@ -12,6 +12,7 @@ nma(
   class_interactions = c("common", "exchangeable", "independent"),
   class_effects = c("independent", "common", "exchangeable"),
   class_sd = c("independent", "common"),
+  connect_baseline = NULL,
   likelihood = NULL,
   link = NULL,
   ...,
@@ -35,7 +36,8 @@ nma(
   mspline_degree = 3,
   n_knots = 7,
   knots = NULL,
-  mspline_basis = NULL
+  mspline_basis = NULL,
+  debug = FALSE
 )
 }
 \arguments{
@@ -51,21 +53,28 @@ effects}
 \item{regression}{A one-sided model formula, specifying the prognostic and
 effect-modifying terms for a regression model. Any references to treatment
 should use the \code{.trt} special variable, for example specifying effect
-modifier interactions as \code{variable:.trt} (see details).}
+modifier interactions as \code{variable:.trt} (see details). The special
+variable \code{.mu} can be used for baseline risk meta-regression: \code{~.mu:.trt}.}
 
 \item{class_interactions}{Character string specifying whether effect modifier
 interactions are specified as \code{"common"}, \code{"exchangeable"}, or
 \code{"independent"}.}
 
-\item{class_effects}{Character string specifying a model for treatment class effects,
-either \code{"independent"} (the default), \code{"exchangeable"}, or \code{"common"}.}
+\item{class_effects}{Character string specifying a model for treatment class
+effects, either \code{"independent"} (the default), \code{"exchangeable"}, or
+\code{"common"}.}
 
-\item{class_sd}{Character string specifying whether the class standard deviations in a
-class effects model should be \code{"independent"} (i.e. separate for each class, the default),
-or \code{"common"} (i.e. shared across all classes). Alternatively this can be a list of
-character vectors, each of which describe a set classes for which to share a common class SD;
-any list names will be used to name the output parameters, otherwise the name will be taken
-from the first class in each set.}
+\item{class_sd}{Character string specifying whether the class standard
+deviations in a class effects model should be \code{"independent"} (i.e.
+separate for each class, the default), or \code{"common"} (i.e. shared across
+all classes). Alternatively this can be a list of character vectors, each
+of which describe a set classes for which to share a common class SD; any
+list names will be used to name the output parameters, otherwise the name
+will be taken from the first class in each set.}
+
+\item{connect_baseline}{Baseline connections created by \code{\link[=con]{con()}}, used to
+connect a disconnected network. Multiple \code{\link[=con]{con()}} specifications may be
+provided as a list.}
 
 \item{likelihood}{Character string specifying a likelihood, if unspecified
 will be inferred from the data (see details)}
@@ -173,6 +182,11 @@ investigate knot placement prior to model fitting.}
 \code{knots}, a named list of M-spline bases (one for each study) can be
 provided with \code{mspline_basis} which will be used directly. In this case,
 all other M-spline options will be ignored.}
+
+\item{debug}{If \code{TRUE}, the model will not be fitted and instead a list of
+the data input to Stan will be returned. Note that the full design matrix
+(combined across all data types) is element \code{X} of this list. Default
+\code{FALSE}.}
 }
 \value{
 \code{nma()} returns a \link{stan_nma} object, except when \code{consistency = "nodesplit"} when a \link{nma_nodesplit} or \link{nma_nodesplit_df} object is
@@ -243,7 +257,8 @@ the relation \eqn{\log(\mathrm{AF}) = -\log(\mathrm{STR})} (or equivalently
 \eqn{\mathrm{AF} = 1/\mathrm{STR}}).
 
 Further details on each likelihood and link function are given by
-\insertCite{TSD2;textual}{multinma}.
+\insertCite{TSD2;textual}{multinma}. Details of survival models are given
+by \insertCite{Phillippo_survival;textual}{multinma}.
 }
 
 \section{Auxiliary parameters}{
@@ -294,10 +309,10 @@ the other survival distributions implemented in this package.
 For the \code{mspline} and \code{pexp} likelihoods, the auxiliary parameters are the
 spline coefficients for each study. These form a unit simplex (i.e. lie
 between 0 and 1, and sum to 1), and are given a random walk prior
-distribution. \code{prior_aux} specifies the hyperprior on the random walk
-standard deviation \eqn{\sigma} which controls the level of smoothing of
-the baseline hazard, with \eqn{\sigma = 0} corresponding to a constant
-baseline hazard.
+distribution \insertCite{Phillippo_mspline}{multinma}. \code{prior_aux}
+specifies the hyperprior on the random walk standard deviation \eqn{\sigma}
+which controls the level of smoothing of the baseline hazard, with
+\eqn{\sigma = 0} corresponding to a constant baseline hazard.
 
 The auxiliary parameters can be stratified by additional factors through
 the \code{aux_by} argument. For example, to allow the shape of the baseline
@@ -317,10 +332,11 @@ absolute predictions may only be produced for the observed treatment arms
 in each study population, whereas if \code{aux_regression = ~.trt} then absolute
 predictions can be produced for all treatments in any population. For
 \code{mspline} and \code{pexp} likelihoods, the regression coefficients are smoothed
-over time using a random walk prior to avoid overfitting: \code{prior_aux_reg}
-specifies the hyperprior for the random walk standard deviation. For other
-parametric likelihoods, \code{prior_aux_reg} specifies the prior for the
-auxiliary regression coefficients.
+over time using a random walk prior to avoid overfitting
+\insertCite{Phillippo_mspline}{multinma}: \code{prior_aux_reg} specifies the
+hyperprior for the random walk standard deviation. For other parametric
+likelihoods, \code{prior_aux_reg} specifies the prior for the auxiliary
+regression coefficients.
 }
 }
 
@@ -341,7 +357,7 @@ smk_net
 
 \donttest{
 # Fitting a fixed effect model
-smk_fit_FE <- nma(smk_net, \dontshow{refresh = if (interactive()) 200 else 0,}
+smk_fit_FE <- nma(smk_net,
                   trt_effects = "fixed",
                   prior_intercept = normal(scale = 100),
                   prior_trt = normal(scale = 100))
@@ -351,7 +367,7 @@ smk_fit_FE
 
 \donttest{
 # Fitting a random effects model
-smk_fit_RE <- nma(smk_net, \dontshow{refresh = if (interactive()) 200 else 0,}
+smk_fit_RE <- nma(smk_net, 
                   trt_effects = "random",
                   prior_intercept = normal(scale = 100),
                   prior_trt = normal(scale = 100),
@@ -362,7 +378,7 @@ smk_fit_RE
 
 \donttest{
 # Fitting an unrelated mean effects (inconsistency) model
-smk_fit_RE_UME <- nma(smk_net, \dontshow{refresh = if (interactive()) 200 else 0,}
+smk_fit_RE_UME <- nma(smk_net, 
                       consistency = "ume",
                       trt_effects = "random",
                       prior_intercept = normal(scale = 100),
@@ -374,7 +390,7 @@ smk_fit_RE_UME
 
 \donttest{
 # Fitting all possible node-splitting models
-smk_fit_RE_nodesplit <- nma(smk_net, \dontshow{refresh = if (interactive()) 200 else 0,}
+smk_fit_RE_nodesplit <- nma(smk_net, 
                             consistency = "nodesplit",
                             trt_effects = "random",
                             prior_intercept = normal(scale = 100),
@@ -470,7 +486,7 @@ pso_net <- add_integration(pso_net,
 # init_r = 0.1, since probit models in particular are often hard to initialise.
 # Using the QR decomposition greatly improves sampling efficiency here, as is
 # often the case for regression models.
-pso_fit <- nma(pso_net, \dontshow{refresh = if (interactive()) 200 else 0,}
+pso_fit <- nma(pso_net, 
                trt_effects = "fixed",
                link = "probit",
                likelihood = "bernoulli2",
@@ -500,7 +516,7 @@ ndmm_net <- combine_network(
                covariates = ndmm_agd_covs))
 \donttest{
 # Fit Weibull (PH) model
-ndmm_fit <- nma(ndmm_net, \dontshow{refresh = if (interactive()) 200 else 0,}
+ndmm_fit <- nma(ndmm_net, 
                 likelihood = "weibull",
                 prior_intercept = normal(scale = 100),
                 prior_trt = normal(scale = 10),

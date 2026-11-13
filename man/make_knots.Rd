@@ -116,3 +116,7 @@ plot_knots(ndmm_net, make_knots(ndmm_net, type = "equal"))
 plot_knots(ndmm_net, make_knots(ndmm_net, type = "equal_common"))
 
 }
+\seealso{
+\code{\link[=knots.stan_nma]{knots.stan_nma()}} for obtaining the knots from a fitted model
+object.
+}

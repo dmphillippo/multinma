@@ -19,6 +19,9 @@
 #' @param summary Logical, calculate posterior summaries? Default `TRUE`.
 #' @param sucra Logical, calculate the surface under the cumulative ranking
 #'   curve (SUCRA) for each treatment? Default `FALSE`.
+#' @param subset Names of treatments to include in the rank calculation, e.g. if
+#'   the decision set is smaller than the analysis set. By default, all
+#'   treatments in the network will be included.
 #'
 #' @return A [nma_summary] object if `summary = TRUE`, otherwise a list
 #'   containing a 3D MCMC array of samples and (for regression models) a data
@@ -109,7 +112,8 @@ posterior_ranks <- function(x, newdata = NULL, study = NULL,
                             lower_better = TRUE,
                             probs = c(0.025, 0.25, 0.5, 0.75, 0.975),
                             sucra = FALSE,
-                            summary = TRUE) {
+                            summary = TRUE,
+                            subset = NULL) {
   # Checks
   if (!rlang::is_bool(lower_better))
     abort("`lower_better` should be TRUE or FALSE.")
@@ -126,9 +130,19 @@ posterior_ranks <- function(x, newdata = NULL, study = NULL,
   if (x$consistency != "consistency")
     abort(glue::glue("Cannot produce ranks under inconsistency '{x$consistency}' model."))
 
+  # Check subset
+  if (!is.null(subset)) {
+    if (!all(subset %in% levels(x$network$treatments))) abort("Treatments listed in `subset` not present in the network.")
+    subset <- factor(subset, levels = levels(x$network$treatments))
+    subset <- sort(unique(subset))
+    if (length(subset) == 1) abort("Must have 2 or more treatments included in `subset` to rank.")
+  } else {
+    subset <- x$network$treatments
+  }
+
   # Get reference treatment, number of treatments
   trt_ref <- levels(x$network$treatments)[1]
-  ntrt <- nlevels(x$network$treatments)
+  ntrt <- length(subset)
 
   # All other checks handled by relative_effects()
   rel_eff <- relative_effects(x = x, newdata = newdata, study = {{ study }},
@@ -137,14 +151,23 @@ posterior_ranks <- function(x, newdata = NULL, study = NULL,
   studies <- rel_eff$studies
 
   if (is.null(studies)) { # No study-specific treatment effects
+
+    # Subset
+    sim <- rel_eff$sim
+    sim <- sim[ , , grepl(paste0("^d\\[\\Q", subset, "\\E\\]$", collapse = "|"), dimnames(sim)[[3]]), drop = FALSE]
+
     # Add zeros for d[1]
-    dim_d <- dim(rel_eff$sim)
-    dim_d[3] <- dim_d[3] + 1
-    dimnames_d <- dimnames(rel_eff$sim)
-    dimnames_d[[3]] <- c(paste0("d[", trt_ref, "]"), dimnames_d[[3]])
+    dim_d <- dim(sim)
+    if (trt_ref %in% subset) dim_d[3] <- dim_d[3] + 1
+    dimnames_d <- dimnames(sim)
+    if (trt_ref %in% subset) dimnames_d[[3]] <- c(paste0("d[", trt_ref, "]"), dimnames_d[[3]])
     d <- array(NA_real_, dim = dim_d, dimnames = dimnames_d)
-    d[ , , 1] <- 0
-    d[ , , 2:ntrt] <- rel_eff$sim
+    if (trt_ref %in% subset) {
+      d[ , , 1] <- 0
+      d[ , , 2:ntrt] <- sim
+    } else {
+      d <- sim
+    }
 
     # Get ranks at each iteration
     rk <- aperm(apply(d, 1:2, rank, ties.method = "min"),
@@ -154,12 +177,12 @@ posterior_ranks <- function(x, newdata = NULL, study = NULL,
     if (!lower_better) rk <- ntrt + 1 - rk
 
     # Rename parameters
-    dimnames(rk)[[3]] <- paste0("rank[", levels(x$network$treatments), "]")
+    dimnames(rk)[[3]] <- paste0("rank[", subset, "]")
 
     # Get summaries
     if (summary) {
       rk_summary <- summary_mcmc_array(rk, probs = probs) %>%
-        tibble::add_column(.trt = x$network$treatments, .before = 1)
+        tibble::add_column(.trt = subset, .before = 1)
 
       if (sucra) {
         # Calculate SUCRA using scaled mean rank relation of Rucker and Schwarzer (2015)
@@ -175,12 +198,16 @@ posterior_ranks <- function(x, newdata = NULL, study = NULL,
   } else { # Study-specific treatment effects
     nstudy <- nrow(studies)
 
-    d <- rel_eff$sim
+    # Subset
+    sim <- rel_eff$sim
+    sim <- sim[ , , grepl(paste0("\\: \\Q", subset, "\\E\\]$", collapse = "|"), dimnames(sim)[[3]]), drop = FALSE]
+
+    d <- sim
     d_names <- dimnames(d)[[3]]
 
     # Calculate ranks within each study population
     dim_rk <- dim(d)
-    dim_rk[3] <- dim_rk[3] + nstudy
+    if (trt_ref %in% subset) dim_rk[3] <- dim_rk[3] + nstudy
     rk_names <- vector("character", dim_rk[[3]])
     dimnames_rk <- dimnames(d)
     dimnames_rk[[3]] <- rk_names
@@ -189,16 +216,24 @@ posterior_ranks <- function(x, newdata = NULL, study = NULL,
     dim_temp_d <- dim(d)
     dim_temp_d[[3]] <- ntrt
     dimnames_temp_d <- dimnames(d)
-    dimnames_temp_d[[3]] <- paste0("d[", levels(x$network$treatments), "]")
+    dimnames_temp_d[[3]] <- paste0("d[", subset, "]")
     temp_d <- array(NA_real_, dim = dim_temp_d, dimnames = dimnames_temp_d)
-    temp_d[ , , 1] <- 0
+    if (trt_ref %in% subset) temp_d[ , , 1] <- 0
 
     for (i in seq_len(nstudy)) {
       rk_names[(i - 1)*ntrt + 1:ntrt] <-
-        c(paste0("d[", studies$.study[i], ": ", trt_ref, "]"),
-          d_names[(i - 1)*(ntrt - 1) + 1:(ntrt - 1)])
+        if (trt_ref %in% subset) {
+          c(paste0("d[", studies$.study[i], ": ", trt_ref, "]"),
+            d_names[(i - 1)*(ntrt - 1) + 1:(ntrt - 1)])
+        } else {
+          d_names[(i - 1)*ntrt + 1:ntrt]
+        }
 
-      temp_d[ , , 2:ntrt] <- d[ , , (i - 1)*(ntrt - 1) + 1:(ntrt - 1)]
+      if (trt_ref %in% subset) {
+        temp_d[ , , 2:ntrt] <- d[ , , (i - 1)*(ntrt - 1) + 1:(ntrt - 1)]
+      } else {
+        temp_d <- d[ , , (i - 1)*ntrt + 1:ntrt]
+      }
 
       rk[ , , (i - 1)*ntrt + 1:ntrt] <-
         aperm(apply(temp_d, 1:2, rank, ties.method = "min"),
@@ -216,7 +251,7 @@ posterior_ranks <- function(x, newdata = NULL, study = NULL,
       rk_summary <- summary_mcmc_array(rk, probs = probs) %>%
         # Add in study info
         tibble::add_column(.study = rep(studies$.study, each = ntrt),
-                           .trt = rep(x$network$treatments, times = nstudy),
+                           .trt = rep(subset, times = nstudy),
                            .before = 1)
 
       if (sucra) {
@@ -246,7 +281,7 @@ posterior_ranks <- function(x, newdata = NULL, study = NULL,
 #' @export
 #' @rdname posterior_ranks
 posterior_rank_probs <- function(x, newdata = NULL, study = NULL, lower_better = TRUE,
-                                 cumulative = FALSE, sucra = FALSE) {
+                                 cumulative = FALSE, sucra = FALSE, subset = NULL) {
   # Checks
   if (!rlang::is_bool(cumulative))
     abort("`cumulative` should be TRUE or FALSE.")
@@ -256,9 +291,19 @@ posterior_rank_probs <- function(x, newdata = NULL, study = NULL, lower_better =
 
   # All other checks handled by posterior_ranks()
   rk <- posterior_ranks(x = x, newdata = newdata, study = {{ study }},
-                        lower_better = lower_better, summary = FALSE)
+                        lower_better = lower_better, subset = subset,
+                        summary = FALSE)
 
-  ntrt <- nlevels(x$network$treatments)
+  # Check subset
+  if (!is.null(subset)) {
+    if (!all(subset %in% levels(x$network$treatments))) abort("Treatments listed in `subset` not present in the network.")
+    subset <- factor(subset, levels = levels(x$network$treatments))
+    subset <- sort(unique(subset))
+  } else {
+    subset <- x$network$treatments
+  }
+
+  ntrt <- length(subset)
   studies <- rk$studies
 
   if (is.null(studies)) { # No study-specific treatment effects
@@ -275,7 +320,7 @@ posterior_rank_probs <- function(x, newdata = NULL, study = NULL, lower_better =
     colnames(p_rank) <- paste0("p_rank[", 1:ntrt, "]")
 
     p_rank <- tibble::as_tibble(p_rank, rownames = "parameter") %>%
-      tibble::add_column(.trt = x$network$treatments, .before = 1)
+      tibble::add_column(.trt = subset, .before = 1)
 
     if (sucra) p_rank$sucra <- unname(sucras)
 
@@ -305,7 +350,7 @@ posterior_rank_probs <- function(x, newdata = NULL, study = NULL, lower_better =
     p_rank <- tibble::as_tibble(p_rank, rownames = "parameter") %>%
       # Add in study info
       tibble::add_column(.study = rep(studies$.study, each = ntrt),
-                         .trt = rep(x$network$treatments, times = nstudy),
+                         .trt = rep(subset, times = nstudy),
                          .before = 1)
 
     if (sucra) p_rank$sucra <- unname(sucras)

@@ -57,7 +57,7 @@ mean survival time functions for the M-spline baseline hazards model.
 }
 \details{
 Survival models with a flexible M-spline on the baseline hazard are
-described by \insertCite{Brilleman2020;textual}{multinma}.
+described by \insertCite{Phillippo_mspline;textual}{multinma}.
 Piecewise-exponential baseline hazards are a special case where the degree
 of the M-spline polynomial is 0.
 
