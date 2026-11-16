@@ -29,6 +29,7 @@ library(dplyr)      # dplyr for data manipulation
 #> 
 #>     intersect, setdiff, setequal, union
 library(ggplot2)    # ggplot2 for plotting
+set.seed(12345)     # for reproducibility
 ```
 
 ``` r
@@ -324,30 +325,30 @@ pso_fit_bs <- baseline_synthesis(pso_net_disc,
                                  prior_reg = normal(scale = 10),
                                  prior_aux = flat(),
                                  QR = FALSE,
-                                 init_r = 0.2)
+                                 init_r = 0.2,
+                                 adapt_delta = 0.99)
 ```
 
 Note that we do not use the QR decomposition (`QR = FALSE`) here, unlike for the fixed and external bridges and the full network.
 The QR decomposition reparameterises the regression to make sampling easier, but it does not work well with a random effect on the study baselines, and sampling can be very slow.
 We therefore turn it off for both stages of the random baseline bridge, including the Stage 2 models with `connect_baseline` below.
-With `QR = FALSE`, sampling is more efficient when the covariates are approximately unit scale, which is why we rescaled them earlier (for example, dividing weight by 10), and when they are centred, which is the default (`center = TRUE`).
+We also set `adapt_delta = 0.99` for this model: with the default of 0.95 there are a small number of divergent transitions, which are removed at 0.99 at the cost of a slightly longer running time.
 
 The posterior summaries give the mean study baseline (`baseline_mean`), the between-study standard deviation (`baseline_sd`), and the predictive distribution for the baseline in a new study (`baseline_new`), all on the probit scale.
 
 ``` r
 summary(pso_fit_bs, pars = c("baseline_new", "baseline_mean", "baseline_sd"))
 #>                mean   sd  2.5%   25%   50%   75% 97.5% Bulk_ESS Tail_ESS Rhat
-#> baseline_new  -1.64 0.17 -1.96 -1.72 -1.63 -1.55 -1.31     3196     3142    1
-#> baseline_mean -1.63 0.09 -1.81 -1.69 -1.63 -1.58 -1.46     2296     2223    1
-#> baseline_sd    0.12 0.08  0.02  0.07  0.10  0.14  0.32     1353     1443    1
+#> baseline_new  -1.63 0.18 -1.98 -1.72 -1.64 -1.54 -1.29     3237     3095    1
+#> baseline_mean -1.64 0.09 -1.81 -1.69 -1.64 -1.58 -1.46     2287     2446    1
+#> baseline_sd    0.12 0.10  0.03  0.07  0.10  0.14  0.36     1443     1907    1
 ```
 
-The predictive distribution has heavier tails than a normal distribution, since it also includes the uncertainty in `baseline_mean` and `baseline_sd`.
-`baseline_synthesis()` therefore approximates it by a Student t distribution, stored as `baseline_prior`:
+The predictive distribution has heavier tails than a normal distribution, therefore we approximate it by a Student t distribution, stored as `baseline_prior`:
 
 ``` r
 pso_fit_bs$baseline_prior
-#> A Student t prior distribution: location = -1.63344635624909, scale = 0.11279782138027, df = 3.74205168367888.
+#> A Student t prior distribution: location = -1.6346566844866, scale = 0.11815904896569, df = 3.63897196326123.
 ```
 
 
@@ -501,6 +502,7 @@ ggplot(pso_pasi75, aes(x = mean, xmin = `2.5%`, xmax = `97.5%`, y = Bridge, colo
 
 <img src="figure/pso_pasi75_compare-1.png" alt="" style="display: block; margin: auto;" />
 
-<!-- TODO (Sam): describe the PASI 75 results once the vignette has been rebuilt -->
+In FIXTURE, the differences between bridges follow the relative effects above: only the secukinumab predictions differ.
+In FEATURE the pattern flips: FEATURE only observed secukinumab, so it has to cross the bridge to make predictions for the treatments in the placebo sub-network.
 
 # References
