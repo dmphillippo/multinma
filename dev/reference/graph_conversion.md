@@ -91,9 +91,9 @@ smk_net
 
 # Convert to igraph object
 igraph::as.igraph(smk_net)  # Edges combined by default
-#> IGRAPH 65d9165 UN-- 4 6 -- 
+#> IGRAPH bc46063 UN-- 4 6 -- 
 #> + attr: name (v/c), .sample_size (v/n), .type (e/c), .nstudy (e/n)
-#> + edges from 65d9165 (vertex names):
+#> + edges from bc46063 (vertex names):
 #> [1] No intervention       --Group counselling     
 #> [2] No intervention       --Individual counselling
 #> [3] Group counselling     --Individual counselling
@@ -101,9 +101,9 @@ igraph::as.igraph(smk_net)  # Edges combined by default
 #> [5] Group counselling     --Self-help             
 #> [6] Individual counselling--Self-help             
 igraph::as.igraph(smk_net, collapse = FALSE)  # Without combining edges
-#> IGRAPH 7dc399c UN-- 4 28 -- 
+#> IGRAPH 7d0a1ec UN-- 4 28 -- 
 #> + attr: name (v/c), .sample_size (v/n), .study (e/x), .type (e/c)
-#> + edges from 7dc399c (vertex names):
+#> + edges from 7d0a1ec (vertex names):
 #>  [1] No intervention       --Group counselling     
 #>  [2] No intervention       --Individual counselling
 #>  [3] Group counselling     --Individual counselling
