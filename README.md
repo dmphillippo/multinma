@@ -8,7 +8,7 @@
 [![CRAN
 status](https://www.r-pkg.org/badges/version/multinma)](https://CRAN.R-project.org/package=multinma)
 [![R-universe](https://dmphillippo.r-universe.dev/badges/multinma)](https://dmphillippo.r-universe.dev)
-[![R-CMD-check](https://github.com/dmphillippo/multinma/workflows/R-CMD-check/badge.svg)](https://github.com/dmphillippo/multinma/actions)
+[![R-CMD-check](https://github.com/dmphillippo/multinma/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/dmphillippo/multinma/actions)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3904454.svg)](https://doi.org/10.5281/zenodo.3904454)
 <!-- badges: end -->
 
@@ -80,7 +80,7 @@ papers:
 The `multinma` package can be cited as follows:
 
 > Phillippo, D. M. (2026). *multinma: Bayesian Network Meta-Analysis of
-> Individual and Aggregate Data*. R package version 0.9.1.9002, doi:
+> Individual and Aggregate Data*. R package version 0.9.1.9004, doi:
 > [10.5281/zenodo.3904454](https://doi.org/10.5281/zenodo.3904454).
 
 When fitting ML-NMR models, please cite the methods paper:
