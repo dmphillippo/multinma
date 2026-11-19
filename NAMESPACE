@@ -126,6 +126,7 @@ export(relative_effects)
 export(rmst_mspline)
 export(set_agd_arm)
 export(set_agd_contrast)
+export(set_agd_regression)
 export(set_agd_surv)
 export(set_ipd)
 export(softmax)
@@ -162,6 +163,7 @@ importFrom(rstantools,
 importFrom(stats,
   as.formula,
   complete.cases,
+  cov2cor,
   dbinom,
   dnorm,
   dunif,
@@ -171,6 +173,7 @@ importFrom(stats,
   model.frame,
   model.matrix,
   model.offset,
+  na.omit,
   optim,
   pbinom,
   plogis,

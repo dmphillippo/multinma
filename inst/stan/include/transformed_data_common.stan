@@ -25,7 +25,7 @@ array[RE_sparse ? n_delta + 1 : 0] int RE_L_u = RE_sparse ? csr_extract_u(RE_L) 
 // int totni = ni_ipd + nint * (ni_agd_arm + ni_agd_contrast);
 
 // Total number of study intercepts (none for contrast-based data)
-int totns = ns_ipd + ns_agd_arm - (n_mixed_studies ? n_mixed_studies : 0); // + ns_agd_contrast;
+int totns = ns_ipd + ns_agd_arm + ns_agd_regression - (n_mixed_studies ? n_mixed_studies : 0); // + ns_agd_contrast;
 
 // Indicator for studies in the baseline synthesis subnetwork
 array[random_baseline ? totns : 0] int<lower=0, upper=1> in_baseline_subnet;
@@ -45,6 +45,11 @@ matrix[0, nX] Xdummy;
 matrix[ni_ipd, nX] X_ipd = ni_ipd ? X[1:ni_ipd] : Xdummy;
 matrix[nint_max * ni_agd_arm, nX] X_agd_arm = ni_agd_arm ? X[(ni_ipd + 1):(ni_ipd + nint_max * ni_agd_arm)] : Xdummy;
 matrix[nint_max * ni_agd_contrast, nX] X_agd_contrast = ni_agd_contrast ? X[(ni_ipd + nint_max * ni_agd_arm + 1):(ni_ipd + nint_max * (ni_agd_arm + ni_agd_contrast))] : Xdummy;
+matrix[nc_agd_regression, nX] X_agd_regression = nc_agd_regression ? X[(ni_ipd + nint_max * (ni_agd_arm + ni_agd_contrast) + 1):(ni_ipd + nint_max * (ni_agd_arm + ni_agd_contrast) + nc_agd_regression)] : Xdummy;
+
+// -- AgD regression coefficients --
+matrix[no_agd_regression ? nc_agd_regression : 0, no_agd_regression ? nX : 0] X_agd_regression_no_QR = X_agd_regression; // Design matrix for AgD regression (no QR)
+if (no_agd_regression && QR) X_agd_regression_no_QR = X_agd_regression * inverse(R_inv);
 
 // Split offsets into IPD and AgD rows
 vector[0] odummy;
