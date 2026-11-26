@@ -141,7 +141,7 @@ bcg_fit_unadj
 #> lp__             1
 #> tau              1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Thu Nov 19 13:00:34 2026.
+#> Samples were drawn using NUTS(diag_e) at Thu Nov 26 11:49:25 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -239,7 +239,7 @@ bcg_fit_lat
 #> lp__                          -13447.92  1408    1
 #> tau                                0.77  1590    1
 #> 
-#> Samples were drawn using NUTS(diag_e) at Thu Nov 19 13:00:45 2026.
+#> Samples were drawn using NUTS(diag_e) at Thu Nov 26 11:49:36 2026.
 #> For each parameter, n_eff is a crude measure of effective sample size,
 #> and Rhat is the potential scale reduction factor on split chains (at 
 #> convergence, Rhat=1).
@@ -504,7 +504,7 @@ bcg_predeff_lat <- relative_effects(bcg_fit_lat,
                                    study = label,
                                    predictive_distribution = TRUE)
 #> 
-#>  Elapsed Time: 0.006 seconds (Generated Quantities)
+#>  Elapsed Time: 0.005 seconds (Generated Quantities)
 
 bcg_predeff_lat
 #> ------------------------------------------------------------ Study: 0° latitude ---- 

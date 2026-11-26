@@ -80,9 +80,9 @@ is 0.
 
 The d/p/h/H functions are calculated from their definitions.
 `qmspline()` uses numerical inversion via
-[`flexsurv::qgeneric()`](http://chjackson.github.io/flexsurv-dev/reference/qgeneric.md).
+[`flexsurv::qgeneric()`](https://chjackson.github.io/flexsurv/reference/qgeneric.html).
 `rmst_mspline()`uses numerical integration via
-[`flexsurv::rmst_generic()`](http://chjackson.github.io/flexsurv-dev/reference/rmst_generic.md),
+[`flexsurv::rmst_generic()`](https://chjackson.github.io/flexsurv/reference/rmst_generic.html),
 except for the special case of the piecewise-exponential hazard (i.e.
 degree 0 M-splines) which uses the explicit formula from Royston and
 Parmar (2013) .
