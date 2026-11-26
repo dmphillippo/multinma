@@ -64,12 +64,20 @@ summary(half_normal(scale = 5))
 
 The model is fitted using the `nma()` function.
 By default, this will use a Binomial likelihood and a logit link function, auto-detected from the data.
-```{r}
+```{r, eval=!params$run_tests}
 smkfit <- nma(smknet, 
               trt_effects = "random",
               prior_intercept = normal(scale = 100),
               prior_trt = normal(scale = 100),
               prior_het = normal(scale = 5))
+```
+```{r, eval=params$run_tests, echo=FALSE}
+smkfit <- nma(smknet, 
+              trt_effects = "random",
+              prior_intercept = normal(scale = 100),
+              prior_trt = normal(scale = 100),
+              prior_het = normal(scale = 5),
+              iter = 4000)
 ```
 
 Basic parameter summaries are given by the `print()` method:
@@ -119,13 +127,23 @@ smoking[smoking$r == 0, ]
 ### Unrelated mean effects
 We first fit an unrelated mean effects (UME) model [@TSD4] to assess the consistency assumption.
 Again, we use the function `nma()`, but now with the argument `consistency = "ume"`.
-```{r}
+```{r, eval=!params$run_tests}
 smkfit_ume <- nma(smknet, 
                   consistency = "ume",
                   trt_effects = "random",
                   prior_intercept = normal(scale = 100),
                   prior_trt = normal(scale = 100),
                   prior_het = normal(scale = 5))
+smkfit_ume
+```
+```{r, eval=params$run_tests, echo=FALSE}
+smkfit_ume <- nma(smknet, 
+                  consistency = "ume",
+                  trt_effects = "random",
+                  prior_intercept = normal(scale = 100),
+                  prior_trt = normal(scale = 100),
+                  prior_het = normal(scale = 5),
+                  iter = 4000)
 smkfit_ume
 ```
 
