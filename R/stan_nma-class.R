@@ -115,6 +115,21 @@ print.stan_nma <- function(x, ...) {
                            !!! dots,
                            .homonyms = "last")
   do.call(print, dots)
+
+  if (inherits(x, "stan_baseline") && !is.null(x$baseline_prior)) {
+    bp <- x$baseline_prior
+    bp_txt <- if (bp$dist == "Student t") {
+      sprintf("student_t(location = %s, scale = %s, df = %s)",
+              signif(bp$location, 4), signif(bp$scale, 4), signif(bp$df, 3))
+    } else {
+      sprintf("normal(location = %s, scale = %s)", signif(bp$location, 4), signif(bp$scale, 4))
+    }
+    cat("\n")
+    cglue("Predictive distribution for a new study baseline, approximated by a {bp$dist} distribution:")
+    cglue("  {bp_txt}")
+    cglue("Use as the Stage 2 prior with con(type = \"random\", prior_baseline = <fit>$baseline_prior).")
+  }
+
   invisible(x)
 }
 

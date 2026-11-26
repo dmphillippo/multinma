@@ -370,3 +370,27 @@ test_that("TSD5 smoking cessation - separate modelling", {
   expect_equal(s_new$`2.5%`, -3.82, tolerance = tol)
   expect_equal(s_new$`97.5%`, -1.41, tolerance = tol)
 })
+
+test_that("baseline_prior is a Student t fitted to baseline_new", {
+  fit <- suppressWarnings(baseline_synthesis(disc_net_3, iter = 2000, seed = 2468))
+
+  bp <- fit$baseline_prior
+  expect_s3_class(bp, "nma_prior")
+  expect_equal(bp$dist, "Student t")
+
+  draws <- as.vector(as.array(fit, pars = "baseline_new"))
+  tf <- suppressWarnings(MASS::fitdistr(draws, "t"))
+  expect_equal(bp$location, tf$estimate[["m"]])
+  expect_equal(bp$scale, tf$estimate[["s"]])
+  expect_equal(bp$df, tf$estimate[["df"]])
+
+  # Shown when printed, ready to use in con()
+  expect_output(print(fit), "approximated by a Student t distribution")
+  expect_output(print(fit), "student_t\\(location = ")
+  expect_no_error(con(type = "random", studies = "S2", prior_baseline = bp))
+})
+
+test_that("baseline_prior is NULL when there are no posterior draws", {
+  fit <- suppressWarnings(baseline_synthesis(disc_net, test_grad = TRUE))
+  expect_null(fit$baseline_prior)
+})
