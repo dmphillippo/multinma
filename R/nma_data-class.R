@@ -859,7 +859,7 @@ plot.nma_data <- function(x, ..., layout, circular,
   g <- ggraph::ggraph(ig, layout = layout, circular = circular, ...)
 
   # catch networks with no edges (single arms only)
-  no_edges <- igraph::ecount(ig) - igraph::count_loops(ig) == 0
+  no_edges <- all(igraph::which_loop(ig))
 
   if (!no_edges && weight_edges) {
     g <- g +
