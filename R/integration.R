@@ -577,7 +577,7 @@ qgamma <- function(p, shape, rate = 1, scale = 1/rate, lower.tail = TRUE,
     return(stats::qgamma(p, shape = (mean / sd)^2, rate = mean / sd^2,
                         lower.tail = lower.tail, log.p = log.p))
   else
-    return(stats::qgamma(p, shape = shape, rate = rate,
+    return(stats::qgamma(p, shape = shape, scale = scale,
                         lower.tail = lower.tail, log.p = log.p))
 }
 
@@ -588,7 +588,7 @@ dgamma <- function(x, shape, rate = 1, scale = 1/rate, log = FALSE, mean, sd) {
   if (!missing(mean) && !missing(sd))
     return(stats::dgamma(x, shape = (mean / sd)^2, rate = mean / sd^2, log = log))
   else
-    return(stats::dgamma(x, shape = shape, rate = rate, log = log))
+    return(stats::dgamma(x, shape = shape, scale = scale, log = log))
 }
 
 #' @export
@@ -600,7 +600,7 @@ pgamma <- function(q, shape, rate = 1, scale = 1/rate, lower.tail = TRUE,
     return(stats::pgamma(q, shape = (mean / sd)^2, rate = mean / sd^2,
                          lower.tail = lower.tail, log.p = log.p))
   else
-    return(stats::pgamma(q, shape = shape, rate = rate,
+    return(stats::pgamma(q, shape = shape, scale = scale,
                          lower.tail = lower.tail, log.p = log.p))
 }
 
